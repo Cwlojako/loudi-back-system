@@ -40,22 +40,18 @@
               <el-option label="区域二" value="beijing"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="出生日期">
-            <el-form-item prop="birthday">
-              <el-date-picker type="date" placeholder="请选择年月日" v-model="baseInfoForm.birthday"
-                              style="width: 100%;">
-              </el-date-picker>
-            </el-form-item>
+          <el-form-item label="出生日期" prop="birthday">
+            <el-date-picker type="date" placeholder="请选择年月日" v-model="baseInfoForm.birthday"
+                            style="width: 100%;">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="培训批次" prop="trainingOrder">
             <el-input v-model="baseInfoForm.trainingOrder"></el-input>
           </el-form-item>
-          <el-form-item label="正式入职日期">
-            <el-form-item prop="employedAt">
-              <el-date-picker type="date" placeholder="请选择年月日" v-model="baseInfoForm.employedAt"
-                              style="width: 100%;">
-              </el-date-picker>
-            </el-form-item>
+          <el-form-item label="正式入职日期" prop="employedAt">
+            <el-date-picker type="date" placeholder="请选择年月日" v-model="baseInfoForm.employedAt"
+                            style="width: 100%;">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="介绍人" prop="introducer">
             <el-input v-model="baseInfoForm.introducer"></el-input>
@@ -77,77 +73,69 @@
       </el-tab-pane>
       <el-tab-pane label="详细信息" name="second">
         <el-form :model="detailInfoForm" :rules="detailInfoRules" ref="detailInfoRef" label-width="120px"
-                 label-position="left">
-          <el-form-item label="填表日期">
-            <el-form-item prop="writeFormDate">
-              <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.writeFormDate" style="width: 100%;"></el-date-picker>
-            </el-form-item>
+                label-position="left">
+          <el-form-item label="填表日期" prop="fillAt">
+            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.fillAt" style="width: 100%;"></el-date-picker>
           </el-form-item>
           <el-form-item label="学历" prop="education">
-            <el-select v-model="detailInfoForm.education" placeholder="请选择活动区域">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+            <el-select v-model="detailInfoForm.education" placeholder="请选择学历">
+              <el-option v-for="(item, index) in educationOptions"
+                        :key='index'
+                        :label="item.label" 
+                        :value="item.value">
+              </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="兴趣爱好" prop="interest">
-            <el-input v-model="detailInfoForm.name"></el-input>
+            <el-input v-model="detailInfoForm.interest"></el-input>
           </el-form-item>
-          <el-form-item label="婚姻状况" prop="marryStatus">
-            <el-select v-model="detailInfoForm.marryStatus" placeholder="请选择活动区域">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+          <el-form-item label="婚姻状况" prop="maritalStatus">
+            <el-select v-model="detailInfoForm.maritalStatus" placeholder="请选择">
+              <el-option v-for="(item, index) in maritalOptions"
+                        :key='index'
+                        :label="item.label" 
+                        :value="item.value">
+              </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="子女情况" prop="childrenStatus">
-            <el-input v-model="detailInfoForm.childrenStatus"></el-input>
+          <el-form-item label="子女情况" prop="childrenSituation">
+            <el-input v-model="detailInfoForm.childrenSituation"></el-input>
           </el-form-item>
-          <el-form-item label="培训开始日期">
-            <el-form-item prop="trainBeginDate">
-              <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.trainBeginDate" style="width: 100%;"></el-date-picker>
-            </el-form-item>
+          <el-form-item label="培训开始日期" prop="trainingStartAt">
+            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.trainingStartAt" style="width: 100%;"></el-date-picker>
           </el-form-item>
-          <el-form-item label="培训结束日期">
-            <el-form-item prop="trainEndDate">
-              <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.trainEndDate" style="width: 100%;"></el-date-picker>
-            </el-form-item>
+          <el-form-item label="培训结束日期" prop="trainingFinishAt">
+            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.trainingFinishAt" style="width: 100%;"></el-date-picker>
           </el-form-item>
-          <el-form-item label="实习开始日期">
-            <el-form-item prop="internBeginDate">
-              <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.internBeginDate" style="width: 100%;"></el-date-picker>
-            </el-form-item>
+          <el-form-item label="实习开始日期" prop="practiceStartAt">
+            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.practiceStartAt" style="width: 100%;"></el-date-picker>
           </el-form-item>
-          <el-form-item label="实习结束日期">
-            <el-form-item prop="internEndDate">
-              <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.internEndDate" style="width: 100%;"></el-date-picker>
-            </el-form-item>
+          <el-form-item label="实习结束日期" prop="practiceFinishAt">
+            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.practiceFinishAt" style="width: 100%;"></el-date-picker>
           </el-form-item>
-          <el-form-item label="合同签订日期">
-            <el-form-item prop="contractDate">
-              <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.contractDate" style="width: 100%;"></el-date-picker>
-            </el-form-item>
+          <el-form-item label="合同签订日期" prop="signAt">
+            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.signAt" style="width: 100%;"></el-date-picker>
           </el-form-item>
-          <el-form-item label="入伙日期">
-            <el-form-item prop="joinDate">
-              <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.joinDate" style="width: 100%;"></el-date-picker>
-            </el-form-item>
+          <el-form-item label="入伙日期" prop="joinAt">
+            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.joinAt" style="width: 100%;"></el-date-picker>
           </el-form-item>
-          <el-form-item label="第一联系人" prop="firstLinkman">
-            <el-input v-model="detailInfoForm.firstLinkman"></el-input>
+          <el-form-item label="第一联系人" prop="firstContactName">
+            <el-input v-model="detailInfoForm.firstContactName"></el-input>
           </el-form-item>
-          <el-form-item label="第一联系人电话" prop="firstLinkmanPhone">
-            <el-input v-model="detailInfoForm.firstLinkmanPhone"></el-input>
+          <el-form-item label="第一联系人电话" prop="firstContactPhone">
+            <el-input v-model="detailInfoForm.firstContactPhone"></el-input>
           </el-form-item>
-          <el-form-item label="第二联系人" prop="secondLinkman">
-            <el-input v-model="detailInfoForm.secondLinkman"></el-input>
+          <el-form-item label="第二联系人" prop="secondContactName">
+            <el-input v-model="detailInfoForm.secondContactName"></el-input>
           </el-form-item>
-          <el-form-item label="第二联系人电话" prop="secondLinkmanPhone">
-            <el-input v-model="detailInfoForm.secondLinkmanPhone"></el-input>
+          <el-form-item label="第二联系人电话" prop="secondContactPhone">
+            <el-input v-model="detailInfoForm.secondContactPhone"></el-input>
           </el-form-item>
-          <el-form-item label="现住址" prop="nowAddress">
-            <el-input v-model="detailInfoForm.nowAddress"></el-input>
+          <el-form-item label="现住址" prop="presentAddress">
+            <el-input v-model="detailInfoForm.presentAddress"></el-input>
           </el-form-item>
-          <el-form-item label="家庭详细住址" prop="familyDetailAddress">
-            <el-input v-model="detailInfoForm.familyDetailAddress" class="detailAddress"></el-input>
+          <el-form-item label="家庭详细住址" prop="homeAddress">
+            <el-input v-model="detailInfoForm.homeAddress"></el-input>
           </el-form-item>
         </el-form>
         <div class="submit">
@@ -183,6 +171,7 @@
 
 <script>
   import Emitter from '@/framework/mixins/emitter'
+  import {get} from '@/project/service/employee'
 
   export default {
     mixins: [Emitter],
@@ -190,6 +179,8 @@
       return {
         // 当前激活项
         activeName: 'first',
+        // 员工编辑id
+        editId: 0,
         // 基本信息表单数据
         baseInfoForm: {
           phone: '',
@@ -250,49 +241,56 @@
             }]
           }]
         }],
+        // 可选择学历
+        educationOptions: [
+          {label: '小学', value: '小学'},
+          {label: '初中', value: '初中'},
+          {label: '高中', value: '高中'},
+          {label: '中专', value: '中专'},
+          {label: '大专', value: '大专'},
+          {label: '本科', value: '本科'},
+          {label: '研究生', value: '研究生'},
+          {label: '硕士', value: '硕士'},
+          {label: '博士', value: '博士'},
+          {label: '博士后', value: '博士后'},
+          {label: '其他', value: '其他'}
+        ],
+        // 婚姻状况可选项
+        maritalOptions: [
+          {label: '未婚', value: '未婚'},
+          {label: '已婚', value: '已婚'},
+          {label: '恋爱中', value: '恋爱中'},
+          {label: '单身', value: '单身'},
+          {label: '离异', value: '离异'},
+          {label: '二婚', value: '二婚'}
+        ],
         // 可选择部门节点ID
         checkedId: '',
         // 可选择部门文本内容
         checkedLabel: '',
         // 详细信息表单数据
         detailInfoForm: {
-          writeFormDate:'',
+          fillAt:'',
           education:'',
           interest:'',
-          marryStatus:'',
-          childrenStatus:'',
-          trainBeginDate:'',
-          trainEndDate:'',
-          internBeginDate:'',
-          internEndDate:'',
-          contractDate:'',
-          joinDate:'',
-          nowAddress:'',
-          familyDetailAddress:'',
-          firstLinkman:'',
-          firstLinkmanPhone:'',
-          secondLinkman:'',
-          secondLinkmanPhone:''
+          maritalStatus:'',
+          childrenSituation:'',
+          trainingStartAt:'',
+          trainingFinishAt:'',
+          practiceStartAt:'',
+          practiceFinishAt:'',
+          signAt:'',
+          joinAt:'',
+          presentAddress:'',
+          homeAddress:'',
+          firstContactName:'',
+          firstContactPhone:'',
+          secondContactName:'',
+          secondContactPhone:''
         },
         // 详细信息表单验证规则
         detailInfoRules: {
-          writeFormDate:'',
-          education:'',
-          interest:'',
-          marryStatus:'',
-          childrenStatus:'',
-          trainBeginDate:'',
-          trainEndDate:'',
-          internBeginDate:'',
-          internEndDate:'',
-          contractDate:'',
-          joinDate:'',
-          nowAddress:'',
-          familyDetailAddress:'',
-          firstLinkman:'',
-          firstLinkmanPhone:'',
-          secondLinkman:'',
-          secondLinkmanPhone:''
+          fillAt: [{required: true, message: '请选择', trigger: 'blur'}]
         }
       }
     },
@@ -317,8 +315,25 @@
         this.baseInfoForm.department = checkedLabel
       },
       // 提交员工基本信息
-      handleSaveBase() {
-        
+      handleSaveBase() {},
+      // 提交员工详细信息
+      handleSaveDetail() {}
+    },
+    created() {
+      this.editId = this.$route.params.id
+      if (this.editId === 0) {
+        // 如果id为0则证明没有传递过来新的id值，则表示是新建员工
+        this.$refs.baseInfoForm.resetFields()
+        this.$refs.detailInfoForm.resetFields()
+      } else {
+        // 否则则是进入编辑员工页面,根据id获取员工信息
+        get({id: this.editId}, res => {
+          this.baseInfoForm = res
+          // 处理是否负责人数据
+          this.baseInfoForm.manageable = res.manageable ? '是' : '否'
+          // 处理部门数据
+          this.baseInfoForm.department = res.department.name
+        })
       }
     }
   }
