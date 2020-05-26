@@ -14,7 +14,6 @@
         <el-table
           :data="customerData"
           style="width: 95%;margin:0 auto;"
-          @selection-change="handleSelectionChange"
           @row-dblclick="handleRowClick"
         >
           <el-table-column type="selection" width="55"></el-table-column>

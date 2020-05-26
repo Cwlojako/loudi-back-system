@@ -171,20 +171,17 @@
       <!--   修改部门信息表单验证规则和新增部门表单规则一致   -->
       <el-form :model="editDepartmentForm" :rules="addDepartmentRules" ref="editDepartmentRef" label-width="90px"
                class="demo-ruleForm" label-position="left">
-        <el-form-item label="上级部门:" prop="heightDepartment">
-          <el-select v-model="editDepartmentForm.heightDepartment" placeholder="请选择活动区域">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
+        <el-form-item label="上级部门:" prop="parent">
+          <el-input v-model="editDepartmentForm.parent" disabled readonly></el-input>
         </el-form-item>
-        <el-form-item label="部门名称:" prop="departmentName">
-          <el-input v-model="editDepartmentForm.departmentName"></el-input>
+        <el-form-item label="部门名称:" prop="name">
+          <el-input v-model="editDepartmentForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="排序号:" prop="sortNum">
-          <el-input v-model="editDepartmentForm.sortNum"></el-input>
+        <el-form-item label="排序号:" prop="position">
+          <el-input v-model="editDepartmentForm.position"></el-input>
         </el-form-item>
-        <el-form-item label="备注:" prop="remark">
-          <el-input v-model="editDepartmentForm.remark"></el-input>
+        <el-form-item label="备注:" prop="comment">
+          <el-input v-model="editDepartmentForm.comment"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -247,21 +244,17 @@
         },
         // 新增部门表单验证规则
         addDepartmentRules: {
-          heightDepartment: [
-            {required: true, message: '请选择上级部门', trigger: 'change'}
+          parent: [
+            {required: true, message: '请选择上级部门', trigger: 'blur'}
           ],
-          departmentName: [
+          name: [
             {required: true, message: '请填写部门名称', trigger: 'blur'},
             {min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur'}
           ],
-          sortNum: [
+          position: [
             {required: true, message: '请填写排序号', trigger: 'blur'},
             {min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur'}
-          ],
-          remark: [
-            {required: true, message: '请填写备注', trigger: 'blur'},
-            {min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur'}
-          ],
+          ]
         },
         // 控制修改部门信息对话框的显示与隐藏
         editDepartmentShow: false,
@@ -289,6 +282,10 @@
         // 今日登录过数量
         loginedTotal: 0,
         extraParam: {},
+        // 时间范围搜索条件
+        fillAtParam: {},
+        employedAtParam: {},
+        birthdayParam: {},
         // 搜索组件配置项
         searchItems: [
           {
@@ -323,7 +320,7 @@
           {
             name: "填表时间",
             key: "fillAt",
-            type: "date",
+            type: "daterange",
           },
           {
             name: "职位变更",
@@ -335,7 +332,7 @@
           {
             name: "入职日期",
             key: "employedAt",
-            type: "date",
+            type: "daterange",
           },
           {
             name: "婚姻状况",
@@ -366,7 +363,7 @@
           ,{
             name: "出生日期",
             key: "birthday",
-            type: "date",
+            type: "daterange",
           }, {
             name: "经介绍人",
             key: "introducer",
@@ -403,7 +400,7 @@
       showEditDepartment(id) {
         this.editDepartmentShow = true;
         // 根据id获取部门信息
-        get(id, res => {
+        get({id}, res => {
           this.editDepartmentForm = res
         })
       },
@@ -479,6 +476,7 @@
       },
       // 顶部额外搜索条件
       searchBySearchItem(searchItems) {
+        console.log(searchItems)
         let keys = [];
         for (
           let i = 0,
@@ -492,9 +490,39 @@
         for (let i in keys) {
           if (searchItems[keys[i]]) {
             this.extraParam[keys[i]] = searchItems[keys[i]];
+            if (keys[i] === 'fillAt') delete this.extraParam[keys[i]]
+            if (keys[i] === 'employedAt') delete this.extraParam[keys[i]]
+            if (keys[i] === 'birthday') delete this.extraParam[keys[i]]
           } else {
             delete this.extraParam[keys[i]];
           }
+        }
+        // 处理填表时间参数
+        if (searchItems.fillAt) {
+          this.fillAtParam = {
+            'start': searchItems.fillAt[0],
+            'end': searchItems.fillAt[1]
+          }
+        } else {
+          delete this.fillAtParam
+        }
+        // 处理入职时间参数
+        if (searchItems.employedAt) {
+          this.employedAtParam = {
+            'start': searchItems.employedAt[0],
+            'end': searchItems.employedAt[1]
+          }
+        } else {
+          delete this.employedAtParam
+        }
+        // 处理出生日期参数
+        if (searchItems.birthday){
+          this.birthdayParam = {
+            'start': searchItems.birthday[0],
+            'end': searchItems.birthday[1]
+          }
+        } else {
+          delete this.birthdayParam
         }
         this.search(1);
       },
@@ -513,14 +541,21 @@
             sort: _t.sort
           },
           [this.model]: _t.extraParam,
-          isLoginedToday: false
+          isLoginedToday: false,
+          fillAt: this.fillAtParam,
+          employedAt: this.employedAtParam,
+          birthday: this.birthdayParam
         };
+        // 如果参数不需要则清除
         if (
           param.pageable.sort.asc.length === 0 &&
           param.pageable.sort.desc.length === 0
         ) {
           delete param.pageable.sort;
         }
+        if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
+        if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
+        if (JSON.stringify(param.birthday) === "{}") delete param.birthday
         find(param, res => {
           // 把启用数，禁用数置为0
           this.disableTotal = 0
@@ -620,7 +655,7 @@
       },
       // 控制双击行事件
       handleRowClick(row) {
-        this.$router.push({path: '/manager/show/' + row.id})
+        this.$router.push({path: '/staff/addStaff/' + row.id})
       },
       // 控制页码跳转
       handleCurrentChange(val) {
@@ -646,7 +681,9 @@
     },
     created() {
       this.search(1)
+      // 获取上级部门可选项
       this.getParentOptions()
+      // 获取今日登录数
       this.getLoginedToday()
     }
   }

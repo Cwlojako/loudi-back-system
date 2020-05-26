@@ -9,6 +9,7 @@
           @on-search="searchBySearchItem"
         ></search>
       </el-col>
+      <!--      标签-->
       <el-col :span="24" style="margin-left: 42px">
         <el-tag type="success">全部(800)</el-tag>
         <el-tag type="success">已合作(600)</el-tag>
@@ -55,113 +56,28 @@
           :data="data"
           style="width: 95%;margin:0 auto;"
           @selection-change="handleSelectionChange"
-          @row-dblclick="handleRowClick"
-        >
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
-          <el-table-column
-            prop="username"
-            label="店铺编号"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="realname"
-            label="店铺名称"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="phone"
-            label="分类"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="position "
-            label="所属老师"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="department"
-            label="归属市场"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="status"
-            label="成交数量"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="预付款总额"
-            width="70px"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="订单总额"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="结算金额"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="欠款金额"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="退款金额"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="合作状态"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="合作子状态"
-            width="70px"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="培训次数"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="未出单天数"
-            width="70px"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="有无设备"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="responsible"
-            label="状态"
-          >
-          </el-table-column>
-
-          <el-table-column
-            fixed="right"
-            align="center"
-            label="操作"
-            width="240">
+          @row-dblclick="handleRowClick">
+          <el-table-column prop="id" label="店铺编号"></el-table-column>
+          <el-table-column prop="name" label="店铺名称"></el-table-column>
+          <el-table-column prop="category" label="分类"></el-table-column>
+          <el-table-column prop="teacher " label="所属老师"></el-table-column>
+          <el-table-column prop="department" label="归属市场"></el-table-column>
+          <el-table-column prop="customerQuantity" label="成交数量"></el-table-column>
+          <el-table-column prop="responsible" label="预付款总额" width="70px"></el-table-column>
+          <el-table-column prop="responsible" label="订单总额"></el-table-column>
+          <el-table-column prop="responsible" label="结算金额"></el-table-column>
+          <el-table-column prop="responsible" label="欠款金额"></el-table-column>
+          <el-table-column prop="responsible" label="退款金额"></el-table-column>
+          <el-table-column prop="cooperationStatus" label="合作状态"></el-table-column>
+          <el-table-column prop="cooperationSubStatus" label="合作子状态" width="70px"></el-table-column>
+          <el-table-column prop="responsible" label="培训次数"></el-table-column>
+          <el-table-column prop="responsible" label="未出单天数" width="70px"></el-table-column>
+          <el-table-column prop="deviceAssigned" label="有无设备"></el-table-column>
+          <el-table-column prop="status" label="状态"></el-table-column>
+          <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="goShopDetail">
-                查看
-              </el-button>
-              <el-button type="text" size="small">
-                编辑
-              </el-button>
+              <el-button type="text" size="small" @click="goShopDetail">查看</el-button>
+              <el-button type="text" size="small">编辑</el-button>
             </template>
           </el-table-column>
         </el-table>

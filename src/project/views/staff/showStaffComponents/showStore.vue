@@ -5,46 +5,24 @@
       <el-col :span="24">
         <search
           style="width: 95%;margin: 10px auto"
-          :search-items="customerSearchItems"
-          @on-search="customerSearchBySearchItem"
+          :search-items="salonSearchItems"
+          @on-search="salonSearchBySearchItems"
         ></search>
       </el-col>
       <!--    表格-->
       <el-col :span="24">
         <el-table
-          :data="customerData"
+          :data="salonData"
           style="width: 95%;margin:0 auto;"
           @selection-change="handleSelectionChange"
           @row-dblclick="handleRowClick"
         >
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
-          <el-table-column
-            prop="username"
-            label="店铺编号"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="realname"
-            label="店铺名称"
-          >
-          </el-table-column>
-          <el-table-column
-            label="分类"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="phone"
-            label="状态"
-          >
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            align="center"
-            label="操作"
-            width="240">
+          <el-table-column type="selection" width="55"></el-table-column>
+          <el-table-column prop="id" label="店铺编号"></el-table-column>
+          <el-table-column prop="name" label="店铺名称"></el-table-column>
+          <el-table-column prop="category" label="分类"></el-table-column>
+          <el-table-column prop="phone" label="状态"></el-table-column>
+          <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
               <el-button type="text" size="small">
                 查看
@@ -87,34 +65,34 @@
 
     data() {
       return {
-        // 顾客信息搜索配置项
-        customerSearchItems: [
+        // 店铺信息搜索配置项
+        salonSearchItems: [
           {
             name: "店铺编号",
-            key: "username",
+            key: "id",
             type: "string"
           },
           {
             name: "店铺名称",
-            key: "username",
+            key: "name",
             type: "string"
           },
           {
             name: "分类",
-            key: "",
+            key: "category",
             type: "select",
-            displayValue: [],
-            value: []
+            displayValue: ['美容美发', '养生', '其他'],
+            value: ['美容美发', '养生', '其他']
           },
           {
             name: "状态",
             key: "",
             type: "select",
-            displayValue: [],
-            value: []
+            displayValue: ["启用", "禁用"],
+            value: ["启用", "禁用"]
           }],
-        // 顾客数据
-        customerData: [],
+        // 店铺数据
+        salonData: [],
         model: "manager",
         selectList: [],
         sort: {asc: [], desc: []},
@@ -126,7 +104,7 @@
     },
     methods:{
       // 搜索顾客信息
-      customerSearchBySearchItem(searchItems) {
+      salonSearchBySearchItems(searchItems) {
         let keys = [];
         for (
           let i = 0,

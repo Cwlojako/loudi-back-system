@@ -12,8 +12,8 @@
         :clearable="true"
         style="width: 200px"
       >
-        <el-option :value="-1">不限</el-option>
-        <el-option v-for="d,i in item.displayValue" :value="i" :key="i">{{d}}</el-option>
+        <el-option :value="-1" label="不限">不限</el-option>
+        <el-option v-for="d,i in item.displayValue" :value="i" :key="i" :label="d">{{d}}</el-option>
       </el-select>
     </div>
     <div class="content" v-if="item.type === 'datetime'">
@@ -40,10 +40,10 @@
       <el-date-picker
         v-model="value"
         @change="onChange"
+        value-format="yyyy-MM-dd"
         format="yyyy-MM-dd"
         type="daterange"
         :placeholder="item.name"
-
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         style="width: 350px"
@@ -59,7 +59,7 @@
         :placeholder="item.name"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
-        style="width: 350px"
+        style="width: 400px"
       ></el-date-picker>
     </div>
   </div>
@@ -93,11 +93,12 @@
       }
     },
     methods: {
+      // 首先分类型监听表单的数据变动，并把最新的value值赋值给定义的obj对象中
       onChange(e) {
-        console.log(e);
         let obj = {};
-        obj.key = this.item.key;
-        let type = this.item.type;
+        obj.key = this.item.key; //username
+        let type = this.item.type; // string
+        // {key: 'username', type: 'string'}
         if (type === "string") {
           let value = e;
           if (value) {
@@ -108,29 +109,36 @@
           if (value !== -1) {
             obj.value = this.item.value[value];
             this.value = this.item.value[value];
+          } else {
+            obj.value = undefined;
           }
         } else if (type === "date") {
           obj.value = e;
         } else if (type === "datetime") {
           obj.value = e;
         } else if (type === "daterange") {
-          if (!e[1] && !e[0]) {
+          if (e) {
+            if (!e[1] && !e[0]) {
+              obj.value = undefined;
+            } else {
+              obj.value = e;
+            }
+          }else {
             obj.value = undefined;
-          } else {
-            obj.value = e;
           }
         } else if (type === "datetimerange") {
-           if (e) {
-             if (!e[1] && !e[0]) {
-               // when arr member is '', set this item disappear
-               obj.value = undefined;
-             } else {
-               obj.value = e;
-             }
-           }else {
-             obj.value = undefined;
-           }
+          if (e) {
+            if (!e[1] && !e[0]) {
+              // when arr member is '', set this item disappear
+              obj.value = undefined;
+            } else {
+              obj.value = e;
+            }
+          }else {
+            obj.value = undefined;
+          }
         }
+        // 最后通过$emit的形式通知父组件接受obj对象
         this.$emit("on-change", obj); // emit
       }
     }

@@ -5,48 +5,23 @@
       <el-col :span="24">
         <search
           style="width: 95%;margin: 10px auto"
-          :search-items="customerSearchItems"
-          @on-search="customerSearchBySearchItem"
+          :search-items="deviceSearchItems"
+          @on-search="deviceSearchBySearchItem"
         ></search>
       </el-col>
       <!--    表格-->
       <el-col :span="24">
         <el-table
-          :data="customerData"
+          :data="deviceData"
           style="width: 95%;margin:0 auto;"
-          @selection-change="handleSelectionChange"
-          @row-dblclick="handleRowClick"
-        >
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
-          <el-table-column
-            prop="username"
-            label="设备编号"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="realname"
-            label="归属市场"
-          >
-          </el-table-column>
-          <el-table-column
-            label="归属分公司"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="phone"
-            label="设备状态"
-          >
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            align="center"
-            label="操作"
-            width="240">
+          @row-dblclick="handleRowClick">
+          <el-table-column prop="number" label="设备编号"></el-table-column>
+          <el-table-column prop="department" label="归属市场"></el-table-column>
+          <el-table-column label="归属分公司"></el-table-column>
+          <el-table-column prop="status" label="设备状态"></el-table-column>
+          <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
-              <el-button type="text" size="small">
+              <el-button type="text" size="small" @click="toDeviceDetail(scope.row.number)">
                 查看
               </el-button>
             </template>
@@ -77,25 +52,23 @@
 <script>
   import Search from "@/framework/components/search";
   import {post} from "@/framework/http/request";
-  import {search, count, del, enable, disable} from '@/project/service/manager'
+  import {findByEmployeeId, count} from '@/project/service/device'
 
 
   export default {
 
     data() {
       return {
-        // 顾客信息搜索配置项
-        customerSearchItems: [
+        // 设备信息搜索配置项
+        deviceSearchItems: [
           {
             name: "设备编号",
-            key: "username",
+            key: "id",
             type: "string"
           }],
-        // 顾客数据
-        customerData: [],
-        model: "manager",
-        selectList: [],
-        sort: {asc: [], desc: []},
+        // 设备数据
+        deviceData: [],
+        model: "device",
         pageSize: 10,
         page: 1,
         total: 0,
@@ -103,8 +76,8 @@
       }
     },
     methods:{
-      // 搜索顾客信息
-      customerSearchBySearchItem(searchItems) {
+      // 搜索设备信息
+      deviceSearchBySearchItem(searchItems) {
         let keys = [];
         for (
           let i = 0,
@@ -124,94 +97,19 @@
         }
         this.search(1);
       },
-      handleEdit() {
-        this.editId = this.selectList[0].id
-        this.editProps.visible = true;
-      },
-      handleStatusChange(row) {
-        let status;
-        let _t = this;
-        if (row.status.indexOf('启用') >= 0) {
-          status = '禁用'
-        } else {
-          status = '启用'
-        }
-        this.$confirm(`确定${status}选中内容？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          if (status === '禁用') {
-            disable({id: row.id}, res => {
-              _t.$message({
-                type: 'success',
-                message: '已禁用!'
-              });
-              _t.search(_t.page);
-            })
-          } else {
-            enable({id: row.id}, res => {
-              _t.$message({
-                type: 'success',
-                message: '已启用!'
-              });
-              _t.search(_t.page);
-            })
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-
-      },
-      handlePageSizeChange(pageSize) {
-        this.pageSize = pageSize;
-        this.search(1);
-      },
-      handlePageChange(page) {
-        this.search(page);
-      },
-      handleSortChange(sort) {
-        let key = sort.key;
-        let order = sort.order;
-        let asc = this.sort.asc;
-        let desc = this.sort.desc;
-        if (asc.indexOf(key) > -1) {
-          let idx = asc.indexOf(key);
-          asc.splice(idx, 1);
-        }
-        if (desc.indexOf(key) > -1) {
-          let idx = desc.indexOf(key);
-          desc.splice(idx, 1);
-        }
-        if (order !== "normal") {
-          this.sort[order].push(key);
-        }
-        this.search(1);
-      },
+      // 根据员工id获取所属设备列表
       search(page) {
         let _t = this;
         _t.page = page;
-        console.log(this.sort);
         let param = {
           pageable: {
             page: page,
-            size: _t.pageSize,
-            sort: _t.sort
+            size: _t.pageSize
           },
           [this.model]: _t.extraParam
         };
-        if (
-          param.pageable.sort.asc.length === 0 &&
-          param.pageable.sort.desc.length === 0
-        ) {
-          delete param.pageable.sort;
-        }
-        search(param, res => {
-          let data = res;
-          _t.customerData = data;
+        findByEmployeeId(param, res => {
+          _t.deviceData = res;
           _t.getTotal();
         });
       },
@@ -222,71 +120,28 @@
           _t.total = parseInt(res);
         });
       },
-      handleTransportSelectList(list) {
-        this.selectList = list;
-      },
-      delete(id) {
-        let _t = this;
-        del({id: id}, res => {
-          _t.search(_t.page);
-        });
-      },
-      enable(id, url) {
-        let _t = this;
-        post(url, {id: id}, res => {
-          _t.search(_t.page);
-        });
-      },
-      handleClose() {
-        this.createProps.visible = false;
-        this.editProps.visible = false;
-      },
-      handleSelectionChange(val) {
-        this.selectList = val;
-      },
+      // 控制双击行事件
       handleRowClick(row) {
-        this.$router.push({path: '/manager/show/' + row.id})
+        this.$router.push({path: '/equipment/equipmentDetail'})
       },
+      // 控制分页操作
       handleCurrentChange(val) {
         this.page = val;
         this.search(this.page);
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-
         this.search(this.page);
       },
-      onMenuChange(val) {
-        console.log(val);
-      },
-      handleClick(command) {
-        switch (command) {
-          case '编辑':
-            console.log('编辑');
-            this.editId = this.selectList[0].id;
-            this.editProps.visible = true;
-            break;
-          case '启用':
-            console.log('启用');
-            this.batchEnable();
-            break;
-          case '禁用':
-            console.log('禁用')
-            this.batchDisable();
-            break;
-        }
+      // 根据设备编号跳转到设备详情
+      toDeviceDetail(number) {
+        this.$router.push({path: '/equipment/equipmentDetail'})
       }
     },
     components: {
       Search
     },
-    computed: {
-      route() {
-        return this.$route;
-      }
-    },
     mounted() {
-      // this.findAllRoles();
       this.search(1);
     }
   }

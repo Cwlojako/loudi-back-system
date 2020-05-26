@@ -81,7 +81,7 @@
             <el-select v-model="detailInfoForm.education" placeholder="请选择学历">
               <el-option v-for="(item, index) in educationOptions"
                         :key='index'
-                        :label="item.label" 
+                        :label="item.label"
                         :value="item.value">
               </el-option>
             </el-select>
@@ -93,7 +93,7 @@
             <el-select v-model="detailInfoForm.maritalStatus" placeholder="请选择">
               <el-option v-for="(item, index) in maritalOptions"
                         :key='index'
-                        :label="item.label" 
+                        :label="item.label"
                         :value="item.value">
               </el-option>
             </el-select>
@@ -171,7 +171,7 @@
 
 <script>
   import Emitter from '@/framework/mixins/emitter'
-  import {get} from '@/project/service/employee'
+  import {get, save} from '@/project/service/employee'
 
   export default {
     mixins: [Emitter],
@@ -317,24 +317,26 @@
       // 提交员工基本信息
       handleSaveBase() {},
       // 提交员工详细信息
-      handleSaveDetail() {}
-    },
-    created() {
-      this.editId = this.$route.params.id
-      if (this.editId === 0) {
-        // 如果id为0则证明没有传递过来新的id值，则表示是新建员工
-        this.$refs.baseInfoForm.resetFields()
-        this.$refs.detailInfoForm.resetFields()
-      } else {
-        // 否则则是进入编辑员工页面,根据id获取员工信息
-        get({id: this.editId}, res => {
-          this.baseInfoForm = res
-          // 处理是否负责人数据
-          this.baseInfoForm.manageable = res.manageable ? '是' : '否'
-          // 处理部门数据
-          this.baseInfoForm.department = res.department.name
-        })
+      handleSaveDetail() {},
+      // 进入的是编辑员工模式还是新建员工模式
+      selectAddOrEdit() {
+        if (!this.editId) {
+          console.log('新建模式')
+        } else {
+          // 否则则是进入编辑员工页面,根据id获取员工信息
+          get({id: this.editId}, res => {
+            this.baseInfoForm = res
+            // 处理是否负责人数据
+            this.baseInfoForm.manageable = res.manageable ? '是' : '否'
+            // 处理部门数据
+            this.baseInfoForm.department = res.department.name
+          })
+        }
       }
+    },
+    mounted() {
+      this.editId = this.$route.params.id
+      this.selectAddOrEdit()
     }
   }
 </script>
