@@ -5,7 +5,6 @@
         <el-tree
           :data="departmentData"
           node-key="id"
-          default-expand-all
           :expand-on-click-node="false"
         >
           <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -169,8 +168,7 @@
     <!--  修改部门信息对话框  -->
     <el-dialog title="修改部门信息" :visible.sync="editDepartmentShow" width="600px" @close="closeEditDepartment">
       <!--   修改部门信息表单验证规则和新增部门表单规则一致   -->
-      <el-form :model="editDepartmentForm" :rules="addDepartmentRules" ref="editDepartmentRef" label-width="90px"
-               class="demo-ruleForm" label-position="left">
+      <el-form :model="editDepartmentForm" :rules="addDepartmentRules" ref="editDepartmentRef" label-width="90px">
         <el-form-item label="上级部门:" prop="parent">
           <el-input v-model="editDepartmentForm.parent" disabled readonly></el-input>
         </el-form-item>
@@ -692,7 +690,6 @@
 <style lang="less" scoped>
   .el-container {
     .el-aside {
-      background-color: #f5f7fa;
       padding-top: 20px;
     }
     .el-main {
@@ -733,5 +730,20 @@
   }
   .content /deep/ .el-date-editor /deep/ .el-input__inner /deep/  .el-input__prefix /deep/ .el-input__icon {
     line-height: 32px !important;
+  }
+  // .el-tree-node:hover {
+  //   background: #ccc;
+  // }
+  .el-tree /deep/ .el-tree-node__content:hover {
+    background: #ccc!important;
+  }
+  .el-tree /deep/ .el-tree-node:focus>.el-tree-node__content {
+    background: #ccc!important;
+  }
+  .el-tree /deep/ .el-tree-node__expand-icon {
+    color: #505050;
+  }
+  .el-tree /deep/  .el-tree-node__expand-icon.is-leaf {
+    color: transparent;
   }
 </style>
