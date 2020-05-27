@@ -195,42 +195,13 @@
   import Emitter from '@/framework/mixins/emitter'
   import Search from "@/framework/components/search";
   import {find, count, leave, enable, disable, batchEnable, batchDisable} from '@/project/service/employee'
-  import {save, searchDepartment, delDepartment, get} from '@/project/service/department'
+  import {save, delDepartment, get, findFather, findByParentId} from '@/project/service/department'
 
   export default {
     mixins: [Emitter],
     data() {
       return {
-        departmentData: [{
-          id: 1,
-          label: '总部',
-          children: [{
-            id: 4,
-            label: '培训部'
-          }, {
-            id: 9,
-            label: '营销部'
-          }, {
-            id: 6,
-            label: '后勤部'
-          }, {
-            id: 3,
-            label: '人事部'
-          }, {
-            id: 7,
-            label: '市场部',
-            children: [{
-              id: 13,
-              label: '湖南/湖北'
-            }, {
-              id: 14,
-              label: '广西/海南'
-            }, {
-              id: 26,
-              label: '福建/广东'
-            }]
-          }]
-        }],
+        departmentData: [],
         // 控制新增部门对话框的显示与隐藏
         addDepartmentShow: false,
         //新增部门表单信息对象
@@ -387,7 +358,7 @@
         save(param, res => {
           this.handleClose()
           // 重新查询所有部门
-          searchDepartment()
+          // searchDepartment()
           this.$message({
             type: 'success',
             message: '添加成功!'
@@ -400,6 +371,7 @@
         // 根据id获取部门信息
         get({id}, res => {
           this.editDepartmentForm = res
+          this.editDepartmentForm.parent = res.parent.name
         })
       },
       // 删除部门
@@ -412,7 +384,7 @@
           // 根据id删除部门
           delDepartment({departmentId: id}, res => {
             // 重新查询所有部门
-            searchDepartment()
+            // searchDepartment()
             this.$message({
               type: 'success',
               message: '删除成功!'
@@ -554,6 +526,7 @@
         if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
         if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
         if (JSON.stringify(param.birthday) === "{}") delete param.birthday
+        // 发送请求获取员工列表
         find(param, res => {
           // 把启用数，禁用数置为0
           this.disableTotal = 0
@@ -585,6 +558,8 @@
           this.loginedTotal = parseInt(res)
         })
       },
+      // 获取部门列表数据
+      searchDepartment() {},
       // 批量启用
       batchEnable() {
         let _t = this;
@@ -683,6 +658,8 @@
       this.getParentOptions()
       // 获取今日登录数
       this.getLoginedToday()
+      // 获取部门列表数据
+      this.searchDepartment()
     }
   }
 </script>
