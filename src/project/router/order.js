@@ -22,7 +22,7 @@ const order = {
       component: () => import('@/project/views/order/list')
     },
     {
-      path:'/order/orderDetail',
+      path:'/order/orderDetail/:id',
       name:'orderDetail',
       meta:{
         isShowHeader:true,
@@ -38,14 +38,14 @@ const order = {
           },
           {
             name:'订单详情',
-            path:'/order/orderDetail'
+            path:'/order/orderDetail/:id'
           }
         ]
       },
       component: () => import('@/project/views/order/orderDetail')
     },
     {
-      path:'/order/editOrderDetail',
+      path:'/order/editOrderDetail/:id',
       name:'editOrderDetail',
       meta:{
         isShowHeader:true,
@@ -61,11 +61,11 @@ const order = {
           },
           {
             name:'订单详情',
-            path:'/order/orderDetail'
+            path:'/order/orderDetail/:id'
           },
           {
             name:'编辑订单',
-            path:'/order/editOrderDetail'
+            path:'/order/editOrderDetail/:id'
           }
         ]
       },

@@ -5,62 +5,35 @@
       <el-col :span="24">
         <search
           style="width: 95%;margin: 10px auto"
-          :search-items="customerSearchItems"
-          @on-search="customerSearchBySearchItem"
+          :search-items="orderSearchItems"
+          @on-search="orderSearchBySearchItem"
         ></search>
       </el-col>
       <!--    表格-->
       <el-col :span="24">
         <el-table
-          :data="customerData"
+          :data="orderData"
           style="width: 95%;margin:0 auto;"
-          @selection-change="handleSelectionChange"
           @row-dblclick="handleRowClick"
         >
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
-          <el-table-column
-            prop="username"
-            label="订单编号"
-          >
-          </el-table-column>
-          <el-table-column
-            label="订单类型"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="realname"
-            label="顾客名称"
-          >
-          </el-table-column>
-          <el-table-column
-            label="疗程部位"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="phone"
-            label="手机号码"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="position "
-            label="成交金额"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="department"
-            label="下单时间"
-          >
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            align="center"
-            label="操作"
-            width="240">
+          <el-table-column prop="id" label="订单编号"></el-table-column>
+          <el-table-column prop="type" label="订单类型"></el-table-column>
+          <el-table-column label="顾客名称">
             <template slot-scope="scope">
-              <el-button type="text" size="small">
+              {{scope.row.customer.realName}}
+            </template>
+          </el-table-column>
+          <el-table-column prop="id" label="疗程部位"></el-table-column>
+          <el-table-column prop="phone" label="手机号码">
+            <template slot-scope="scope">
+              {{scope.row.customer.phone}}
+            </template>
+          </el-table-column>
+          <el-table-column prop="paymentAmount" label="成交金额"></el-table-column>
+          <el-table-column prop="createAt" label="下单时间"></el-table-column>
+          <el-table-column fixed="right" align="center" label="操作" width="240">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="toOrderDetail(scope.row.id)">
                 查看
               </el-button>
             </template>
@@ -91,54 +64,58 @@
 <script>
   import Search from "@/framework/components/search";
   import {post} from "@/framework/http/request";
-  import {search, count, del, enable, disable} from '@/project/service/manager'
+  import {findByEmployeeId, count} from '@/project/service/order'
 
   export default {
 
     data() {
       return {
-        // 顾客信息搜索配置项
-        customerSearchItems: [
+        // 订单信息搜索配置项
+        orderSearchItems: [
           {
             name: "订单编号",
-            key: "username",
+            key: "id",
             type: "string"
           },
           {
             name: "顾客名称",
-            key: "username",
+            key: "customer",
             type: "string"
           },
           {
             name: "订单类型",
-            key: "",
+            key: "type",
             type: "select",
-            displayValue: [],
-            value: []
+            displayValue: ['暂存订单', '已确认订单', '已取消订单'],
+            value: ['暂存订单', '已确认订单', '已取消订单']
           },
           {
             name: "产品",
-            key: "username",
+            key: "product",
             type: "string"
           }],
-        // 顾客数据
-        customerData: [],
-        model: "manager",
-        selectList: [],
-        sort: {asc: [], desc: []},
+        // 订单表格数据
+        orderData: [],
+        model: "order",
         pageSize: 10,
         page: 1,
         total: 0,
-        extraParam: {}
+        // 订单额外搜索参数
+        extraParam: {},
+        // 顾客搜索参数
+        customerParam: {},
+        // 产品搜索参数
+        productParam: {}
       }
     },
     methods:{
-      // 搜索顾客信息
-      customerSearchBySearchItem(searchItems) {
+      // 搜索订单信息
+      orderSearchBySearchItem(searchItems) {
+        console.log(searchItems)
         let keys = [];
         for (
           let i = 0,
-            searchItemList = this.searchItems,
+            searchItemList = this.orderSearchItems,
             len = searchItemList.length;
           i < len;
           i++
@@ -148,131 +125,67 @@
         for (let i in keys) {
           if (searchItems[keys[i]]) {
             this.extraParam[keys[i]] = searchItems[keys[i]];
+            if (keys[i] === 'customer') delete this.extraParam[keys[i]]
+            if (keys[i] === 'product') delete this.extraParam[keys[i]]
           } else {
             delete this.extraParam[keys[i]];
           }
         }
-        this.search(1);
-      },
-      handleEdit() {
-        this.editId = this.selectList[0].id
-        this.editProps.visible = true;
-      },
-      handleStatusChange(row) {
-        let status;
-        let _t = this;
-        if (row.status.indexOf('启用') >= 0) {
-          status = '禁用'
-        } else {
-          status = '启用'
-        }
-        this.$confirm(`确定${status}选中内容？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          if (status === '禁用') {
-            disable({id: row.id}, res => {
-              _t.$message({
-                type: 'success',
-                message: '已禁用!'
-              });
-              _t.search(_t.page);
-            })
-          } else {
-            enable({id: row.id}, res => {
-              _t.$message({
-                type: 'success',
-                message: '已启用!'
-              });
-              _t.search(_t.page);
-            })
+        // 处理顾客名称参数
+        if (searchItems.customer) {
+          this.customerParam = {
+            realName: searchItems.customer
           }
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-
-      },
-      handlePageSizeChange(pageSize) {
-        this.pageSize = pageSize;
-        this.search(1);
-      },
-      handlePageChange(page) {
-        this.search(page);
-      },
-      handleSortChange(sort) {
-        let key = sort.key;
-        let order = sort.order;
-        let asc = this.sort.asc;
-        let desc = this.sort.desc;
-        if (asc.indexOf(key) > -1) {
-          let idx = asc.indexOf(key);
-          asc.splice(idx, 1);
+        } else {
+          delete this.customerParam
         }
-        if (desc.indexOf(key) > -1) {
-          let idx = desc.indexOf(key);
-          desc.splice(idx, 1);
+        // 处理产品参数
+        if (searchItems.product) {
+          this.productParam = {
+            name: searchItems.product
+          }
+        } else {
+          delete this.productParam
         }
-        if (order !== "normal") {
-          this.sort[order].push(key);
-        }
-        this.search(1);
+        this.search(1, this.id);
       },
-      search(page) {
+      // 根据员工id查询所属订单信息
+      search(page, id) {
         let _t = this;
         _t.page = page;
-        console.log(this.sort);
         let param = {
           pageable: {
             page: page,
             size: _t.pageSize,
-            sort: _t.sort
           },
-          [this.model]: _t.extraParam
-        };
-        if (
-          param.pageable.sort.asc.length === 0 &&
-          param.pageable.sort.desc.length === 0
-        ) {
-          delete param.pageable.sort;
+          [this.model]: _t.extraParam,
+          teacher: {id: id},
+          customer: _t.customerParam,
+          product: _t.productParam
         }
-        search(param, res => {
-          let data = res;
-          _t.customerData = data;
-          _t.getTotal();
+        // 如果没有查询条件则清除携带参数对象
+        if (JSON.stringify(param.customer) === "{}") delete param.customer
+        if (JSON.stringify(param.product) === "{}") delete param.product
+        findByEmployeeId(param, res => {
+          _t.orderData = res;
+          _t.getTotal(id);
         });
       },
-      getTotal() {
+      getTotal(id) {
         let _t = this;
-        let param = {[this.model]: _t.extraParam};
+        let param = {
+          [this.model]: _t.extraParam,
+          teacher: {id: id},
+          customer: _t.customerParam,
+          product: _t.productParam
+        };
         count(param, res => {
           _t.total = parseInt(res);
         });
       },
-      handleTransportSelectList(list) {
-        this.selectList = list;
-      },
-      delete(id) {
-        let _t = this;
-        del({id: id}, res => {
-          _t.search(_t.page);
-        });
-      },
-      enable(id, url) {
-        let _t = this;
-        post(url, {id: id}, res => {
-          _t.search(_t.page);
-        });
-      },
-      handleClose() {
-        this.createProps.visible = false;
-        this.editProps.visible = false;
-      },
-      handleSelectionChange(val) {
-        this.selectList = val;
+      // 跳转到订单详情页
+      toOrderDetail(id) {
+        this.$router.push({path: '/order/orderDetail/' + id})
       },
       handleRowClick(row) {
         this.$router.push({path: '/manager/show/' + row.id})
@@ -283,41 +196,15 @@
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-
         this.search(this.page);
-      },
-      onMenuChange(val) {
-        console.log(val);
-      },
-      handleClick(command) {
-        switch (command) {
-          case '编辑':
-            console.log('编辑');
-            this.editId = this.selectList[0].id;
-            this.editProps.visible = true;
-            break;
-          case '启用':
-            console.log('启用');
-            this.batchEnable();
-            break;
-          case '禁用':
-            console.log('禁用')
-            this.batchDisable();
-            break;
-        }
       }
     },
     components: {
       Search
     },
-    computed: {
-      route() {
-        return this.$route;
-      }
-    },
     mounted() {
-      // this.findAllRoles();
-      this.search(1);
+      this.id = this.$route.params.id
+      this.search(1, this.id);
     }
   }
 </script>

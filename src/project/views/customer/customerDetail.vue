@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page">
     <el-tabs type="border-card">
       <el-tab-pane label="基本信息">
         <customerBaseInfo></customerBaseInfo>
@@ -20,9 +20,7 @@
   import orderMessage from "./customerDetailComponents/orderMessage" // 引入顾客详情的订单信息组件
   export default {
     data() {
-      return {
-
-      }
+      return {}
     },
     components:{
       customerBaseInfo,
@@ -35,5 +33,9 @@
 <style lang="less" scoped>
   .el-tabs {
     margin-left: 30px;
+  }
+  .page {
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 </style>

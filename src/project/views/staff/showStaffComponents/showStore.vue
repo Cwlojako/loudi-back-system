@@ -24,7 +24,7 @@
           <el-table-column prop="phone" label="状态"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
-              <el-button type="text" size="small">
+              <el-button type="text" size="small" @click="toSalonDetail(scope.row.id)">
                 查看
               </el-button>
               <el-button type="text" size="small">
@@ -58,13 +58,14 @@
 <script>
   import Search from "@/framework/components/search";
   import {post} from "@/framework/http/request";
-  import {search, count, del, enable, disable} from '@/project/service/manager'
+  import {findByEmployeeId, count} from '@/project/service/salon'
 
 
   export default {
-
     data() {
       return {
+        // 员工id
+        id: 0,
         // 店铺信息搜索配置项
         salonSearchItems: [
           {
@@ -86,14 +87,14 @@
           },
           {
             name: "状态",
-            key: "",
+            key: "enabled",
             type: "select",
             displayValue: ["启用", "禁用"],
             value: ["启用", "禁用"]
           }],
         // 店铺数据
         salonData: [],
-        model: "manager",
+        model: "salon",
         selectList: [],
         sort: {asc: [], desc: []},
         pageSize: 10,
@@ -103,12 +104,12 @@
       }
     },
     methods:{
-      // 搜索顾客信息
+      // 搜索店铺信息
       salonSearchBySearchItems(searchItems) {
         let keys = [];
         for (
           let i = 0,
-            searchItemList = this.searchItems,
+            searchItemList = this.salonSearchItems,
             len = searchItemList.length;
           i < len;
           i++
@@ -122,12 +123,9 @@
             delete this.extraParam[keys[i]];
           }
         }
-        this.search(1);
+        this.search(1, this.id);
       },
-      handleEdit() {
-        this.editId = this.selectList[0].id
-        this.editProps.visible = true;
-      },
+      // 控制启禁用
       handleStatusChange(row) {
         let status;
         let _t = this;
@@ -166,80 +164,30 @@
         });
 
       },
-      handlePageSizeChange(pageSize) {
-        this.pageSize = pageSize;
-        this.search(1);
-      },
-      handlePageChange(page) {
-        this.search(page);
-      },
-      handleSortChange(sort) {
-        let key = sort.key;
-        let order = sort.order;
-        let asc = this.sort.asc;
-        let desc = this.sort.desc;
-        if (asc.indexOf(key) > -1) {
-          let idx = asc.indexOf(key);
-          asc.splice(idx, 1);
-        }
-        if (desc.indexOf(key) > -1) {
-          let idx = desc.indexOf(key);
-          desc.splice(idx, 1);
-        }
-        if (order !== "normal") {
-          this.sort[order].push(key);
-        }
-        this.search(1);
-      },
-      search(page) {
+      // 根据员工id查找所属店铺
+      search(page, id) {
         let _t = this;
         _t.page = page;
-        console.log(this.sort);
         let param = {
           pageable: {
             page: page,
             size: _t.pageSize,
-            sort: _t.sort
           },
-          [this.model]: _t.extraParam
+          [this.model]: _t.extraParam,
+          teacher: {id: id}
         };
-        if (
-          param.pageable.sort.asc.length === 0 &&
-          param.pageable.sort.desc.length === 0
-        ) {
-          delete param.pageable.sort;
-        }
-        search(param, res => {
+        findByEmployeeId(param, res => {
           let data = res;
-          _t.customerData = data;
-          _t.getTotal();
+          _t.salonData = data;
+          _t.getTotal(id);
         });
       },
-      getTotal() {
+      getTotal(id) {
         let _t = this;
-        let param = {[this.model]: _t.extraParam};
+        let param = {[this.model]: _t.extraParam, teacher: {id: id}};
         count(param, res => {
           _t.total = parseInt(res);
         });
-      },
-      handleTransportSelectList(list) {
-        this.selectList = list;
-      },
-      delete(id) {
-        let _t = this;
-        del({id: id}, res => {
-          _t.search(_t.page);
-        });
-      },
-      enable(id, url) {
-        let _t = this;
-        post(url, {id: id}, res => {
-          _t.search(_t.page);
-        });
-      },
-      handleClose() {
-        this.createProps.visible = false;
-        this.editProps.visible = false;
       },
       handleSelectionChange(val) {
         this.selectList = val;
@@ -253,25 +201,18 @@
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-
         this.search(this.page);
-      },
-      onMenuChange(val) {
-        console.log(val);
       },
       handleClick(command) {
         switch (command) {
           case '编辑':
-            console.log('编辑');
             this.editId = this.selectList[0].id;
             this.editProps.visible = true;
             break;
           case '启用':
-            console.log('启用');
             this.batchEnable();
             break;
           case '禁用':
-            console.log('禁用')
             this.batchDisable();
             break;
         }
@@ -280,14 +221,10 @@
     components: {
       Search
     },
-    computed: {
-      route() {
-        return this.$route;
-      }
-    },
-    mounted() {
-      // this.findAllRoles();
-      this.search(1);
+    created() {
+      this.id = this.$route.params.id
+      // 获取店铺列表
+      this.search(1, this.id);
     }
   }
 </script>

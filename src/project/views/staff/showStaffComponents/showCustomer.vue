@@ -14,17 +14,15 @@
         <el-table
           :data="customerData"
           style="width: 95%;margin:0 auto;"
-          @row-dblclick="handleRowClick"
-        >
-          <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column prop="username" label="顾客编号"></el-table-column>
-          <el-table-column prop="realname" label="顾客名称"></el-table-column>
+          @row-dblclick="handleRowClick">
+          <el-table-column prop="id" label="顾客编号"></el-table-column>
+          <el-table-column prop="realName" label="顾客名称"></el-table-column>
           <el-table-column prop="phone" label="手机号码"></el-table-column>
-          <el-table-column prop="position " label="顾客类型"></el-table-column>
-          <el-table-column prop="department" label="疗程顾客子类型"></el-table-column>
+          <el-table-column prop="type" label="顾客类型"></el-table-column>
+          <el-table-column prop="subtype" label="疗程顾客子类型"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
-              <el-button type="text" size="small">
+              <el-button type="text" size="small" @click="toCustomerDetail(scope.row.id)">
                 查看
               </el-button>
               <el-button type="text" size="small">
@@ -44,7 +42,7 @@
               :current-page="page"
               :page-sizes="[10, 20, 30, 40]"
               :page-size="pageSize"
-              layout="total, sizes, jumper, pager,prev, next"
+              layout="total, sizes, pager, jumper, prev, next"
               :total="total"
               background>
             </el-pagination>
@@ -67,28 +65,32 @@
         customerSearchItems: [
           {
             name: "顾客编号",
-            key: "username",
+            key: "id",
             type: "string"
           },
           {
             name: "顾客名称",
-            key: "username",
+            key: "realName",
             type: "string"
           },
           {
             name: "手机号码",
-            key: "username",
+            key: "phone",
             type: "string"
           },
           {
             name: "顾客类型",
-            key: "username",
-            type: "string"
+            key: "type",
+            type: "select",
+            displayValue: ['疗程顾客', '体验顾客', '意向顾客'],
+            value: ['疗程顾客', '体验顾客', '意向顾客']
           },
           {
             name: "顾客子类型",
-            key: "username",
-            type: "string"
+            key: "subtype",
+            type: "select",
+            displayValue: ['按次疗程顾客', '转交顾客', '已结束疗程顾客', '异地售后顾客'],
+            value: ['按次疗程顾客', '转交顾客', '已结束疗程顾客', '异地售后顾客']
           }],
         // 顾客数据
         customerData: [],
@@ -107,7 +109,7 @@
         let keys = [];
         for (
           let i = 0,
-            searchItemList = this.searchItems,
+            searchItemList = this.customerSearchItems,
             len = searchItemList.length;
           i < len;
           i++
@@ -121,22 +123,36 @@
             delete this.extraParam[keys[i]];
           }
         }
-        this.search(1);
+        this.search(1, this.id);
       },
-      // 获取员工所属的顾客信息
-      getCustomerData(id) {
-        findByEmployeeId({id: id}, res => {
-          this.customerData = res
-          this.getTotal()
-        })
+      // 根据员工id查找所属店铺
+      search(page, id) {
+        let _t = this;
+        _t.page = page;
+        let param = {
+          pageable: {
+            page: page,
+            size: _t.pageSize,
+          },
+          [this.model]: _t.extraParam,
+          teacher: {id: id}
+        };
+        findByEmployeeId(param, res => {
+          _t.customerData = res;
+          _t.getTotal(id);
+        });
       },
       // 获取数据条数
-      getTotal() {
+      getTotal(id) {
         let _t = this;
-        let param = {[this.model]: _t.extraParam};
+        let param = {[this.model]: _t.extraParam, teacher: {id: id}};
         count(param, res => {
           _t.total = parseInt(res);
         });
+      },
+      // 跳转到顾客详情页
+      toCustomerDetail(id) {
+        this.$router.push({path: `/customer/customerDetail/${id}`})
       },
       // 控制双击行事件
       handleRowClick(row) {
@@ -144,11 +160,11 @@
       },
       handleCurrentChange(val) {
         this.page = val;
-        this.search(this.page);
+        this.search(this.page, this.id);
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-        this.search(this.page);
+        this.search(this.page, this.id);
       }
     },
     components: {
@@ -157,7 +173,7 @@
     created() {
       this.id = parseInt(this.$route.params.id)
       // 获取顾客列表数据
-      this.getCustomerData(this.id);
+      this.search(1, this.id);
     }
   }
 </script>

@@ -201,7 +201,36 @@
     mixins: [Emitter],
     data() {
       return {
-        departmentData: [],
+        departmentData: [{
+          id: 1,
+          label: '总部',
+          children: [{
+            id: 4,
+            label: '培训部'
+          }, {
+            id: 9,
+            label: '营销部'
+          }, {
+            id: 6,
+            label: '后勤部'
+          }, {
+            id: 3,
+            label: '人事部'
+          }, {
+            id: 7,
+            label: '市场部',
+            children: [{
+              id: 13,
+              label: '湖南/湖北'
+            }, {
+              id: 14,
+              label: '广西/海南'
+            }, {
+              id: 26,
+              label: '福建/广东'
+            }]
+          }]
+        }],
         // 控制新增部门对话框的显示与隐藏
         addDepartmentShow: false,
         //新增部门表单信息对象

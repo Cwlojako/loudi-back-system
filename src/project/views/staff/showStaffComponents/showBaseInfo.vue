@@ -141,7 +141,7 @@
     methods:{
       // 前往编辑员工基本信息页面
       goEditStaffPage(id) {
-        this.$router.push({path: '/staff/addStaff/' + id});
+        this.$router.push({path: '/staff/addStaff/' + id, query: {activeName: 'first'}});
       },
       // 离职
       leave(id) {

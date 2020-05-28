@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page">
     <el-tabs type="border-card" v-model="activeName">
       <el-tab-pane label="基本信息" name="0">
         <orderDetailBaseInfo></orderDetailBaseInfo>
@@ -39,5 +39,9 @@
 <style lang="less" scoped>
   .el-tabs {
     margin-left: 30px;
+  }
+  .page {
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 </style>

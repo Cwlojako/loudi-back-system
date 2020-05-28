@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row style="margin-left: 44px">
-      <el-col :span="6">
+      <el-col :span="12">
         <el-row>
           <el-row>
             <el-col :span="6" style="font-size: 18px;font-weight: bold">收款情况</el-col>
@@ -9,49 +9,49 @@
           </el-row>
           <el-row>
             <el-col :span="6"><div class="grid-content bg-purple">成交价格</div></el-col>
-            <el-col :span="18"><div class="grid-content bg-purple-light">2999</div></el-col>
+            <el-col :span="18"><div class="grid-content bg-purple-light">XXX</div></el-col>
           </el-row>
           <el-row>
             <el-col :span="6"><div class="grid-content bg-purple">回款总金额</div></el-col>
-            <el-col :span="18"><div class="grid-content bg-purple-light">1999</div></el-col>
+            <el-col :span="18"><div class="grid-content bg-purple-light">XXX</div></el-col>
           </el-row>
           <el-row>
             <el-col :span="6"><div class="grid-content bg-purple">退款总金额</div></el-col>
-            <el-col :span="18"><div class="grid-content bg-purple-light">1000</div></el-col>
+            <el-col :span="18"><div class="grid-content bg-purple-light">XXX</div></el-col>
           </el-row>
           <el-row>
             <el-col :span="6"><div class="grid-content bg-purple">欠款金额</div></el-col>
-            <el-col :span="18"><div class="grid-content bg-purple-light">999</div></el-col>
+            <el-col :span="18"><div class="grid-content bg-purple-light">XXX</div></el-col>
           </el-row>
         </el-row>
       </el-col>
-      <el-col :span="18">
+      <el-col :span="12">
         <el-row>
           <el-row>
-            <el-col :span="2" style="font-size: 18px;font-weight: bold">收款情况</el-col>
-            <el-col :span="22"></el-col>
+            <el-col :span="6" style="font-size: 18px;font-weight: bold">回款情况</el-col>
+            <el-col :span="18"></el-col>
           </el-row>
           <el-row>
-            <el-col :span="2"><div class="grid-content bg-purple">成交价格</div></el-col>
-            <el-col :span="22"><div class="grid-content bg-purple-light">2999</div></el-col>
+            <el-col :span="6"><div class="grid-content bg-purple">公司总回款</div></el-col>
+            <el-col :span="18"><div class="grid-content bg-purple-light">XXX</div></el-col>
           </el-row>
           <el-row>
-            <el-col :span="2"><div class="grid-content bg-purple">回款总金额</div></el-col>
-            <el-col :span="22"><div class="grid-content bg-purple-light">1999</div></el-col>
+            <el-col :span="6"><div class="grid-content bg-purple">店家总回款</div></el-col>
+            <el-col :span="18"><div class="grid-content bg-purple-light">XXX</div></el-col>
           </el-row>
           <el-row>
-            <el-col :span="2"><div class="grid-content bg-purple">退款总金额</div></el-col>
-            <el-col :span="22"><div class="grid-content bg-purple-light">1000</div></el-col>
+            <el-col :span="6"><div class="grid-content bg-purple">欠公司回款</div></el-col>
+            <el-col :span="18"><div class="grid-content bg-purple-light">XXX</div></el-col>
           </el-row>
           <el-row>
-            <el-col :span="2"><div class="grid-content bg-purple">欠款金额</div></el-col>
-            <el-col :span="22"><div class="grid-content bg-purple-light">999</div></el-col>
+            <el-col :span="6"><div class="grid-content bg-purple">欠店家回款</div></el-col>
+            <el-col :span="18"><div class="grid-content bg-purple-light">XXX</div></el-col>
           </el-row>
         </el-row>
       </el-col>
     </el-row>
     <el-row style="margin-left: 44px;font-weight: bold;font-size: 18px">收款记录</el-row>
-    <el-row  class="page">
+    <el-row class="page">
       <!--    表格-->
       <el-col :span="24">
         <el-table
@@ -116,9 +116,6 @@
         </div>
       </el-col>
     </el-row>
-
-
-
   </div>
 </template>
 
@@ -532,7 +529,6 @@
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-
         this.search(this.page);
       },
       onMenuChange(val) {
@@ -559,13 +555,7 @@
     components: {
       Search
     },
-    computed: {
-      route() {
-        return this.$route;
-      }
-    },
     mounted() {
-      // this.findAllRoles();
       this.search(1);
     }
   }
@@ -575,7 +565,6 @@
   .el-row {
     margin-bottom: 20px;
   }
-
   .bg-purple {
     color: #999999;
   }

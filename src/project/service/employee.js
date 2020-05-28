@@ -11,6 +11,7 @@ let batchEnableUrl = `api/${model}/batchEnable`
 let batchDisableUrl = `api/${model}/batchDisable`
 let leaveUrl = `api/${model}/leave`
 let restoreUrl = `api/${model}/restore`
+let getInfoUrl = `api/${model}/getInfo`
 
 // 根据id获取员工信息
 export function get(param, callback) {
