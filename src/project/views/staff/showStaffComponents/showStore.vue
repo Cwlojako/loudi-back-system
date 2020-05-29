@@ -195,6 +195,9 @@
       handleRowClick(row) {
         this.$router.push({path: '/manager/show/' + row.id})
       },
+      toSalonDetail(id) {
+        this.$router.push({path: '/shop/shopDetail/' + id})
+      },
       handleCurrentChange(val) {
         this.page = val;
         this.search(this.page);

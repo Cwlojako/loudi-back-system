@@ -16,8 +16,12 @@
           style="width: 95%;margin:0 auto;"
           @row-dblclick="handleRowClick">
           <el-table-column prop="number" label="设备编号"></el-table-column>
-          <el-table-column prop="department" label="归属市场"></el-table-column>
-          <el-table-column label="归属分公司"></el-table-column>
+          <el-table-column prop="department" label="归属市场">
+            <template slot-scope="scope">
+              {{scope.row.department.name}}
+            </template>
+          </el-table-column>
+          <el-table-column prop="department" label="归属分公司">xxx</el-table-column>
           <el-table-column prop="status" label="设备状态"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
@@ -51,19 +55,16 @@
 
 <script>
   import Search from "@/framework/components/search";
-  import {post} from "@/framework/http/request";
   import {findByEmployeeId, count} from '@/project/service/device'
 
-
   export default {
-
     data() {
       return {
         // 设备信息搜索配置项
         deviceSearchItems: [
           {
             name: "设备编号",
-            key: "id",
+            key: "number",
             type: "string"
           }],
         // 设备数据
@@ -72,7 +73,9 @@
         pageSize: 10,
         page: 1,
         total: 0,
-        extraParam: {}
+        extraParam: {},
+        // 设备编号
+        deviceNumber: ''
       }
     },
     methods:{
@@ -81,7 +84,7 @@
         let keys = [];
         for (
           let i = 0,
-            searchItemList = this.searchItems,
+            searchItemList = this.deviceSearchItems,
             len = searchItemList.length;
           i < len;
           i++
@@ -95,10 +98,16 @@
             delete this.extraParam[keys[i]];
           }
         }
-        this.search(1);
+        // 处理设备编号参数
+        if (searchItems.number) {
+          this.deviceNumber = searchItems.number
+        } else {
+          delete this.deviceNumber
+        }
+        this.search(1, this.id);
       },
       // 根据员工id获取所属设备列表
-      search(page) {
+      search(page, id) {
         let _t = this;
         _t.page = page;
         let param = {
@@ -106,16 +115,23 @@
             page: page,
             size: _t.pageSize
           },
-          [this.model]: _t.extraParam
+          employeeId: id,
+          deviceNumber: this.deviceNumber
         };
+        // 如果没有查询条件则清除携带参数对象
+        if (param.deviceNumber === "") delete param.deviceNumber
         findByEmployeeId(param, res => {
-          _t.deviceData = res;
-          _t.getTotal();
+          _t.deviceData = res
+          _t.getTotal(id)
         });
       },
-      getTotal() {
+      getTotal(id) {
         let _t = this;
-        let param = {[this.model]: _t.extraParam};
+        let param = {
+          [this.model]: _t.extraParam,
+          isRunToday: false,
+          employee: {id: id}
+        };
         count(param, res => {
           _t.total = parseInt(res);
         });
@@ -127,11 +143,11 @@
       // 控制分页操作
       handleCurrentChange(val) {
         this.page = val;
-        this.search(this.page);
+        this.search(this.page, this.id);
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-        this.search(this.page);
+        this.search(this.page, this.id);
       },
       // 根据设备编号跳转到设备详情
       toDeviceDetail(number) {
@@ -142,7 +158,8 @@
       Search
     },
     mounted() {
-      this.search(1);
+      this.id = parseInt(this.$route.params.id)
+      this.search(1, this.id);
     }
   }
 </script>

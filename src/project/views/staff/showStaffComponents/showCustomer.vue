@@ -137,6 +137,7 @@
           [this.model]: _t.extraParam,
           teacher: {id: id}
         };
+
         findByEmployeeId(param, res => {
           _t.customerData = res;
           _t.getTotal(id);
@@ -172,6 +173,7 @@
     },
     created() {
       this.id = parseInt(this.$route.params.id)
+      console.log(this.id)
       // 获取顾客列表数据
       this.search(1, this.id);
     }

@@ -335,7 +335,9 @@
       }
     },
     mounted() {
-      this.activeName = this.$route.query.activeName
+      if (this.$route.query.activeName) {
+        this.activeName = this.$route.query.activeName
+      }
       this.editId = this.$route.params.id
       this.selectAddOrEdit()
     }

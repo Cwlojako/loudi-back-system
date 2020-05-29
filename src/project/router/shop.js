@@ -91,7 +91,7 @@ const shop = {
       component: () => import('@/project/views/shop/addOrEditBaseInfo')
     },
     {
-      path:'/shop/shopDetail',
+      path:'/shop/shopDetail/:id',
       name:'shopDetail',
       meta:{
         isShowHeader:true,
@@ -107,7 +107,7 @@ const shop = {
           },
           {
             name:'店铺详情',
-            path:'/shop/shopDetail'
+            path:'/shop/shopDetail/:id'
           }
         ]
       },

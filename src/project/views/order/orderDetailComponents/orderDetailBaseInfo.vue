@@ -25,7 +25,7 @@
           </el-row>
           <el-row>
             <el-col :span="6"><div class="grid-content bg-purple">活动折扣</div></el-col>
-            <el-col :span="18"><div class="grid-content bg-purple-light">1999</div></el-col>
+            <el-col :span="18"><div class="grid-content bg-purple-light">XXX</div></el-col>
           </el-row>
           <el-row>
             <el-col :span="6"><div class="grid-content bg-purple">其他费用</div></el-col>
@@ -91,15 +91,15 @@
           </el-row>
           <el-row>
             <el-col :span="4"><div class="grid-content bg-purple">姓名</div></el-col>
-            <el-col :span="20"><div class="grid-content bg-purple-light">{{order.customer.realName}}</div></el-col>
+            <el-col :span="20"><div class="grid-content bg-purple-light"></div></el-col>
           </el-row>
           <el-row>
             <el-col :span="4"><div class="grid-content bg-purple">性别</div></el-col>
-            <el-col :span="20"><div class="grid-content bg-purple-light">{{order.customer.gender}}</div></el-col>
+            <el-col :span="20"><div class="grid-content bg-purple-light"></div></el-col>
           </el-row>
           <el-row>
             <el-col :span="4"><div class="grid-content bg-purple">联系电话</div></el-col>
-            <el-col :span="20"><div class="grid-content bg-purple-light">{{order.customer.phone}}</div></el-col>
+            <el-col :span="20"><div class="grid-content bg-purple-light"></div></el-col>
           </el-row>
         </el-row>
         <el-row>
@@ -161,7 +161,8 @@
           customer: {},
           partner: {},
           operator: {}
-        }
+        },
+        model: 'order'
       }
     },
     methods:{
@@ -173,13 +174,16 @@
         this.$router.push({path:'/order/editOrderDetail'});
       },
       getOrderData(id) {
-        getById({id: id}, res => {
-          this.order = res
+        getById({
+          [this.model]: {id: id}
+        }, res => {
+          this.order = res[0]
+          this.$emit("transmitProductId", res[0].product.id)
         })
       }
     },
     created() {
-      this.id = this.$route.params.id
+      this.id = parseInt(this.$route.params.id)
       // 获取订单基本信息数据
       this.getOrderData(this.id)
     }

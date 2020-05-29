@@ -7,37 +7,15 @@
       <!--    表格-->
       <el-col :span="24">
         <el-table
-          :data="customerData"
+          :data="contractData"
           style="width: 95%;margin:0 auto;"
-          @selection-change="handleSelectionChange"
-          @row-dblclick="handleRowClick"
-        >
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
-          <el-table-column
-            prop="username"
-            label="合同名称"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="position "
-            label="合同说明"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="department"
-            label="签订日期"
-          >
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            align="center"
-            label="操作"
-            width="240">
+          @row-dblclick="handleRowClick">
+          <el-table-column prop="name" label="合同名称"></el-table-column>
+          <el-table-column prop="content" label="合同说明"></el-table-column>
+          <el-table-column prop="signAt" label="签订日期"></el-table-column>
+          <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="editPact">
+              <el-button type="text" size="small" @click="editPact(scope.row.id)">
                 编辑
               </el-button>
             </template>
@@ -63,66 +41,64 @@
       </el-col>
     </el-row>
 
-    <!--  新增合同对话框  -->
+    <!--  新增编辑合同对话框  -->
     <el-dialog
       :title="pactDialogTitle"
       :visible.sync="pactShow"
-      width="30%"
-      @close="closeAddPactDialog"
+      width="40%"
+      @close="handleClose"
       >
-      <el-form :model="pactData" :rules="pactRules" ref="pactRef" label-width="100px" class="demo-ruleForm">
+      <el-form :model="contractForm" :rules="pactRules" ref="pactRef" label-width="100px" class="demo-ruleForm">
         <el-form-item label="合同名称" prop="name" required>
-          <el-input v-model="pactData.name"></el-input>
+          <el-input v-model="contractForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="合同说明" prop="explain">
-          <el-input v-model="pactData.explain"></el-input>
+        <el-form-item label="合同说明" prop="content">
+          <el-input v-model="contractForm.content"></el-input>
         </el-form-item>
         <el-form-item label="签订日期" >
           <el-col :span="11">
-            <el-form-item prop="date">
-              <el-date-picker type="date" placeholder="选择日期" v-model="pactData.date" style="width: 100%;"></el-date-picker>
+            <el-form-item prop="signAt">
+              <el-date-picker type="datetime" placeholder="选择日期"
+                              value-format="yyyy-MM-dd hh:mm:ss"
+                              format="yyyy-MM-dd hh:mm:ss"
+                              v-model="contractForm.signAt"
+                              style="width: 100%;">
+              </el-date-picker>
             </el-form-item>
           </el-col>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="pactShow = false">取 消</el-button>
-    <el-button type="primary" @click="pactShow = false">确 定</el-button>
-  </span>
+        <el-button @click="handleClose">取 消</el-button>
+        <el-button type="primary" @click="handleConfirm">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-  import {post} from "@/framework/http/request";
-  import {search, count, del, enable, disable} from '@/project/service/manager'
-
+  import {findByEmployeeId, save, count} from '@/project/service/contract'
 
   export default {
-
     data() {
       return {
-        // 合同数据对象
-        pactData:{
+        // 合同表单数据对象
+        contractForm: {
           name:'',
-          explain:'',
-          date:''
+          content:'',
+          signAt:''
         },
         // 合同验证规则
         pactRules:{
-          name:'',
-          explain:'',
-          date:''
+          name:[{required: true, message: '请输入合同名称', trigger: 'blur'}],
         },
         // 控制新增合同对话框的显示与隐藏
         pactShow:false,
         // 合同对话框的标题
-        pactDialogTitle:'新增合同',
+        pactDialogTitle:'',
         // 顾客数据
-        customerData: [],
-        model: "manager",
-        selectList: [],
-        sort: {asc: [], desc: []},
+        contractData: [],
+        model: "contract",
         pageSize: 10,
         page: 1,
         total: 0,
@@ -131,199 +107,70 @@
     },
     methods: {
       // 关闭新增合同对话框
-      closeAddPactDialog() {
+      handleClose() {
+        this.pactShow = false
         this.$refs.pactRef.resetFields();
+      },
+      handleConfirm() {
+        save({contract: Object.assign(this.contractForm, {employee: {id: this.id}})}, res => {
+          this.handleClose()
+          // 重新获取数据
+          this.search(1, this.id)
+          this.$message({
+            type: 'success',
+            message: '添加成功'
+          })
+        })
       },
       // 新增合同
       addPact() {
+        this.pactDialogTitle = '新建合同';
         this.pactShow = true;
       },
-      editPact() {
+      editPact(id) {
+        findByEmployeeId({contract: {id: id}, employee: {id: this.id}}, res => {
+          console.log(res)
+          this.contractForm = res[0]
+        })
         this.pactDialogTitle = '编辑合同';
         this.pactShow = true;
       },
-      // 搜索顾客信息
-      customerSearchBySearchItem(searchItems) {
-        let keys = [];
-        for (
-          let i = 0,
-            searchItemList = this.searchItems,
-            len = searchItemList.length;
-          i < len;
-          i++
-        ) {
-          keys.push(searchItemList[i].key);
-        }
-        for (let i in keys) {
-          if (searchItems[keys[i]]) {
-            this.extraParam[keys[i]] = searchItems[keys[i]];
-          } else {
-            delete this.extraParam[keys[i]];
-          }
-        }
-        this.search(1);
-      },
-      handleEdit() {
-        this.editId = this.selectList[0].id
-        this.editProps.visible = true;
-      },
-      handleStatusChange(row) {
-        let status;
-        let _t = this;
-        if (row.status.indexOf('启用') >= 0) {
-          status = '禁用'
-        } else {
-          status = '启用'
-        }
-        this.$confirm(`确定${status}选中内容？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          if (status === '禁用') {
-            disable({id: row.id}, res => {
-              _t.$message({
-                type: 'success',
-                message: '已禁用!'
-              });
-              _t.search(_t.page);
-            })
-          } else {
-            enable({id: row.id}, res => {
-              _t.$message({
-                type: 'success',
-                message: '已启用!'
-              });
-              _t.search(_t.page);
-            })
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-
-      },
-      handlePageSizeChange(pageSize) {
-        this.pageSize = pageSize;
-        this.search(1);
-      },
-      handlePageChange(page) {
-        this.search(page);
-      },
-      handleSortChange(sort) {
-        let key = sort.key;
-        let order = sort.order;
-        let asc = this.sort.asc;
-        let desc = this.sort.desc;
-        if (asc.indexOf(key) > -1) {
-          let idx = asc.indexOf(key);
-          asc.splice(idx, 1);
-        }
-        if (desc.indexOf(key) > -1) {
-          let idx = desc.indexOf(key);
-          desc.splice(idx, 1);
-        }
-        if (order !== "normal") {
-          this.sort[order].push(key);
-        }
-        this.search(1);
-      },
-      search(page) {
+      search(page, id) {
         let _t = this;
         _t.page = page;
-        console.log(this.sort);
         let param = {
           pageable: {
             page: page,
-            size: _t.pageSize,
-            sort: _t.sort
+            size: _t.pageSize
           },
-          [this.model]: _t.extraParam
-        };
-        if (
-          param.pageable.sort.asc.length === 0 &&
-          param.pageable.sort.desc.length === 0
-        ) {
-          delete param.pageable.sort;
+          employee: {id: id}
         }
-        search(param, res => {
-          let data = res;
-          _t.customerData = data;
-          _t.getTotal();
+        findByEmployeeId(param, res => {
+          _t.contractData = res;
+          _t.getTotal(id)
         });
       },
-      getTotal() {
-        let _t = this;
-        let param = {[this.model]: _t.extraParam};
-        count(param, res => {
-          _t.total = parseInt(res);
-        });
-      },
-      handleTransportSelectList(list) {
-        this.selectList = list;
-      },
-      delete(id) {
-        let _t = this;
-        del({id: id}, res => {
-          _t.search(_t.page);
-        });
-      },
-      enable(id, url) {
-        let _t = this;
-        post(url, {id: id}, res => {
-          _t.search(_t.page);
-        });
-      },
-      handleClose() {
-        this.createProps.visible = false;
-        this.editProps.visible = false;
-      },
-      handleSelectionChange(val) {
-        this.selectList = val;
+      getTotal(id) {
+        count({employee: {id: id}}, res => {
+          this.total = res
+        })
       },
       handleRowClick(row) {
         this.$router.push({path: '/manager/show/' + row.id})
       },
       handleCurrentChange(val) {
         this.page = val;
-        this.search(this.page);
+        this.search(this.page, this.id);
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-
-        this.search(this.page);
-      },
-      onMenuChange(val) {
-        console.log(val);
-      },
-      handleClick(command) {
-        switch (command) {
-          case '编辑':
-            console.log('编辑');
-            this.editId = this.selectList[0].id;
-            this.editProps.visible = true;
-            break;
-          case '启用':
-            console.log('启用');
-            this.batchEnable();
-            break;
-          case '禁用':
-            console.log('禁用')
-            this.batchDisable();
-            break;
-        }
-      }
-    },
-    computed: {
-      route() {
-        return this.$route;
+        this.search(this.page, this.id);
       }
     },
     mounted() {
-      // this.findAllRoles();
-      this.search(1);
+      this.id = parseInt(this.$route.params.id)
+      // 根据员工id获取合同信息
+      this.search(1, this.id);
     }
   }
 </script>

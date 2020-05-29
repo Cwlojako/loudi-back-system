@@ -2,13 +2,13 @@
   <div class="page">
     <el-tabs type="border-card" v-model="activeName">
       <el-tab-pane label="基本信息" name="0">
-        <orderDetailBaseInfo></orderDetailBaseInfo>
+        <orderDetailBaseInfo @transmitProductId="transmitProductId"></orderDetailBaseInfo>
       </el-tab-pane>
       <el-tab-pane label="收款记录" name="1">
         <collectionRecord></collectionRecord>
       </el-tab-pane>
       <el-tab-pane label="疗程信息" name="2">
-        <treatmentMessage></treatmentMessage>
+        <treatmentMessage :productId="productId"></treatmentMessage>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -21,7 +21,9 @@
   export default {
     data() {
       return {
-        activeName:'0'
+        activeName: '0',
+        // 产品id
+        productId: 0
       }
     },
     components:{
@@ -29,9 +31,13 @@
       collectionRecord,
       treatmentMessage
     },
+    methods: {
+      transmitProductId(id) {
+        this.productId = id
+      }
+    },
     mounted() {
        this.activeName = this.$route.params.activeName ? this.$route.params.activeName:this.activeName;
-       console.log(this.$route.params);
     }
   }
 </script>

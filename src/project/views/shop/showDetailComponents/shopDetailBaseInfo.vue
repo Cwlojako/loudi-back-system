@@ -124,9 +124,12 @@
 </template>
 
 <script>
+    import {getById} from '@/project/service/salon'
     export default {
       data() {
         return {
+          // 店铺数据对象
+          salon: {}
         }
       },
       methods:{
@@ -138,7 +141,17 @@
         },
         goBack() {
           this.$router.go(-1);
+        },
+        // 获取店铺详细数据
+        getSalonData(id) {
+          getById({id: id}, res => {
+            console.log(res)
+          })
         }
+      },
+      created() {
+        this.id = this.$route.params.id
+        this.getSalonData(this.id)
       }
     }
 </script>

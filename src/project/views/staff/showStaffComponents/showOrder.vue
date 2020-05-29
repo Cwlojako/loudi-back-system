@@ -18,17 +18,9 @@
         >
           <el-table-column prop="id" label="订单编号"></el-table-column>
           <el-table-column prop="type" label="订单类型"></el-table-column>
-          <el-table-column label="顾客名称">
-            <template slot-scope="scope">
-              {{scope.row.customer.realName}}
-            </template>
-          </el-table-column>
-          <el-table-column prop="id" label="疗程部位"></el-table-column>
-          <el-table-column prop="phone" label="手机号码">
-            <template slot-scope="scope">
-              {{scope.row.customer.phone}}
-            </template>
-          </el-table-column>
+          <el-table-column label="顾客名称">XXX</el-table-column>
+          <el-table-column prop="id" label="疗程部位">XXX</el-table-column>
+          <el-table-column prop="phone" label="手机号码">XXX</el-table-column>
           <el-table-column prop="paymentAmount" label="成交金额"></el-table-column>
           <el-table-column prop="createAt" label="下单时间"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="240">
@@ -111,7 +103,6 @@
     methods:{
       // 搜索订单信息
       orderSearchBySearchItem(searchItems) {
-        console.log(searchItems)
         let keys = [];
         for (
           let i = 0,
@@ -192,11 +183,11 @@
       },
       handleCurrentChange(val) {
         this.page = val;
-        this.search(this.page);
+        this.search(this.page, this.id);
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-        this.search(this.page);
+        this.search(this.page, this.id);
       }
     },
     components: {

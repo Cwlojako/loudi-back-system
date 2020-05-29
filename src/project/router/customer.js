@@ -27,7 +27,7 @@ const customer = {
       meta:{
         isShowHeader:true,
         isShowLeftSider:true,
-        keepAlive:true,
+        keepAlive:false,
         breadcrumb: [
           {
             name:'首页',

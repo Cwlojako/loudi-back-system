@@ -6,13 +6,13 @@
         <el-table
           :data="treatmentData"
           style="width: 95%;margin:0 auto;">
-          <el-table-column prop="username" label="疗程阶段"></el-table-column>
-          <el-table-column prop="realname" label="频率"></el-table-column>
-          <el-table-column prop="realname" label="能量"></el-table-column>
-          <el-table-column prop="realname" label="制冷等级"></el-table-column>
-          <el-table-column prop="realname" label="发光次数"></el-table-column>
-          <el-table-column prop="realname" label="开始时间"></el-table-column>
-          <el-table-column prop="realname" label="结束时间"></el-table-column>
+          <el-table-column prop="username" label="疗程阶段">XXX</el-table-column>
+          <el-table-column prop="frequency" label="频率"></el-table-column>
+          <el-table-column prop="energy" label="能量"></el-table-column>
+          <el-table-column prop="refrigerationLevel" label="制冷等级"></el-table-column>
+          <el-table-column prop="flashTimes" label="发光次数"></el-table-column>
+          <el-table-column prop="creatAt" label="开始时间">XXX</el-table-column>
+          <el-table-column prop="enAt" label="结束时间">XXX</el-table-column>
           <el-table-column fixed="right" align="center" label="疗程图片" width="260">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="showTreatmentPic">
@@ -64,6 +64,11 @@
   import {findByProduct} from '@/project/service/treatment'
 
   export default {
+    props: {
+      productId: {
+        type: Number
+      }
+    },
     data() {
       return {
         treatmentPicShow:false,
@@ -79,7 +84,7 @@
       goBack() {
         this.$router.go(-1);
       },
-      search(page) {
+      search(page, id) {
         let _t = this;
         _t.page = page;
         let param = {
@@ -87,10 +92,10 @@
             page: page,
             size: _t.pageSize,
           },
-          [this.model]: _t.extraParam
+          product: {id: id}
         }
         findByProduct(param, res => {
-          _t.customerData = res;
+          _t.treatmentData = res;
         });
       },
       getTotal() {
@@ -108,6 +113,7 @@
         this.pageSize = pageSize;
         this.search(this.page);
       },
+      // 显示图片
       showTreatmentPic() {
         this.treatmentPicShow = true
       }
@@ -116,7 +122,8 @@
       Search
     },
     mounted() {
-      this.search(1);
+      // 根据productId获取疗程信息
+      this.search(1, this.productId);
     }
   }
 </script>
