@@ -3,21 +3,22 @@
     <el-container style="height: 100%;">
       <el-aside width="250px">
         <el-tree
-          :data="departmentData"
-          node-key="id"
-          :expand-on-click-node="false"
+          :props="props"
+          :load="loadNode"
+          lazy
+          :expand-on-click-node='false'
         >
-          <span class="custom-tree-node" slot-scope="{ node, data }">
+          <span class="custom-tree-node" slot-scope="{ node, data }" @click="findByDepartmentId(data.id)">
             <span class="title">{{ node.label }}</span>
             <span>
-              <el-tooltip class="item" effect="light" content="添加" placement="top" :enterable="false">
-                <i class="treeIcon el-icon-circle-plus-outline" @click="showAddDepartment"></i>
+              <el-tooltip class="item" content="添加" placement="top" :enterable="false">
+                <i class="treeIcon el-icon-circle-plus-outline" @click="showAddDepartment($event, data.id)"></i>
               </el-tooltip>
-              <el-tooltip class="item" effect="light" content="编辑" placement="bottom" :enterable="false">
-                <i class="treeIcon el-icon-edit" @click="showEditDepartment(data.id)"></i>
+              <el-tooltip class="item" content="编辑" placement="bottom" :enterable="false">
+                <i class="treeIcon el-icon-edit" @click="showEditDepartment($event, data.id)"></i>
               </el-tooltip>
-              <el-tooltip class="item" effect="light" content="删除" placement="top" :enterable="false">
-                <i class="treeIcon el-icon-delete" @click="deleteDepartment(data.id)"></i>
+              <el-tooltip class="item" content="删除" placement="top" :enterable="false">
+                <i class="treeIcon el-icon-delete" @click="deleteDepartment($event, data.id)"></i>
               </el-tooltip>
             </span>
           </span>
@@ -141,13 +142,7 @@
     <el-dialog title="添加部门" :visible.sync="addDepartmentShow" width="600px" @close="closeAddDepartment">
       <el-form :model="addDepartmentForm" :rules="addDepartmentRules" ref="addDepartmentRef" label-width="90px">
         <el-form-item label="上级部门:" prop="parent">
-          <el-select v-model="addDepartmentForm.parent" placeholder="请选择上级部门">
-            <el-option v-for='(item, index) in parentOptions'
-              :key='index'
-              :value='item.value'
-              :label='item.label'>
-            </el-option>
-          </el-select>
+          <el-input v-model="addDepartmentForm.parent" disabled readonly></el-input>
         </el-form-item>
         <el-form-item label="部门名称:" prop="name">
           <el-input v-model="addDepartmentForm.name"></el-input>
@@ -194,43 +189,19 @@
 <script>
   import Emitter from '@/framework/mixins/emitter'
   import Search from "@/framework/components/search";
-  import {find, count, leave, enable, disable, batchEnable, batchDisable} from '@/project/service/employee'
-  import {save, delDepartment, get, findFather, findByParentId} from '@/project/service/department'
+  import {find, findByDepartmentId, count, leave, enable, disable, batchEnable, batchDisable} from '@/project/service/employee'
+  import {save, delDepartment, get, findFather, findByParentId, findNext} from '@/project/service/department'
 
   export default {
     mixins: [Emitter],
     data() {
       return {
-        departmentData: [{
-          id: 1,
-          label: '总部',
-          children: [{
-            id: 4,
-            label: '培训部'
-          }, {
-            id: 9,
-            label: '营销部'
-          }, {
-            id: 6,
-            label: '后勤部'
-          }, {
-            id: 3,
-            label: '人事部'
-          }, {
-            id: 7,
-            label: '市场部',
-            children: [{
-              id: 13,
-              label: '湖南/湖北'
-            }, {
-              id: 14,
-              label: '广西/海南'
-            }, {
-              id: 26,
-              label: '福建/广东'
-            }]
-          }]
-        }],
+        props: {
+          label: 'name',
+          children: 'children',
+          isLeaf: 'leaf',
+          id: 'id'
+        },
         // 控制新增部门对话框的显示与隐藏
         addDepartmentShow: false,
         //新增部门表单信息对象
@@ -242,9 +213,6 @@
         },
         // 新增部门表单验证规则
         addDepartmentRules: {
-          parent: [
-            {required: true, message: '请选择上级部门', trigger: 'blur'}
-          ],
           name: [
             {required: true, message: '请填写部门名称', trigger: 'blur'},
             {min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur'}
@@ -263,8 +231,6 @@
           position: '',// 排序号
           comment: '' // 备注
         },
-        // 上级部门可选项
-        parentOptions: [],
         model: "employee",
         editId: 0,//编辑id
         data: [], // 员工表格数据
@@ -284,6 +250,8 @@
         fillAtParam: {},
         employedAtParam: {},
         birthdayParam: {},
+        // 部门根节点
+        rootNode: [],
         // 搜索组件配置项
         searchItems: [
           {
@@ -374,13 +342,41 @@
       Search
     },
     methods: {
+      // 点击部门节点获取相应部门下的员工列表
+      findByDepartmentId(departmentId) {
+        findByDepartmentId({departmentId: departmentId}, res => {
+          this.data = res
+        })
+      },
+      // 控制树结构的懒加载，点击父部门再加载子部门
+      loadNode(node, resolve) {
+        if (node.level === 0) {
+          findFather(res => {
+            return resolve(res)
+          })
+        }
+        if (node.level >= 1) {
+          findNext({id: node.data.id}, res => {
+            return resolve(res)
+          })
+        }
+      },
       // 前往查看员工相关信息页面
       goShowStaffPage(id){
         this.$router.push({path:'/staff/showStaff/' + id});
       },
       // 显示新增部门
-      showAddDepartment() {
+      showAddDepartment(e, id) {
         this.addDepartmentShow = true;
+        e.stopPropagation()
+        // 根据id获取部门信息
+        get({id}, res => {
+          console.log(res)
+          if (res.name) {
+            this.addDepartmentForm.parent = res.name
+          }
+          console.log(this.addDepartmentForm)
+        })
       },
       // 发送新增部门请求
       addDepartment() {
@@ -395,16 +391,22 @@
         })
       },
       // 编辑部门信息
-      showEditDepartment(id) {
+      showEditDepartment(e, id) {
         this.editDepartmentShow = true;
+        // 阻止事件冒泡
+        e.stopPropagation()
         // 根据id获取部门信息
         get({id}, res => {
           this.editDepartmentForm = res
-          this.editDepartmentForm.parent = res.parent.name
+          if (res.parent && res.parent.name) {
+            this.editDepartmentForm.parent = res.parent.name
+          } else {
+            this.editDepartmentForm.parent = '顶级部门'
+          }
         })
       },
       // 删除部门
-      deleteDepartment(id) {
+      deleteDepartment(e, id) {
         this.$confirm(' 删除该部门请确认该部门下没有员工', '确定删除该部门吗?', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -425,6 +427,7 @@
             message: '已取消删除'
           });
         });
+        e.stopPropagation()
       },
       // 关闭新增部门对话框
       closeAddDepartment() {
@@ -475,7 +478,6 @@
       },
       // 顶部额外搜索条件
       searchBySearchItem(searchItems) {
-        console.log(searchItems)
         let keys = [];
         for (
           let i = 0,
@@ -536,8 +538,7 @@
         let param = {
           pageable: {
             page: page,
-            size: _t.pageSize,
-            sort: _t.sort
+            size: _t.pageSize
           },
           [this.model]: _t.extraParam,
           isLoginedToday: false,
@@ -546,12 +547,6 @@
           birthday: this.birthdayParam
         };
         // 如果参数不需要则清除
-        if (
-          param.pageable.sort.asc.length === 0 &&
-          param.pageable.sort.desc.length === 0
-        ) {
-          delete param.pageable.sort;
-        }
         if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
         if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
         if (JSON.stringify(param.birthday) === "{}") delete param.birthday
@@ -571,8 +566,6 @@
           _t.getTotal()
         });
       },
-      // 获取上级部门可选项数据
-      getParentOptions() {},
       // 获取员工信息条目总数
       getTotal() {
         let param = {[this.model]: this.extraParam, isLoginedToday: false};
@@ -587,8 +580,6 @@
           this.loginedTotal = parseInt(res)
         })
       },
-      // 获取部门列表数据
-      searchDepartment() {},
       // 批量启用
       batchEnable() {
         let _t = this;
@@ -683,12 +674,8 @@
     },
     created() {
       this.search(1)
-      // 获取上级部门可选项
-      this.getParentOptions()
       // 获取今日登录数
       this.getLoginedToday()
-      // 获取部门列表数据
-      this.searchDepartment()
     }
   }
 </script>
@@ -737,9 +724,6 @@
   .content /deep/ .el-date-editor /deep/ .el-input__inner /deep/  .el-input__prefix /deep/ .el-input__icon {
     line-height: 32px !important;
   }
-  // .el-tree-node:hover {
-  //   background: #ccc;
-  // }
   .el-tree /deep/ .el-tree-node__content:hover {
     background: #ccc!important;
   }

@@ -2,6 +2,7 @@ import axios from '@/framework/http/axios'
 const model = 'employee'
 let getUrl = `api/${model}/get`
 let findUrl = `api/${model}/find`
+let findByDepartmentIdUrl = `api/${model}/findByDepartmentId`
 let enableUrl = `api/${model}/enable`
 let disableUrl = `api/${model}/disable`
 let countUrl = `api/${model}/count`
@@ -11,7 +12,6 @@ let batchEnableUrl = `api/${model}/batchEnable`
 let batchDisableUrl = `api/${model}/batchDisable`
 let leaveUrl = `api/${model}/leave`
 let restoreUrl = `api/${model}/restore`
-let getInfoUrl = `api/${model}/getInfo`
 
 // 根据id获取员工信息
 export function get(param, callback) {
@@ -21,9 +21,17 @@ export function get(param, callback) {
 		}
 	})
 }
-// 查询员工信息表
+// 获取全部员工信息表
 export function find(param, callback) {
 	axios.post(findUrl, param).then(data => {
+		if (data !== undefined && data !== '' && data !== null) {
+			callback(data)
+		}
+	})
+}
+// 根据部门id获取该部门以及子部门下的员工列表
+export function findByDepartmentId(param, callback) {
+	axios.post(findByDepartmentIdUrl, param).then(data => {
 		if (data !== undefined && data !== '' && data !== null) {
 			callback(data)
 		}
@@ -95,11 +103,11 @@ export function leave(param, callback) {
 }
 // 根据id恢复员工职位
 export function restore(param, callback) {
-  axios.post(restoreUrl, param).then(data => {
-    if (data !== undefined && data !== '' && data !== null) {
-      callback(data)
-    }
-  })
+	axios.post(restoreUrl, param).then(data => {
+	if (data !== undefined && data !== '' && data !== null) {
+		callback(data)
+	}
+	})
 }
 
 

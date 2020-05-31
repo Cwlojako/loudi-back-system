@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='page'>
     <el-tabs class="box" type="border-card">
       <el-tab-pane label="基本信息">
         <shopDetailBaseInfo></shopDetailBaseInfo>
@@ -41,6 +41,10 @@
 </script>
 
 <style lang="less" scoped>
+  .page {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
   .box {
     margin-left: 20px;
   }

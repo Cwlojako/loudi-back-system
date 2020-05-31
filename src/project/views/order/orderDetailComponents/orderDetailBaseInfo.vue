@@ -156,13 +156,16 @@
       return {
         // 订单id
         id: 0,
-        // 订单数据对象
+        model: 'order',
         order: {
-          customer: {},
-          partner: {},
-          operator: {}
-        },
-        model: 'order'
+          operator: {},
+          partner: {}
+        }
+      }
+    },
+    props: {
+      orderData: {
+        type: Object
       }
     },
     methods:{
@@ -172,20 +175,16 @@
       // 编辑订单详情
       editOrderDetail() {
         this.$router.push({path:'/order/editOrderDetail'});
-      },
-      getOrderData(id) {
-        getById({
-          [this.model]: {id: id}
-        }, res => {
-          this.order = res[0]
-          this.$emit("transmitProductId", res[0].product.id)
-        })
       }
     },
-    created() {
-      this.id = parseInt(this.$route.params.id)
-      // 获取订单基本信息数据
-      this.getOrderData(this.id)
+    watch: {
+      orderData: {
+        handler(val) {
+          this.order = val
+          this.order.operator = val.operator
+          this.order.partner = val.partner
+        }
+      }
     }
   }
 </script>

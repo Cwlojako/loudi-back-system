@@ -70,14 +70,14 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取 消</el-button>
-        <el-button type="primary" @click="handleConfirm">确 定</el-button>
+        <el-button type="primary" @click="handleConfirm(isEdit)">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-  import {findByEmployeeId, save, count} from '@/project/service/contract'
+  import {findByEmployeeId, save, count, update} from '@/project/service/contract'
 
   export default {
     data() {
@@ -102,7 +102,9 @@
         pageSize: 10,
         page: 1,
         total: 0,
-        extraParam: {}
+        extraParam: {},
+        // 是否是编辑弹框
+        isEdit: false
       }
     },
     methods: {
@@ -111,29 +113,43 @@
         this.pactShow = false
         this.$refs.pactRef.resetFields();
       },
-      handleConfirm() {
-        save({contract: Object.assign(this.contractForm, {employee: {id: this.id}})}, res => {
-          this.handleClose()
-          // 重新获取数据
-          this.search(1, this.id)
-          this.$message({
-            type: 'success',
-            message: '添加成功'
+      handleConfirm(isEdit) {
+        if (isEdit) {
+          // 如果表单的必填项没有填写则终止请求发送
+          this.$refs.pactRef.validate(valid => {
+            if (!valid) return false
           })
-        })
+          console.log('编辑')
+        } else {
+          // 如果表单的必填项没有填写则终止请求发送
+          this.$refs.pactRef.validate(valid => {
+            if (!valid) return false
+            // 确定有填写再发送请求
+            save({contract: Object.assign(this.contractForm, {employee: {id: this.id}})}, res => {
+              this.handleClose()
+              // 重新获取数据
+              this.search(1, this.id)
+              this.$message({
+                type: 'success',
+                message: '添加成功'
+              })
+            })
+          })
+        }
       },
       // 新增合同
       addPact() {
         this.pactDialogTitle = '新建合同';
         this.pactShow = true;
+        this.isEdit = false
       },
       editPact(id) {
         findByEmployeeId({contract: {id: id}, employee: {id: this.id}}, res => {
-          console.log(res)
           this.contractForm = res[0]
         })
         this.pactDialogTitle = '编辑合同';
         this.pactShow = true;
+        this.isEdit = true
       },
       search(page, id) {
         let _t = this;
@@ -151,7 +167,7 @@
         });
       },
       getTotal(id) {
-        count({employee: {id: id}}, res => {
+        count({employee: {id: id}, [this.model]: {}}, res => {
           this.total = res
         })
       },

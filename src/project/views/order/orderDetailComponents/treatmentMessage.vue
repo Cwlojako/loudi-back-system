@@ -52,7 +52,7 @@
         <img src="../../../assets/logo.png" alt="">
       </div>
       <span slot="footer" class="dialog-footer">
-       <el-button @click="treatmentPicShow = false">关闭</el-button>
+        <el-button @click="treatmentPicShow = false">关闭</el-button>
       </span>
     </el-dialog>
 
@@ -121,9 +121,12 @@
     components: {
       Search
     },
-    mounted() {
-      // 根据productId获取疗程信息
-      this.search(1, this.productId);
+    // 监听productId的变化
+    watch: {
+      productId(val) {
+        this.productId = val
+        this.search(1, this.productId)
+      }
     }
   }
 </script>
