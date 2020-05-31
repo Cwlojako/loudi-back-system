@@ -140,7 +140,7 @@
 
     <!--    新增部门的对话框-->
     <el-dialog title="添加部门" :visible.sync="addDepartmentShow" width="600px" @close="closeAddDepartment">
-      <el-form :model="addDepartmentForm" :rules="addDepartmentRules" ref="addDepartmentRef" label-width="90px">
+      <el-form :model="addDepartmentForm" :rules="rules" ref="addDepartmentRef" label-width="90px">
         <el-form-item label="上级部门:" prop="parent">
           <el-input v-model="addDepartmentForm.parent" disabled readonly></el-input>
         </el-form-item>
@@ -156,14 +156,14 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取 消</el-button>
-        <el-button type="primary" @click="addDepartment">确 定</el-button>
+        <el-button type="primary" @click="addDepartment(departmentId)">确 定</el-button>
       </div>
     </el-dialog>
 
     <!--  修改部门信息对话框  -->
     <el-dialog title="修改部门信息" :visible.sync="editDepartmentShow" width="600px" @close="closeEditDepartment">
       <!--   修改部门信息表单验证规则和新增部门表单规则一致   -->
-      <el-form :model="editDepartmentForm" :rules="addDepartmentRules" ref="editDepartmentRef" label-width="90px">
+      <el-form :model="editDepartmentForm" :rules="rules" ref="editDepartmentRef" label-width="90px">
         <el-form-item label="上级部门:" prop="parent">
           <el-input v-model="editDepartmentForm.parent" disabled readonly></el-input>
         </el-form-item>
@@ -211,8 +211,8 @@
           position: '',// 排序号
           comment: '' // 备注
         },
-        // 新增部门表单验证规则
-        addDepartmentRules: {
+        // 新增编辑部门表单验证规则
+        rules: {
           name: [
             {required: true, message: '请填写部门名称', trigger: 'blur'},
             {min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur'}
@@ -252,6 +252,8 @@
         birthdayParam: {},
         // 部门根节点
         rootNode: [],
+        // 部门id
+        departmentId: 0,
         // 搜索组件配置项
         searchItems: [
           {
@@ -372,22 +374,26 @@
         // 根据id获取部门信息
         get({id}, res => {
           console.log(res)
+          this.departmentId = res.id
           if (res.name) {
             this.addDepartmentForm.parent = res.name
           }
-          console.log(this.addDepartmentForm)
         })
       },
       // 发送新增部门请求
-      addDepartment() {
-        save(param, res => {
-          this.handleClose()
-          // 重新查询所有部门
-          // searchDepartment()
-          this.$message({
-            type: 'success',
-            message: '添加成功!'
-          });
+      addDepartment(parentId) {
+        console.log(parentId)
+        this.addDepartmentForm.parent = {id: parentId}
+        this.$refs.addDepartmentRef.validate(async valid => {
+          if (!valid) return false
+          save({department: this.addDepartmentForm}, res => {
+            this.handleClose()
+            // 重新渲染部门数据 ？？？
+            this.$message({
+              type: 'success',
+              message: '添加成功!'
+            });
+          })
         })
       },
       // 编辑部门信息
