@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page">
     <el-tabs type="border-card" v-model="activeName">
       <el-tab-pane name="0" label="基本信息">
         <el-form :model="baseInfoData" :rules="baseInfoRule" ref="baseInfoRef" label-width="100px" class="demo-ruleForm">

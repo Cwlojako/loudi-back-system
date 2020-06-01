@@ -5,7 +5,7 @@
         <div class="grid-content bg-purple">来源</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">跑店</div>
+        <div class="grid-content bg-purple-light">{{salon.sourceChannel}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -13,7 +13,7 @@
         <div class="grid-content bg-purple">合作状态</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">已合作</div>
+        <div class="grid-content bg-purple-light">{{salon.cooperationStatus}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -21,7 +21,7 @@
         <div class="grid-content bg-purple">项目负责人</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">陈小无</div>
+        <div class="grid-content bg-purple-light">{{salon.projectLeader}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -29,7 +29,7 @@
         <div class="grid-content bg-purple">负责人联系方式</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">13971523546</div>
+        <div class="grid-content bg-purple-light">{{salon.projectLeaderPhone}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -37,7 +37,7 @@
         <div class="grid-content bg-purple">店家分类</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">美容美发</div>
+        <div class="grid-content bg-purple-light">{{salon.category}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -45,7 +45,7 @@
         <div class="grid-content bg-purple">店家质量</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">一般</div>
+        <div class="grid-content bg-purple-light">{{salon.quality}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -53,7 +53,7 @@
         <div class="grid-content bg-purple">店内面积</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">300平方</div>
+        <div class="grid-content bg-purple-light">{{salon.area}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -61,7 +61,7 @@
         <div class="grid-content bg-purple">经营年限</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">3年</div>
+        <div class="grid-content bg-purple-light">{{salon.licenseExpireAt}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -69,7 +69,7 @@
         <div class="grid-content bg-purple">美容师人数</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">15</div>
+        <div class="grid-content bg-purple-light">{{salon.beauticianQuantity}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -77,7 +77,7 @@
         <div class="grid-content bg-purple">店内会员数</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">120</div>
+        <div class="grid-content bg-purple-light">{{salon.memberQuantity}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -85,7 +85,7 @@
         <div class="grid-content bg-purple">成交人数</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">99</div>
+        <div class="grid-content bg-purple-light">{{salon.customerQuantity}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -93,7 +93,7 @@
         <div class="grid-content bg-purple">广告费</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">6523</div>
+        <div class="grid-content bg-purple-light">XXX</div>
       </el-col>
     </el-row>
     <el-row>
@@ -101,7 +101,7 @@
         <div class="grid-content bg-purple">店家配合程度</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">十分配合</div>
+        <div class="grid-content bg-purple-light">{{salon.cooperationDegree}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -109,7 +109,7 @@
         <div class="grid-content bg-purple">店内基本项目</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩‘美容美发，养生按摩</div>
+        <div class="grid-content bg-purple-light">{{salon.serviceContent}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -117,7 +117,7 @@
         <div class="grid-content bg-purple">店外环境</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；十分优美；</div>
+        <div class="grid-content bg-purple-light">{{salon.serviceEnvironment}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -125,7 +125,7 @@
         <div class="grid-content bg-purple">店内介绍</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；店家服务十分到位；</div>
+        <div class="grid-content bg-purple-light">{{salon.description}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -133,7 +133,7 @@
         <div class="grid-content bg-purple">备注</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">无</div>
+        <div class="grid-content bg-purple-light">{{salon.comment}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -149,8 +149,14 @@
 
 <script>
   export default {
+    props: {
+      salonData: {
+        type: Object
+      }
+    },
     data() {
       return {
+        salon: {}
       }
     },
     methods:{
@@ -158,10 +164,18 @@
       goEditDetailInfo() {
         this.$router.push({path:'/shop/addOrEditBaseInfo',query:{
           activeName:'1'
-          }});
+        }});
       },
       goBack() {
         this.$router.go(-1);
+      }
+    },
+    watch: {
+      salonData: {
+        handler(val) {
+          this.salon = val
+        },
+        deep: true
       }
     }
   }

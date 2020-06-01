@@ -40,7 +40,7 @@
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="page"
-              :page-sizes="[10, 20, 30, 40]"
+              :page-sizes="[1, 20, 30, 40]"
               :page-size="pageSize"
               layout="total, sizes, jumper, pager,prev, next"
               :total="total"
@@ -70,7 +70,7 @@
         // 设备数据
         deviceData: [],
         model: "device",
-        pageSize: 10,
+        pageSize: 1,
         page: 1,
         total: 0,
         extraParam: {},

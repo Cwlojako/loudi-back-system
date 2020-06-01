@@ -348,6 +348,7 @@
       findByDepartmentId(departmentId) {
         findByDepartmentId({departmentId: departmentId}, res => {
           this.data = res
+          this.total = res.length
         })
       },
       // 控制树结构的懒加载，点击父部门再加载子部门
@@ -574,9 +575,19 @@
       },
       // 获取员工信息条目总数
       getTotal() {
-        let param = {[this.model]: this.extraParam, isLoginedToday: false};
+        let param = {
+          [this.model]: this.extraParam,
+          isLoginedToday: false,
+          fillAt: this.fillAtParam,
+          employedAt: this.employedAtParam,
+          birthday: this.birthdayParam
+        }
+        // 如果参数不需要则清除
+        if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
+        if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
+        if (JSON.stringify(param.birthday) === "{}") delete param.birthday
         count(param, res => {
-          this.total = parseInt(res);
+          this.total = parseInt(res)
         });
       },
       // 获取今日登录过的数量

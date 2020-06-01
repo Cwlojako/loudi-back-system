@@ -30,7 +30,7 @@
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="page"
-              :page-sizes="[10, 20, 30, 40]"
+              :page-sizes="[2, 20, 30, 40]"
               :page-size="pageSize"
               layout="total, sizes, jumper, pager,prev, next"
               :total="total"
@@ -99,12 +99,14 @@
         // 顾客数据
         contractData: [],
         model: "contract",
-        pageSize: 10,
+        pageSize: 2,
         page: 1,
         total: 0,
         extraParam: {},
         // 是否是编辑弹框
-        isEdit: false
+        isEdit: false,
+        // 合同id
+        contractId: 0
       }
     },
     methods: {
@@ -119,11 +121,24 @@
           this.$refs.pactRef.validate(valid => {
             if (!valid) return false
           })
-          console.log('编辑')
+          let param = Object.assign(this.contractForm, {id: this.contractId})
+          // 发送更新合同请求
+          update({contract: Object.assign(param, {employee: {id: this.id}})}, res => {
+            this.handleClose()
+            // 重新获取数据
+            this.search(1, this.id)
+            this.$message({
+              type: 'success',
+              message: '更新成功'
+            })
+          })
         } else {
           // 如果表单的必填项没有填写则终止请求发送
           this.$refs.pactRef.validate(valid => {
             if (!valid) return false
+            // 处理参数，如果表单填写项为空则清除
+            if (this.contractForm.content === '') delete this.contractForm.content
+            if (this.contractForm.signAt === '') delete this.contractForm.signAt
             // 确定有填写再发送请求
             save({contract: Object.assign(this.contractForm, {employee: {id: this.id}})}, res => {
               this.handleClose()
@@ -145,6 +160,7 @@
       },
       editPact(id) {
         findByEmployeeId({contract: {id: id}, employee: {id: this.id}}, res => {
+          this.contractId = res[0].id
           this.contractForm = res[0]
         })
         this.pactDialogTitle = '编辑合同';

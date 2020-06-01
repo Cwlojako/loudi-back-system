@@ -5,7 +5,7 @@
         <div class="grid-content bg-purple">启用状态</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">已启用</div>
+        <div class="grid-content bg-purple-light">XXX</div>
       </el-col>
     </el-row>
     <el-row>
@@ -13,7 +13,7 @@
         <div class="grid-content bg-purple">店铺编号</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">13546876</div>
+        <div class="grid-content bg-purple-light">{{salon.id}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -21,7 +21,7 @@
         <div class="grid-content bg-purple">所属市场</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">总部-市场部-广东</div>
+        <div class="grid-content bg-purple-light">{{salon.department.name}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -29,7 +29,7 @@
         <div class="grid-content bg-purple">所属老师</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">刘国富</div>
+        <div class="grid-content bg-purple-light">{{salon.teacher.realName}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -37,7 +37,7 @@
         <div class="grid-content bg-purple">详细地址</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">广东省广州市天河区乐天大厦101</div>
+        <div class="grid-content bg-purple-light">{{salon.address}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -45,7 +45,7 @@
         <div class="grid-content bg-purple">营业时间</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">09:00-22:00</div>
+        <div class="grid-content bg-purple-light">{{salon.businessHours}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -53,7 +53,7 @@
         <div class="grid-content bg-purple">跑店人员</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">紫小鲸</div>
+        <div class="grid-content bg-purple-light">XXX</div>
       </el-col>
     </el-row>
     <el-row>
@@ -61,7 +61,7 @@
         <div class="grid-content bg-purple">有无设备</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">有</div>
+        <div class="grid-content bg-purple-light">XXX</div>
       </el-col>
     </el-row>
     <el-row>
@@ -69,7 +69,7 @@
         <div class="grid-content bg-purple">结款方式</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">月结</div>
+        <div class="grid-content bg-purple-light">{{salon.settlementPeriod}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -77,7 +77,7 @@
         <div class="grid-content bg-purple">店家分成比例</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">10%</div>
+        <div class="grid-content bg-purple-light">{{salon.commissionRate}}%</div>
       </el-col>
     </el-row>
     <el-row>
@@ -85,7 +85,7 @@
         <div class="grid-content bg-purple">老板名称</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">刘德华</div>
+        <div class="grid-content bg-purple-light">{{salon.bossName}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -93,7 +93,7 @@
         <div class="grid-content bg-purple">老板电话</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">13554254789</div>
+        <div class="grid-content bg-purple-light">{{salon.bossPhone}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -101,7 +101,7 @@
         <div class="grid-content bg-purple">合作子状态</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">已出单</div>
+        <div class="grid-content bg-purple-light">{{salon.cooperationSubStatus}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -109,7 +109,7 @@
         <div class="grid-content bg-purple">未出单天数</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">30</div>
+        <div class="grid-content bg-purple-light">XXX</div>
       </el-col>
     </el-row>
     <el-row>
@@ -124,12 +124,19 @@
 </template>
 
 <script>
-    import {getById} from '@/project/service/salon'
     export default {
+      props: {
+        salonData: {
+          type: Object
+        }
+      },
       data() {
         return {
           // 店铺数据对象
-          salon: {}
+          salon: {
+            department: {},
+            teacher: {}
+          }
         }
       },
       methods:{
@@ -141,17 +148,15 @@
         },
         goBack() {
           this.$router.go(-1);
-        },
-        // 获取店铺详细数据
-        getSalonData(id) {
-          getById({id: id}, res => {
-            console.log(res)
-          })
         }
       },
-      created() {
-        this.id = this.$route.params.id
-        this.getSalonData(this.id)
+      watch: {
+        salonData: {
+          handler(val) {
+            this.salon = val
+          },
+          deep: true
+        }
       }
     }
 </script>

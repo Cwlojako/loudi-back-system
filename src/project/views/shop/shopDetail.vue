@@ -2,10 +2,10 @@
   <div class='page'>
     <el-tabs class="box" type="border-card">
       <el-tab-pane label="基本信息">
-        <shopDetailBaseInfo></shopDetailBaseInfo>
+        <shopDetailBaseInfo :salonData="salonData"></shopDetailBaseInfo>
       </el-tab-pane>
       <el-tab-pane label="详细信息">
-        <shopDetailInfo></shopDetailInfo>
+        <shopDetailInfo :salonData="salonData"></shopDetailInfo>
       </el-tab-pane>
       <el-tab-pane label="结算记录">
         <settlementRecord></settlementRecord>
@@ -14,7 +14,7 @@
         <trainRecord></trainRecord>
       </el-tab-pane>
       <el-tab-pane label="交接记录">
-        <connectRecord></connectRecord>
+        <connectRecord :salonHandoverData="salonHandoverData"></connectRecord>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -26,9 +26,14 @@
   import settlementRecord from "./showDetailComponents/settlementRecord" // 引入店铺详情结算记录组件
   import trainRecord from "./showDetailComponents/trainRecord"; // 引入店铺详情培训记录组件
   import connectRecord from "./showDetailComponents/connectRecord"; // 引入店铺详情交接记录组件
+  import {getById} from '@/project/service/salon'
   export default {
     data(){
-      return {}
+      return {
+        // 店铺数据
+        salonData: {},
+        salonHandoverData: []
+      }
     },
     components:{
       shopDetailBaseInfo,
@@ -36,6 +41,18 @@
       settlementRecord,
       trainRecord,
       connectRecord
+    },
+    methods: {
+      // 获取店铺详细数据
+      getSalonData(id) {
+        getById({id: id}, res => {
+          this.salonData = res
+        })
+      }
+    },
+    created() {
+      this.id = this.$route.params.id
+      this.getSalonData(this.id)
     }
   }
 </script>

@@ -25,11 +25,11 @@
               <el-radio label="女" value="女"></el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="所属部门" prop="dapartment">
+          <el-form-item label="所属部门" prop="department">
             <el-input placeholder="请选择部门"
                       suffix-icon="el-icon-arrow-right"
-                      v-model="baseInfoForm.department"
-                      @focus="selectDepartment"
+                      v-model="baseInfoForm.department.name"
+                      @focus="selectDepartment(defaultId)"
                       clearable>
             </el-input>
           </el-form-item>
@@ -41,16 +41,24 @@
             </el-select>
           </el-form-item>
           <el-form-item label="出生日期" prop="birthday">
-            <el-date-picker type="date" placeholder="请选择年月日" v-model="baseInfoForm.birthday"
-                            style="width: 100%;">
+            <el-date-picker type="date"
+                            placeholder="请选择年月日"
+                            v-model="baseInfoForm.birthday"
+                            style="width: 100%;"
+                            value-format="yyyy-MM-dd"
+                            format="yyyy-MM-dd">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="培训批次" prop="trainingOrder">
             <el-input v-model="baseInfoForm.trainingOrder"></el-input>
           </el-form-item>
           <el-form-item label="正式入职日期" prop="employedAt">
-            <el-date-picker type="date" placeholder="请选择年月日" v-model="baseInfoForm.employedAt"
-                            style="width: 100%;">
+            <el-date-picker type="date"
+                            placeholder="请选择年月日"
+                            v-model="baseInfoForm.employedAt"
+                            style="width: 100%;"
+                            value-format="yyyy-MM-dd"
+                            format="yyyy-MM-dd">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="介绍人" prop="introducer">
@@ -152,13 +160,15 @@
     >
       <!--      选择部门树形组件-->
       <el-tree
-        :data="departmentData"
-        node-key="id"
-        show-checkbox
+        :props="props"
+        :load="loadNode"
+        lazy
+        :expand-on-click-node='false'
         default-expand-all
+        node-key="id"
+        @check="handleNodeCheck"
         ref="tree"
-        @node-click="handleNodeClick"
-        :expand-on-click-node="false"
+        show-checkbox
       >
       </el-tree>
       <span slot="footer" class="dialog-footer">
@@ -171,12 +181,19 @@
 
 <script>
   import Emitter from '@/framework/mixins/emitter'
-  import {get, save} from '@/project/service/employee'
+  import {get, save, update} from '@/project/service/employee'
+  import {findFather, findNext} from '@/project/service/department'
 
   export default {
     mixins: [Emitter],
     data() {
       return {
+        props: {
+          label: 'name',
+          children: 'children',
+          isLeaf: 'leaf',
+          id: 'id'
+        },
         // 当前激活项
         activeName: 'first',
         // 员工编辑id
@@ -188,7 +205,10 @@
           realName: '',
           manageable: '',
           gender: '',
-          department: '',
+          department: {
+            id: 0,
+            name: ''
+          },
           duty: '',
           birthday: '',
           trainingOrder: '',
@@ -210,37 +230,6 @@
         },
         // 控制选择部门对话框的显示与隐藏
         selectDepartShow: false,
-        // 可选择部门数据
-        departmentData: [{
-          id: 1,
-          label: '总部',
-          children: [{
-            id: 4,
-            label: '培训部'
-          }, {
-            id: 9,
-            label: '营销部'
-          }, {
-            id: 6,
-            label: '后勤部'
-          }, {
-            id: 3,
-            label: '人事部'
-          }, {
-            id: 7,
-            label: '市场部',
-            children: [{
-              id: 13,
-              label: '湖南/湖北'
-            }, {
-              id: 14,
-              label: '广西/海南'
-            }, {
-              id: 26,
-              label: '福建/广东'
-            }]
-          }]
-        }],
         // 可选择学历
         educationOptions: [
           {label: '小学', value: '小学'},
@@ -291,31 +280,85 @@
         // 详细信息表单验证规则
         detailInfoRules: {
           fillAt: [{required: true, message: '请选择', trigger: 'blur'}]
-        }
+        },
+        // 部门id
+        defaultId: 0,
+        // 基本信息提交参数
+        baseInfoParam: {}
       }
     },
     methods: {
+      // 控制树结构的懒加载，点击父部门再加载子部门
+      loadNode(node, resolve) {
+        if (node.level === 0) {
+          findFather(res => {
+            return resolve(res)
+          })
+        }
+        if (node.level >= 1) {
+          findNext({id: node.data.id}, res => {
+            return resolve(res)
+          })
+        }
+      },
       // 返回上一页
       goBack() {
         this.$router.go('-1');
       },
       // 选择部门
-      selectDepartment() {
+      selectDepartment(defaultId) {
         this.selectDepartShow = true;
+        this.$nextTick(() => {
+          // 打开弹框默认选中的部门
+          this.$refs.tree.setCheckedKeys([defaultId])
+        })
       },
-      // 节点被点击时的回调
-      handleNodeClick(item, node, self) { //自己定义的editCheckId，防止单选出现混乱
-        this.checkedLabel = item.label
-        this.checkedId = item.id;
-        this.$refs.tree.setCheckedKeys([item.id])
+      // 节点被选中时的回调
+      handleNodeCheck(item, node, self) { //自己定义的editCheckId，防止单选出现混乱
+        console.log(item)
+        this.checkedLabel = item
+        this.defaultId = item.id;
+        this.$refs.tree.setCheckedKeys([this.defaultId])
       },
       // 确定选中部门
       handleSelectDepartment(checkedLabel) {
         this.selectDepartShow = false
         this.baseInfoForm.department = checkedLabel
       },
-      // 提交员工基本信息
-      handleSaveBase() {},
+      // 新增编辑员工基本信息
+      handleSaveBase() {
+        this.$refs.baseInfoRef.validate(valid => {
+          if (!valid) return false
+          this.baseInfoParam = this.baseInfoForm
+          // 处理是否负责人参数
+          if (this.baseInfoForm.manageable === '是') {
+            this.baseInfoParam.manageable = true
+          } else {
+            this.baseInfoParam.manageable = false
+          }
+          if (!this.editId) {
+            // 添加员工基本信息
+            console.log('新建')
+            save({employee: this.baseInfoParam}, res => {
+              this.$refs.baseInfoRef.resetFields()
+              this.$message({
+                type: 'success',
+                message: '添加员工基本信息成功'
+              });
+            })
+          } else {
+            // 更新员工基本信息
+            console.log('更新')
+            update({employee: this.baseInfoParam}, res => {
+              this.selectAddOrEdit()
+              this.$message({
+                type: 'success',
+                message: '更新员工基本信息成功!'
+              });
+            })
+          }
+        })
+      },
       // 提交员工详细信息
       handleSaveDetail() {},
       // 进入的是编辑员工模式还是新建员工模式
@@ -323,13 +366,14 @@
         if (!this.editId) {
           console.log('新建模式')
         } else {
+          console.log('编辑模式')
           // 否则则是进入编辑员工页面,根据id获取员工信息
           get({id: this.editId}, res => {
+            console.log(res)
             this.baseInfoForm = res
+            this.defaultId = res.department.id
             // 处理是否负责人数据
             this.baseInfoForm.manageable = res.manageable ? '是' : '否'
-            // 处理部门数据
-            this.baseInfoForm.department = res.department.name
           })
         }
       }
