@@ -37,10 +37,10 @@
             ></search>
           </el-col>
           <el-col :span="24" style="margin-left: 35px">
-            <el-tag type="success">全部{{total}}</el-tag>
-            <el-tag type="success">启用{{enableTotal}}</el-tag>
-            <el-tag type="success">禁用{{disableTotal}}</el-tag>
-            <el-tag type="success">今日登陆过{{loginedTotal}}</el-tag>
+            <el-tag type="success">全部 ({{total}})</el-tag>
+            <el-tag type="success">启用 ({{enableTotal}})</el-tag>
+            <el-tag type="success">禁用 ({{disableTotal}})</el-tag>
+            <el-tag type="success">今日登陆过 ({{loginedTotal}})</el-tag>
           </el-col>
           <!--    按钮和分页-->
           <el-col :span="24">

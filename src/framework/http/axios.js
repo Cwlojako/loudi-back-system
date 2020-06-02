@@ -30,11 +30,13 @@ instance.interceptors.request.use(
       config.headers['Access-Token'] = store.state.user.token;
       config.headers['id'] = store.state.user.id;
     } else {
+      console.log('sdsdsd')
       let result = store.dispatch("GET_USER_EXIST");
       result.then((flag) => {
         if (flag) {
           store.dispatch("GET_USER_CACHE");
           if (store.state.user.token) {
+            console.log('chen')
             config.headers['Access-Token'] = store.state.user.token;
             config.headers['id'] = store.state.user.id;
           }

@@ -5,7 +5,7 @@
         <showBaseInfo :employeeData="employeeData" @refreshData="getEmployeeData(id)"></showBaseInfo>
       </el-tab-pane>
       <el-tab-pane label="详细信息">
-        <showDetailInfo :employeeData="employeeData"></showDetailInfo>
+        <showDetailInfo :employeeData="employeeData" @refreshData="getEmployeeData(id)"></showDetailInfo>
       </el-tab-pane>
       <el-tab-pane label="顾客信息">
         <showCustomer></showCustomer>

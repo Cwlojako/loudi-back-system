@@ -141,7 +141,8 @@
     </div>
     <el-row>
       <el-button type="success" @click="goEditStaffPage(id)">编辑</el-button>
-      <el-button type="success">禁用</el-button>
+      <el-button type="success" @click="handleDisable(id)" v-if='employeeData.enabled'>禁用</el-button>
+      <el-button type="success" @click="handleEnable(id)" v-else>启用</el-button>
       <el-button type="success" @click="goBack">返回上一页</el-button>
     </el-row>
 
@@ -167,6 +168,7 @@
 </template>
 
 <script>
+    import {disable, enable} from '@/project/service/employee'
     export default {
       props: {
         employeeData: {
@@ -197,6 +199,7 @@
         },
         // 修改备注信息
         editRemark() {
+          console.log(this.employeeData)
           this.editRemarkShow = true;
           this.remarkText = this.employeeData.comment
         },
@@ -207,6 +210,28 @@
         // 更新备注信息
         handleUpdateComment() {
 
+        },
+        // 禁用员工
+        handleDisable(id) {
+          disable({id: id}, res => {
+            // 刷新数据
+            this.$emit('refreshData', id)
+            this.$message({
+              type: 'success',
+              message: '禁用成功'
+            })
+          })
+        },
+        // 启用员工
+        handleEnable(id) {
+          enable({id: id}, res => {
+            // 刷新数据
+            this.$emit('refreshData', id)
+            this.$message({
+              type: 'success',
+              message: '启用成功'
+            })
+          })
         }
       },
       created() {

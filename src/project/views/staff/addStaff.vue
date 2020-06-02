@@ -45,8 +45,7 @@
             <el-input placeholder="请选择部门"
                       suffix-icon="el-icon-arrow-right"
                       v-model="baseInfoForm.department.name"
-                      @focus="selectDepartment(defaultId)"
-                      clearable>
+                      @focus="selectDepartment(defaultId)">
             </el-input>
           </el-form-item>
 <!--          待完善-->
@@ -180,7 +179,8 @@
             <el-date-picker type="date"
                             placeholder="请选择年月日"
                             v-model="detailInfoForm.joinAt"
-                            style="width: 100%;"value-format="yyyy-MM-dd"
+                            style="width: 100%;"
+                            value-format="yyyy-MM-dd"
                             format="yyyy-MM-dd">
             </el-date-picker>
           </el-form-item>
@@ -273,17 +273,19 @@
           trainingOrder: '',
           employedAt: '',
           introducer: '',
-          comment:''
+          comment:'',
+          serviceStatus: '在职',
+          enable: true
         },
         // 基本信息表单验证规则
         baseInfoRules: {
           phone: [{required: true, message: "手机号不能为空", trigger: "blur"}],
           password: [{required: true, message: "密码不能为空", trigger: "blur"}],
           realName: [{required: true, message: "员工姓名不能为空", trigger: "blur"}],
-          avatar: [{required: true, message: "请上传头像", trigger: "blur"}],
+          avatar: [{required: true, message: "请上传头像"}],
           manageable: [{required: true, message: "请选择", trigger: "blur"}],
           gender: [{required: true, message: "请选择", trigger: "blur"}],
-          department: [{required: true, message: "请选择所属部门", trigger: "blur"}],
+          department: [{required: true, message: "请选择所属部门"}],
           duty: [{required: true, message: "请选择当前职务", trigger: "blur"}],
           birthday: [{required: true, message: "请选择出生日期", trigger: "blur"}],
           employedAt: [{required: true, message: "请选择入职日期", trigger: "blur"}]
@@ -418,7 +420,7 @@
             // 添加员工详细信息
             console.log('新建')
             save({employee: this.baseInfoParam}, res => {
-              this.$refs.baseInfoRef.resetFields()
+              this.$refs.detailInfoRef.resetFields()
               // 跳转到员工列表主页
               this.$router.push({path: `/staff/list`})
               this.$message({
