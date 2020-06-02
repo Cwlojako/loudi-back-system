@@ -7,6 +7,8 @@
           :load="loadNode"
           lazy
           :expand-on-click-node='false'
+          ref='tree'
+          node-key="id"
         >
           <span class="custom-tree-node" slot-scope="{ node, data }" @click="findByDepartmentId(data.id)">
             <span class="title">{{ node.label }}</span>
@@ -18,7 +20,7 @@
                 <i class="treeIcon el-icon-edit" @click="showEditDepartment($event, data.id)"></i>
               </el-tooltip>
               <el-tooltip class="item" content="删除" placement="top" :enterable="false">
-                <i class="treeIcon el-icon-delete" @click="deleteDepartment($event, data.id)"></i>
+                <i class="treeIcon el-icon-delete" @click="deleteDepartment($event, data.id, node)"></i>
               </el-tooltip>
             </span>
           </span>
@@ -196,6 +198,7 @@
     mixins: [Emitter],
     data() {
       return {
+        // 树结构配置项
         props: {
           label: 'name',
           children: 'children',
@@ -254,6 +257,8 @@
         rootNode: [],
         // 部门id
         departmentId: 0,
+        // 添加部门请求参数
+        addDepartmentParam: {},
         // 搜索组件配置项
         searchItems: [
           {
@@ -364,6 +369,16 @@
           })
         }
       },
+      // 刷新节点
+      refreshNode(id) {
+        console.log(id)
+        console.log(this.$refs.tree)
+        let node = this.$refs.tree.getNode(id)
+        console.log(node)
+        node.loaded = false
+        // 主动调用展开节点方法，重新查询该节点下的所有子节点
+        node.expand()
+      },
       // 前往查看员工相关信息页面
       goShowStaffPage(id){
         this.$router.push({path:'/staff/showStaff/' + id});
@@ -383,13 +398,16 @@
       },
       // 发送新增部门请求
       addDepartment(parentId) {
-        console.log(parentId)
-        this.addDepartmentForm.parent = {id: parentId}
-        this.$refs.addDepartmentRef.validate(async valid => {
+        // 清除参数
+        delete this.addDepartmentForm.parent
+        // 合并组成添加部门请求参数
+        this.addDepartmentParam = Object.assign(this.addDepartmentForm, {parent: {id: parentId}})
+        this.$refs.addDepartmentRef.validate(valid => {
           if (!valid) return false
-          save({department: this.addDepartmentForm}, res => {
+          save({department: this.addDepartmentParam}, res => {
             this.handleClose()
-            // 重新渲染部门数据 ？？？
+             // 重新渲染该部门节点下的数据
+            this.refreshNode(parentId)
             this.$message({
               type: 'success',
               message: '添加成功!'
@@ -413,7 +431,9 @@
         })
       },
       // 删除部门
-      deleteDepartment(e, id) {
+      deleteDepartment(e, id, node) {
+        // 获取该节点的父节点id
+        let parentId = node.parent.data.id
         this.$confirm(' 删除该部门请确认该部门下没有员工', '确定删除该部门吗?', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -421,11 +441,11 @@
         }).then(() => {
           // 根据id删除部门
           delDepartment({departmentId: id}, res => {
-            // 重新查询所有部门
-            // searchDepartment()
+            // 重新查询部门
+            this.refreshNode(parentId)
             this.$message({
               type: 'success',
-              message: '删除成功!'
+              message: '删除部门成功!'
             });
           });
         }).catch(() => {
