@@ -371,10 +371,7 @@
       },
       // 刷新节点
       refreshNode(id) {
-        console.log(id)
-        console.log(this.$refs.tree)
         let node = this.$refs.tree.getNode(id)
-        console.log(node)
         node.loaded = false
         // 主动调用展开节点方法，重新查询该节点下的所有子节点
         node.expand()
@@ -389,7 +386,6 @@
         e.stopPropagation()
         // 根据id获取部门信息
         get({id}, res => {
-          console.log(res)
           this.departmentId = res.id
           if (res.name) {
             this.addDepartmentForm.parent = res.name

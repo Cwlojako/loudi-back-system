@@ -25,7 +25,7 @@
           <el-table-column prop="status" label="设备状态"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="toDeviceDetail(scope.row.number)">
+              <el-button type="text" size="small" @click="toDeviceDetail(scope.row.id)">
                 查看
               </el-button>
             </template>
@@ -40,7 +40,7 @@
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="page"
-              :page-sizes="[1, 20, 30, 40]"
+              :page-sizes="[10, 20, 30, 40]"
               :page-size="pageSize"
               layout="total, sizes, jumper, pager,prev, next"
               :total="total"
@@ -70,7 +70,7 @@
         // 设备数据
         deviceData: [],
         model: "device",
-        pageSize: 1,
+        pageSize: 10,
         page: 1,
         total: 0,
         extraParam: {},
@@ -115,6 +115,7 @@
             page: page,
             size: _t.pageSize
           },
+          [this.model]: {},
           employeeId: id,
           deviceNumber: this.deviceNumber
         };
@@ -150,8 +151,8 @@
         this.search(this.page, this.id);
       },
       // 根据设备编号跳转到设备详情
-      toDeviceDetail(number) {
-        this.$router.push({path: '/equipment/equipmentDetail'})
+      toDeviceDetail(id) {
+        this.$router.push({path: '/equipment/equipmentDetail/' + id})
       }
     },
     components: {

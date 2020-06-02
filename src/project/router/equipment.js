@@ -22,7 +22,7 @@ const equipment = {
       component: () => import('@/project/views/equipment/list')
     },
     {
-      path:'/equipment/addOrEditEquipment',
+      path:'/equipment/addOrEditEquipment/:id',
       name:'addOrEditEquipment',
       meta:{
         isShowHeader:true,
@@ -38,7 +38,7 @@ const equipment = {
           },
           {
             name:'新增/编辑设备',
-            path:'/equipment/addOrEditEquipment'
+            path:'/equipment/addOrEditEquipment/:id'
           }
         ]
       },
@@ -91,7 +91,7 @@ const equipment = {
       component: () => import('@/project/views/equipment/map')
     },
     {
-      path:'/equipment/equipmentDetail',
+      path:'/equipment/equipmentDetail/:id',
       name:'equipmentDetail',
       meta:{
         isShowHeader:true,
@@ -107,7 +107,7 @@ const equipment = {
           },
           {
             name:'设备详情',
-            path:'/equipment/equipmentDetail'
+            path:'/equipment/equipmentDetail/:id'
           }
         ]
       },

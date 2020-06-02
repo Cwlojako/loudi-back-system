@@ -1,6 +1,6 @@
 import axios from '@/framework/http/axios'
 const model = 'employee'
-let getUrl = `api/${model}/get`
+let getByIdUrl = `api/${model}/get`
 let findUrl = `api/${model}/find`
 let findByDepartmentIdUrl = `api/${model}/findByDepartmentId`
 let enableUrl = `api/${model}/enable`
@@ -14,8 +14,8 @@ let leaveUrl = `api/${model}/leave`
 let restoreUrl = `api/${model}/restore`
 
 // 根据id获取员工信息
-export function get(param, callback) {
-	axios.post(getUrl, param).then(data => {
+export function getById(param, callback) {
+	axios.post(getByIdUrl, param).then(data => {
 		if (data !== undefined && data !== '' && data !== null) {
 			callback(data)
 		}

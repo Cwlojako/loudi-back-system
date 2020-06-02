@@ -2,10 +2,10 @@
   <div class="showStaff page">
     <el-tabs type="border-card">
       <el-tab-pane label="基本信息">
-        <showBaseInfo></showBaseInfo>
+        <showBaseInfo :employeeData="employeeData" @refreshData="getEmployeeData(id)"></showBaseInfo>
       </el-tab-pane>
       <el-tab-pane label="详细信息">
-        <showDetailInfo></showDetailInfo>
+        <showDetailInfo :employeeData="employeeData"></showDetailInfo>
       </el-tab-pane>
       <el-tab-pane label="顾客信息">
         <showCustomer></showCustomer>
@@ -39,11 +39,15 @@
   import showEquipment from "./showStaffComponents/showEquipment";
   import showDepartment from "./showStaffComponents/showDepartment";
   import showPact from "./showStaffComponents/showPact";
-
+  import {getById} from "@/project/service/employee"
   export default {
     mixins: [Emitter],
+    name: 'showStaff',
     data() {
-      return {}
+      return {
+        // 员工数据对象
+        employeeData: {}
+      }
     },
     components: {
       showCustomer,
@@ -54,6 +58,18 @@
       showEquipment,
       showDepartment,
       showPact
+    },
+    methods: {
+      // 根据id获取员工数据
+      getEmployeeData(id) {
+        getById({id: id}, res => {
+          this.employeeData = res
+        })
+      }
+    },
+    created() {
+      this.id = this.$route.params.id
+      this.getEmployeeData(this.id)
     }
   }
 </script>

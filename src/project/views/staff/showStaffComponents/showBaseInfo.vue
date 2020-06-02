@@ -77,7 +77,7 @@
         <div class="grid-content bg-purple">部门</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">{{employee.department.name}}</div>
+        <div class="grid-content bg-purple-light" v-if="employee.department !== undefined">{{employee.department.name}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -128,13 +128,24 @@
 </template>
 
 <script>
-  import {get, disable, enable, leave, restore} from '@/project/service/employee'
+  import {disable, enable, leave, restore} from '@/project/service/employee'
   export default {
+    props: {
+      employeeData: {
+        type: Object
+      }
+    },
+    watch: {
+      employeeData: {
+        handler(val) {
+          this.employee = val
+        },
+        deep: true
+      }
+    },
     data() {
       return {
-        employee: {
-          department: {name: ''}
-        },
+        employee: {},
         id: 0
       }
     },
@@ -151,7 +162,8 @@
           type: 'warning'
         }).then(() => {
           leave({id: id}, res => {
-            this.getEmployeeData(id)
+            // 刷新数据
+            this.$emit('refreshData', id)
             this.$message({
               type: 'success',
               message: '离职成功!'
@@ -172,7 +184,8 @@
           type: 'warning'
         }).then(() => {
           restore({id: id}, res => {
-            this.getEmployeeData(id)
+            // 刷新数据
+            this.$emit('refreshData', id)
             this.$message({
               type: 'success',
               message: '恢复职位成功!'
@@ -189,17 +202,11 @@
       goBack() {
         this.$router.go('-1');
       },
-      // 根据传递过来的员工id获取员工数据
-      getEmployeeData(id) {
-        get({id: id}, res => {
-          console.log(res)
-          this.employee = res
-        })
-      },
       // 禁用员工
       handleDisable(id) {
         disable({id: id}, res => {
-          this.getEmployeeData(id)
+          // 刷新数据
+          this.$emit('refreshData', id)
           this.$message({
             type: 'success',
             message: '禁用成功'
@@ -209,7 +216,8 @@
       // 启用员工
       handleEnable(id) {
         enable({id: id}, res => {
-          this.getEmployeeData(id)
+          // 刷新数据
+          this.$emit('refreshData', id)
           this.$message({
             type: 'success',
             message: '启用成功'
@@ -219,7 +227,6 @@
     },
     created() {
       this.id = parseInt(this.$route.params.id)
-      this.getEmployeeData(this.id)
     }
   }
 </script>

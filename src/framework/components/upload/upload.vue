@@ -3,7 +3,7 @@
      <div class="upload" v-if="type === 'img'">
        <el-upload
          ref="upload"
-         action="api/attachment/upload"
+         :action="action"
          list-type="picture-card"
          :file-list="defaultList"
          :limit="limit"
@@ -71,7 +71,11 @@ export default {
     },
     prefix: {
       type: String,
-      default: 'http://47.107.184.144/attachment/'
+      default: 'http://47.99.141.16:8001/attachment/'
+    },
+    action: {
+      type: String,
+      default: 'api/attachment/upload'
     },
     multiple: {
       type: Boolean,
@@ -87,14 +91,12 @@ export default {
   },
   created(){
     if (this.fileList.length > 0) {
-      console.log(this.fileList)
       this.defaultList = this.fileList.map((s,i) => {
-        console.log('s',s);
         let obj = {
           name: i,
           url:this.prefix + s,
           response:{
-            data:s
+            data: s
           }
         };
         return obj;
@@ -106,28 +108,20 @@ export default {
   },
   methods: {
     handleRemove(file, fileList) {
-      console.log(file);
-      console.log(fileList);
-      // this.defaultList = fileList;
       let index = fileList.findIndex(s=>{
-        console.log(s.uid);
-        console.log(file.uid);
         return s.uid === file.uid;
       });
-      console.log(index);
       this.defaultList.splice(index,1);
-
     },
     handleSuccess(res,file,fileList) {
+      console.log(file)
       this.defaultList.push(file);
-      console.log(this.defaultList);
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
     handleExceed(file,fileList) {
-      console.log(file,fileList);
       this.$notify({
         title: '警告',
         message: `最多只能上传${this.limit}个文件`,
@@ -150,8 +144,6 @@ export default {
           type: 'warning'
         });
       }
-      console.log(this.accept.indexOf('suffix') === -1);
-      console.log(isLt2M)
       return isLt2M && isLtType;
     }
   }

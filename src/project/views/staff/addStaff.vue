@@ -13,6 +13,22 @@
           <el-form-item label="员工姓名" prop="realName">
             <el-input v-model="baseInfoForm.realName"></el-input>
           </el-form-item>
+          <el-form-item label="头像" prop="avatar">
+            <upload
+              v-if="!this.editId"
+              @on-transport-file-list="handleTransportFileList"
+              :max-size="5120"
+              :limit="1">
+            </upload>
+            <!--        编辑模式下如果有图片会默认显示第一张图-->
+            <upload
+              v-else
+              @on-transport-file-list="handleTransportFileList"
+              :file-list="baseInfoForm.avatar ? baseInfoForm.avatar.split(';') : []"
+              :max-size="5120"
+              :limit="1">
+            </upload>
+          </el-form-item>
           <el-form-item label="是否负责人" prop="manageable">
             <el-radio-group v-model="baseInfoForm.manageable">
               <el-radio label="是" value="是"></el-radio>
@@ -83,7 +99,13 @@
         <el-form :model="detailInfoForm" :rules="detailInfoRules" ref="detailInfoRef" label-width="120px"
                 label-position="left">
           <el-form-item label="填表日期" prop="fillAt">
-            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.fillAt" style="width: 100%;"></el-date-picker>
+            <el-date-picker type="date"
+                            placeholder="请选择年月日"
+                            v-model="detailInfoForm.fillAt"
+                            style="width: 100%;"
+                            value-format="yyyy-MM-dd"
+                            format="yyyy-MM-dd">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="学历" prop="education">
             <el-select v-model="detailInfoForm.education" placeholder="请选择学历">
@@ -110,22 +132,57 @@
             <el-input v-model="detailInfoForm.childrenSituation"></el-input>
           </el-form-item>
           <el-form-item label="培训开始日期" prop="trainingStartAt">
-            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.trainingStartAt" style="width: 100%;"></el-date-picker>
+            <el-date-picker type="date"
+                            placeholder="请选择年月日"
+                            v-model="detailInfoForm.trainingStartAt"
+                            style="width: 100%;"
+                            value-format="yyyy-MM-dd"
+                            format="yyyy-MM-dd">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="培训结束日期" prop="trainingFinishAt">
-            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.trainingFinishAt" style="width: 100%;"></el-date-picker>
+            <el-date-picker type="date"
+                            placeholder="请选择年月日"
+                            v-model="detailInfoForm.trainingFinishAt"
+                            style="width: 100%;"
+                            value-format="yyyy-MM-dd"
+                            format="yyyy-MM-dd">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="实习开始日期" prop="practiceStartAt">
-            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.practiceStartAt" style="width: 100%;"></el-date-picker>
+            <el-date-picker type="date"
+                            placeholder="请选择年月日"
+                            v-model="detailInfoForm.practiceStartAt"
+                            style="width: 100%;"
+                            value-format="yyyy-MM-dd"
+                            format="yyyy-MM-dd">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="实习结束日期" prop="practiceFinishAt">
-            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.practiceFinishAt" style="width: 100%;"></el-date-picker>
+            <el-date-picker type="date"
+                            placeholder="请选择年月日"
+                            v-model="detailInfoForm.practiceFinishAt"
+                            style="width: 100%;"
+                            value-format="yyyy-MM-dd"
+                            format="yyyy-MM-dd">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="合同签订日期" prop="signAt">
-            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.signAt" style="width: 100%;"></el-date-picker>
+            <el-date-picker type="date"
+                            placeholder="请选择年月日"
+                            v-model="detailInfoForm.signAt"
+                            style="width: 100%;"
+                            value-format="yyyy-MM-dd"
+                            format="yyyy-MM-dd">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="入伙日期" prop="joinAt">
-            <el-date-picker type="date" placeholder="请选择年月日" v-model="detailInfoForm.joinAt" style="width: 100%;"></el-date-picker>
+            <el-date-picker type="date"
+                            placeholder="请选择年月日"
+                            v-model="detailInfoForm.joinAt"
+                            style="width: 100%;"value-format="yyyy-MM-dd"
+                            format="yyyy-MM-dd">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="第一联系人" prop="firstContactName">
             <el-input v-model="detailInfoForm.firstContactName"></el-input>
@@ -147,7 +204,7 @@
           </el-form-item>
         </el-form>
         <div class="submit">
-          <el-button type="success">提交</el-button>
+          <el-button type="success" @click="handleSaveDetail">提交</el-button>
           <el-button type="success" @click="goBack">返回上一页</el-button>
         </div>
       </el-tab-pane>
@@ -180,11 +237,15 @@
 </template>
 
 <script>
+  import Upload from "@/framework/components/upload"
   import Emitter from '@/framework/mixins/emitter'
-  import {get, save, update} from '@/project/service/employee'
+  import {getById, save, update} from '@/project/service/employee'
   import {findFather, findNext} from '@/project/service/department'
 
   export default {
+    components: {
+      Upload
+    },
     mixins: [Emitter],
     data() {
       return {
@@ -203,12 +264,10 @@
           phone: '',
           password: '',
           realName: '',
+          avatar: '',
           manageable: '',
           gender: '',
-          department: {
-            id: 0,
-            name: ''
-          },
+          department: '',
           duty: '',
           birthday: '',
           trainingOrder: '',
@@ -221,6 +280,7 @@
           phone: [{required: true, message: "手机号不能为空", trigger: "blur"}],
           password: [{required: true, message: "密码不能为空", trigger: "blur"}],
           realName: [{required: true, message: "员工姓名不能为空", trigger: "blur"}],
+          avatar: [{required: true, message: "请上传头像", trigger: "blur"}],
           manageable: [{required: true, message: "请选择", trigger: "blur"}],
           gender: [{required: true, message: "请选择", trigger: "blur"}],
           department: [{required: true, message: "请选择所属部门", trigger: "blur"}],
@@ -258,25 +318,7 @@
         // 可选择部门文本内容
         checkedLabel: '',
         // 详细信息表单数据
-        detailInfoForm: {
-          fillAt:'',
-          education:'',
-          interest:'',
-          maritalStatus:'',
-          childrenSituation:'',
-          trainingStartAt:'',
-          trainingFinishAt:'',
-          practiceStartAt:'',
-          practiceFinishAt:'',
-          signAt:'',
-          joinAt:'',
-          presentAddress:'',
-          homeAddress:'',
-          firstContactName:'',
-          firstContactPhone:'',
-          secondContactName:'',
-          secondContactPhone:''
-        },
+        detailInfoForm: {},
         // 详细信息表单验证规则
         detailInfoRules: {
           fillAt: [{required: true, message: '请选择', trigger: 'blur'}]
@@ -288,6 +330,10 @@
       }
     },
     methods: {
+      // 返回上一页
+      goBack() {
+        this.$router.go('-1');
+      },
       // 控制树结构的懒加载，点击父部门再加载子部门
       loadNode(node, resolve) {
         if (node.level === 0) {
@@ -300,10 +346,6 @@
             return resolve(res)
           })
         }
-      },
-      // 返回上一页
-      goBack() {
-        this.$router.go('-1');
       },
       // 选择部门
       selectDepartment(defaultId) {
@@ -325,8 +367,14 @@
         this.selectDepartShow = false
         this.baseInfoForm.department = checkedLabel
       },
+      handleTransportFileList(fileList) {
+        console.log(fileList)
+        this.baseInfoForm.avatar = fileList[0].response.data;
+      },
       // 新增编辑员工基本信息
       handleSaveBase() {
+        // 通知上传子组件执行相应的操作
+        this.broadcast('SiUpload', 'on-form-submit', () => {});
         this.$refs.baseInfoRef.validate(valid => {
           if (!valid) return false
           this.baseInfoParam = this.baseInfoForm
@@ -341,6 +389,8 @@
             console.log('新建')
             save({employee: this.baseInfoParam}, res => {
               this.$refs.baseInfoRef.resetFields()
+              // 跳转到员工列表主页
+              this.$router.push({path: `/staff/list`})
               this.$message({
                 type: 'success',
                 message: '添加员工基本信息成功'
@@ -349,7 +399,8 @@
           } else {
             // 更新员工基本信息
             console.log('更新')
-            update({employee: this.baseInfoParam}, res => {
+            let param = Object.assign(this.baseInfoParam, {id: this.editId})
+            update({employee: param}, res => {
               this.selectAddOrEdit()
               this.$message({
                 type: 'success',
@@ -360,7 +411,35 @@
         })
       },
       // 提交员工详细信息
-      handleSaveDetail() {},
+      handleSaveDetail() {
+        this.$refs.detailInfoRef.validate(valid => {
+          if (!valid) return false
+          if (!this.editId) {
+            // 添加员工详细信息
+            console.log('新建')
+            save({employee: this.baseInfoParam}, res => {
+              this.$refs.baseInfoRef.resetFields()
+              // 跳转到员工列表主页
+              this.$router.push({path: `/staff/list`})
+              this.$message({
+                type: 'success',
+                message: '添加员工详细信息成功'
+              });
+            })
+          } else {
+            // 更新员工详细信息
+            console.log('更新')
+            let param = Object.assign(this.detailInfoForm, {id: this.editId})
+            update({employee: param}, res => {
+              this.selectAddOrEdit()
+              this.$message({
+                type: 'success',
+                message: '更新员工详细信息成功!'
+              });
+            })
+          }
+        })
+      },
       // 进入的是编辑员工模式还是新建员工模式
       selectAddOrEdit() {
         if (!this.editId) {
@@ -368,9 +447,10 @@
         } else {
           console.log('编辑模式')
           // 否则则是进入编辑员工页面,根据id获取员工信息
-          get({id: this.editId}, res => {
+          getById({id: this.editId}, res => {
             console.log(res)
             this.baseInfoForm = res
+            this.detailInfoForm = res
             this.defaultId = res.department.id
             // 处理是否负责人数据
             this.baseInfoForm.manageable = res.manageable ? '是' : '否'
@@ -382,7 +462,7 @@
       if (this.$route.query.activeName) {
         this.activeName = this.$route.query.activeName
       }
-      this.editId = this.$route.params.id
+      this.editId = parseInt(this.$route.params.id)
       this.selectAddOrEdit()
     }
   }
