@@ -30,7 +30,7 @@
     </el-row>
     <el-row>
       <el-col :span="2"><div class="grid-content bg-purple">顾客来源</div></el-col>
-      <el-col :span="22"><div class="grid-content bg-purple-light">{{customer.salon.name}}</div></el-col>
+      <el-col :span="22"><div class="grid-content bg-purple-light" v-if="customer.salon !== undefined">{{customer.salon.name}}</div></el-col>
     </el-row>
     <el-row>
       <el-col :span="2"><div class="grid-content bg-purple">顾客类别</div></el-col>
@@ -58,7 +58,7 @@
     </el-row>
     <el-row>
       <el-col :span="2"><div class="grid-content bg-purple">档案录入人</div></el-col>
-      <el-col :span="22"><div class="grid-content bg-purple-light">{{customer.teacher.realName}}</div></el-col>
+      <el-col :span="22"><div class="grid-content bg-purple-light" v-if="customer.teacher !== undefined">{{customer.teacher.realName}}</div></el-col>
     </el-row>
     <el-row>
       <el-col :span="2"><div class="grid-content bg-purple">顾客标签</div></el-col>

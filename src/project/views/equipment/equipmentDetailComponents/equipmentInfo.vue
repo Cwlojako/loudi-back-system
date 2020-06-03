@@ -33,10 +33,10 @@
         </p>
       </div>
       <div class="button-group">
-        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="openEquipment">开机</el-button>
-        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="colseEquipment">关机</el-button>
-        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="impower">授权</el-button>
-        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="takeBack">收回</el-button>
+        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="openEquipment(device.id)">开机</el-button>
+        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="colseEquipment(device.id)">关机</el-button>
+        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="impower(device.id)">授权</el-button>
+        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="takeBack(device.id)">收回</el-button>
       </div>
     </div>
     <p class="p_title">
@@ -48,18 +48,18 @@
         修改
       </el-button>
     </p>
-    <div class="main" v-if="device.deviceModel !== undefined && device.department !== undefined">
+    <div class="main">
       <p>
         <span class="title">设备编号</span>
         <span class="text">{{device.number}}</span>
       </p>
       <p>
         <span class="title">机型</span>
-        <span class="text">{{device.deviceModel.name}}</span>
+        <span class="text" v-if="device.deviceModel !== undefined">{{device.deviceModel.name}}</span>
       </p>
       <p>
         <span class="title">所属市场</span>
-        <span class="text">{{device.department.name}}</span>
+        <span class="text" v-if="device.department !== undefined">{{device.department.name}}</span>
       </p>
       <p>
         <span class="title">所属分公司</span>
@@ -90,6 +90,7 @@
 </template>
 
 <script>
+  import {enable, disable} from '@/project/service/device'
   export default {
     props: {
       deviceData: {
@@ -112,20 +113,21 @@
     methods:{
       // 修改
       editEquipmentInfo(id) {
-        console.log(id)
         this.$router.push({path:'/equipment/addOrEditEquipment/' + id});
       },
       // 开机
-      openEquipment() {
+      openEquipment(id) {
         this.$confirm(' 该操作会影响设备当前状态，您还要继续吗', '是否立即对设备进行开机', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+          enable({id: id}, res => {
             this.$message({
               type: 'success',
               message: '操作成功!'
-          });
+            });
+          })
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -134,16 +136,18 @@
         });
       },
       // 关机
-      colseEquipment() {
+      colseEquipment(id) {
         this.$confirm(' 该操作会影响设备当前状态，您还要继续吗', '是否立即对设备进行关机', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$message({
-            type: 'success',
-            message: '操作成功!'
-          });
+          disable({id: id}, res => {
+            this.$message({
+              type: 'success',
+              message: '操作成功!'
+            });
+          })
         }).catch(() => {
           this.$message({
             type: 'info',

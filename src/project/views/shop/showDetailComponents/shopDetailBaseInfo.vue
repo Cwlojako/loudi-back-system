@@ -5,7 +5,7 @@
         <div class="grid-content bg-purple">启用状态</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">XXX</div>
+        <div class="grid-content bg-purple-light">{{salon.enabled}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -21,7 +21,7 @@
         <div class="grid-content bg-purple">所属市场</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">{{salon.department.name}}</div>
+        <div class="grid-content bg-purple-light" v-if="salon.department !== undefined">{{salon.department.name}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -29,7 +29,7 @@
         <div class="grid-content bg-purple">所属老师</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">{{salon.teacher.realName}}</div>
+        <div class="grid-content bg-purple-light" v-if="salon.teacher !== undefined">{{salon.teacher.realName}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -53,7 +53,7 @@
         <div class="grid-content bg-purple">跑店人员</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">XXX</div>
+        <div class="grid-content bg-purple-light" v-if="salon.founder !== undefined">{{salon.founder.realName}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -61,7 +61,7 @@
         <div class="grid-content bg-purple">有无设备</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">XXX</div>
+        <div class="grid-content bg-purple-light">{{salon.deviceAssigned}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -133,10 +133,7 @@
       data() {
         return {
           // 店铺数据对象
-          salon: {
-            department: {},
-            teacher: {}
-          }
+          salon: {}
         }
       },
       methods:{

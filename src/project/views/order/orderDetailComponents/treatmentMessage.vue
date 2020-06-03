@@ -13,7 +13,7 @@
           <el-table-column prop="flashTimes" label="发光次数"></el-table-column>
           <el-table-column prop="creatAt" label="开始时间">XXX</el-table-column>
           <el-table-column prop="enAt" label="结束时间">XXX</el-table-column>
-          <el-table-column fixed="right" align="center" label="疗程图片" width="260">
+          <el-table-column fixed="right" align="center" label="疗程图片">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="showTreatmentPic">
                 查看
@@ -84,7 +84,7 @@
       goBack() {
         this.$router.go(-1);
       },
-      search(page, id) {
+      search(page, productId) {
         let _t = this;
         _t.page = page;
         let param = {
@@ -92,26 +92,23 @@
             page: page,
             size: _t.pageSize,
           },
-          product: {id: id}
+          product: {id: productId}
         }
         findByProduct(param, res => {
           _t.treatmentData = res;
+          _t.getTotal(res.length)
         });
       },
-      getTotal() {
-        let _t = this;
-        let param = {[this.model]: _t.extraParam};
-        count(param, res => {
-          _t.total = parseInt(res);
-        });
+      getTotal(length) {
+        this.total = length
       },
       handleCurrentChange(val) {
         this.page = val;
-        this.search(this.page);
+        this.search(this.page, this.productId);
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-        this.search(this.page);
+        this.search(this.page, this.productId);
       },
       // 显示图片
       showTreatmentPic() {

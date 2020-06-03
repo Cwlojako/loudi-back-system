@@ -161,14 +161,14 @@
       </el-input>
       <span slot="footer" class="dialog-footer">
     <el-button @click="editRemarkShow = false">取 消</el-button>
-    <el-button type="primary" @click="handleUpdateComment">确 定</el-button>
+    <el-button type="primary" @click="handleUpdateComment(id)">确 定</el-button>
   </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-    import {disable, enable} from '@/project/service/employee'
+    import {disable, enable, update} from '@/project/service/employee'
     export default {
       props: {
         employeeData: {
@@ -189,7 +189,8 @@
           // 控制编辑备注信息对话框的显示与隐藏
           editRemarkShow: false,
           // 备注文本
-          remarkText: ''
+          remarkText: '',
+          id: 0
         }
       },
       methods:{
@@ -199,7 +200,6 @@
         },
         // 修改备注信息
         editRemark() {
-          console.log(this.employeeData)
           this.editRemarkShow = true;
           this.remarkText = this.employeeData.comment
         },
@@ -208,8 +208,20 @@
           this.$router.go('-1');
         },
         // 更新备注信息
-        handleUpdateComment() {
-
+        handleUpdateComment(id) {
+          this.employeeData.comment = this.remarkText
+          let param = {
+            employee: Object.assign({id: id}, this.employeeData)
+          }
+          update(param, res => {
+            // 刷新数据
+            this.$emit('refreshData', id)
+            this.editRemarkShow = false
+            this.$message({
+              type: 'success',
+              message: '更新备注成功'
+            })
+          })
         },
         // 禁用员工
         handleDisable(id) {

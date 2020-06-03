@@ -91,15 +91,15 @@
           </el-row>
           <el-row>
             <el-col :span="4"><div class="grid-content bg-purple">姓名</div></el-col>
-            <el-col :span="20"><div class="grid-content bg-purple-light"></div></el-col>
+            <el-col :span="20"><div class="grid-content bg-purple-light">{{order.customer.realName}}</div></el-col>
           </el-row>
           <el-row>
             <el-col :span="4"><div class="grid-content bg-purple">性别</div></el-col>
-            <el-col :span="20"><div class="grid-content bg-purple-light"></div></el-col>
+            <el-col :span="20"><div class="grid-content bg-purple-light">{{order.customer.gender}}</div></el-col>
           </el-row>
           <el-row>
             <el-col :span="4"><div class="grid-content bg-purple">联系电话</div></el-col>
-            <el-col :span="20"><div class="grid-content bg-purple-light"></div></el-col>
+            <el-col :span="20"><div class="grid-content bg-purple-light">{{order.customer.phone}}</div></el-col>
           </el-row>
         </el-row>
         <el-row>
@@ -109,11 +109,11 @@
           </el-row>
           <el-row>
             <el-col :span="4"><div class="grid-content bg-purple">店铺</div></el-col>
-            <el-col :span="20"><div class="grid-content bg-purple-light">XXX</div></el-col>
+            <el-col :span="20"><div class="grid-content bg-purple-light">{{order.salon.name}}</div></el-col>
           </el-row>
           <el-row>
             <el-col :span="4"><div class="grid-content bg-purple">店家分成比例</div></el-col>
-            <el-col :span="20"><div class="grid-content bg-purple-light">XXX</div></el-col>
+            <el-col :span="20"><div class="grid-content bg-purple-light">{{order.salon.commissionRate}}%</div></el-col>
           </el-row>
         </el-row>
         <el-row>
@@ -123,7 +123,7 @@
           </el-row>
           <el-row>
             <el-col :span="4"><div class="grid-content bg-purple">观察期剩余天数</div></el-col>
-            <el-col :span="20"><div class="grid-content bg-purple-light">XXX</div></el-col>
+            <el-col :span="20"><div class="grid-content bg-purple-light">{{order.observationBalanceDay}}</div></el-col>
           </el-row>
         </el-row>
         <el-row>
@@ -159,7 +159,9 @@
         model: 'order',
         order: {
           operator: {},
-          partner: {}
+          partner: {},
+          customer: {},
+          salon: {}
         }
       }
     },
@@ -181,8 +183,6 @@
       orderData: {
         handler(val) {
           this.order = val
-          this.order.operator = val.operator
-          this.order.partner = val.partner
         }
       }
     }

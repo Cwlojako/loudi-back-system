@@ -4,6 +4,8 @@ let findByEmployeeIdUrl = `api/${model}/findByEmployeeIdAndDeviceNumber`
 let countUrl = `api/${model}/count`
 let getByIdUrl = `api/${model}/get`
 let updateUrl = `api/${model}/update`
+let enableUrl = `api/${model}/enable`
+let disableUrl = `api/${model}/disable`
 
 // 根据员工id获取员工所属设备信息
 export function findByEmployeeId(param, callback) {
@@ -35,6 +37,24 @@ export function getById(param, callback) {
 // 更新设备信息
 export function update(param, callback) {
   axios.post(updateUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
+}
+
+// 启用设备
+export function enable(param, callback) {
+  axios.post(enableUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
+}
+
+// 禁用设备
+export function disable(param, callback) {
+  axios.post(disableUrl, param).then(data => {
     if (data !== undefined && data !== '' && data !== null) {
       callback(data)
     }

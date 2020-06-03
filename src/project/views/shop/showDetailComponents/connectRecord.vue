@@ -200,7 +200,8 @@
         model: "salonHandover",
         pageSize: 10,
         page: 1,
-        total: 0
+        total: 0,
+        id: 0
       }
     },
     methods: {
@@ -213,11 +214,11 @@
       },
       handleCurrentChange(val) {
         this.page = val;
-        this.search(this.page);
+        this.getSalonHandoverData(this.page, this.id);
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-        this.search(this.page);
+        this.getSalonHandoverData(this.page, this.id);
       },
       // 获取店铺数据
       getSalonData(id) {
@@ -226,8 +227,15 @@
         })
       },
       // 获取店铺交接数据
-      getSalonHandoverData(id) {
-        findHandoverBySalonId({salon: {id: id}}, res => {
+      getSalonHandoverData(page, id) {
+        let param = {
+          salon: {id: id},
+          pageable: {
+            page: page,
+            size: this.pageSize
+          }
+        }
+        findHandoverBySalonId(param, res => {
           this.salonHandoverData = res
           this.getTotal(res.length)
         })
@@ -241,7 +249,7 @@
     },
     created() {
       this.id = this.$route.params.id
-      this.getSalonHandoverData(this.id)
+      this.getSalonHandoverData(1, this.id)
       this.getSalonData(this.id)
     }
   }
