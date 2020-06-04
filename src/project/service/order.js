@@ -4,6 +4,7 @@ let findByEmployeeIdUrl = `api/${model}/findByOrderAndSalonAndProductAndTeacherA
 let findByCustomerIdUrl = `api/${model}/findByOrderAndSalonAndProductAndTeacherAndCustomerAndDepartmentAndPromotion`
 let countUrl = `api/${model}/countByOrderAndSalonAndProductAndTeacherAndCustomerAndDepartmentAndPromotion`
 let findByOrderIdUrl = `api/${model}/findByOrderAndSalonAndProductAndTeacherAndCustomerAndDepartmentAndPromotion`
+let getByIdUrl = `api/${model}/get`
 
 // 根据员工id获取员工所属订单信息
 export function findByEmployeeId(param, callback) {
@@ -25,12 +26,22 @@ export function count(param, callback) {
 
 // 根据订单id获取订单详细信息
 export function getById(param, callback) {
+  axios.post(getByIdUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
+}
+
+// 根据订单id获取订单详细信息
+export function findByOrderId(param, callback) {
   axios.post(findByOrderIdUrl, param).then(data => {
     if (data !== undefined && data !== '' && data !== null) {
       callback(data)
     }
   })
 }
+
 
 // 根据顾客id获取订单信息
 export function findByCustomerId(param, callback) {

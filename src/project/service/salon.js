@@ -4,6 +4,9 @@ let findByEmployeeIdUrl = `api/${model}/findBySalonAndEmployeeAndDepartment`
 let countUrl = `api/${model}/countBySalonAndEmployeeAndDepartment`
 let getUrl = `api/${model}/get`
 let findUrl = `api/${model}/findBySalonAndEmployeeAndDepartment`
+let saveUrl = `api/${model}/save`
+let updateUrl = `api/${model}/update`
+let countBySalonExampleUrl = `api/${model}/countBySalonExample`
 
 // 根据员工id获取员工所属店铺信息
 export function findByEmployeeId(param, callback) {
@@ -35,6 +38,33 @@ export function getById(param, callback) {
 // 获取全部店铺列表
 export function find(param, callback) {
   axios.post(findUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
+}
+
+// 更新店铺
+export function update(param, callback) {
+  axios.post(updateUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
+}
+
+// 新增店铺
+export function save(param, callback) {
+  axios.post(saveUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
+}
+
+// 根据合作状态统计店铺数量
+export function countBySalonExample(param, callback) {
+  axios.post(countBySalonExampleUrl, param).then(data => {
     if (data !== undefined && data !== '' && data !== null) {
       callback(data)
     }

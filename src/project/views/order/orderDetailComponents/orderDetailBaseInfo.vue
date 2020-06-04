@@ -142,15 +142,13 @@
         </el-row>
       </el-col>
     </el-row>
-    <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="editOrderDetail">编辑
-    </el-button>
+    <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="editOrderDetail(order.id)">编辑</el-button>
     <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="goBack">返回上一页
     </el-button>
   </div>
 </template>
 
 <script>
-  import {getById} from "@/project/service/order"
   export default {
     data() {
       return {
@@ -175,15 +173,16 @@
         this.$router.go(-1);
       },
       // 编辑订单详情
-      editOrderDetail() {
-        this.$router.push({path:'/order/editOrderDetail'});
+      editOrderDetail(id) {
+        this.$router.push({path:'/order/editOrderDetail/' + id});
       }
     },
     watch: {
       orderData: {
         handler(val) {
           this.order = val
-        }
+        },
+        deep: true
       }
     }
   }

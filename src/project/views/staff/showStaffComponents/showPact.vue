@@ -30,7 +30,7 @@
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="page"
-              :page-sizes="[2, 20, 30, 40]"
+              :page-sizes="[10, 20, 30, 40]"
               :page-size="pageSize"
               layout="total, sizes, jumper, pager,prev, next"
               :total="total"
@@ -99,7 +99,7 @@
         // 顾客数据
         contractData: [],
         model: "contract",
-        pageSize: 2,
+        pageSize: 10,
         page: 1,
         total: 0,
         extraParam: {},

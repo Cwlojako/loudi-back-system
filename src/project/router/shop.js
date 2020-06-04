@@ -68,6 +68,29 @@ const shop = {
       component: () => import('@/project/views/shop/trainRecords')
     },
     {
+      path:'/shop/addOrEditBaseInfo/:id',
+      name:'addOrEditBaseInfo',
+      meta:{
+        isShowHeader:true,
+        isShowLeftSider:true,
+        breadcrumb: [
+          {
+            name:'首页',
+            path:'/index'
+          },
+          {
+            name:'店铺列表',
+            path:'/shop/list'
+          },
+          {
+            name:'编辑店铺',
+            path:'/shop/addOrEditBaseInfo/:id'
+          }
+        ]
+      },
+      component: () => import('@/project/views/shop/addOrEditBaseInfo')
+    },
+    {
       path:'/shop/addOrEditBaseInfo',
       name:'addOrEditBaseInfo',
       meta:{
@@ -83,7 +106,7 @@ const shop = {
             path:'/shop/list'
           },
           {
-            name:'新增/编辑店铺',
+            name:'新增店铺',
             path:'/shop/addOrEditBaseInfo'
           }
         ]

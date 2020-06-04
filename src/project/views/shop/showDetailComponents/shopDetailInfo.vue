@@ -137,7 +137,7 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-button style="background: rgb(0, 161, 108);border: none" type="primary" @click="goEditDetailInfo">编辑
+      <el-button style="background: rgb(0, 161, 108);border: none" type="primary" @click="goEditBaseInfo(salon.id)">编辑
       </el-button>
       <el-button style="background: rgb(0, 161, 108);border: none" type="primary">禁用
       </el-button>
@@ -160,10 +160,10 @@
       }
     },
     methods:{
-      // 前往编辑详细信息页面
-      goEditDetailInfo() {
-        this.$router.push({path:'/shop/addOrEditBaseInfo',query:{
-          activeName:'1'
+      // 前往编辑店铺基本信息页面
+      goEditBaseInfo(id) {
+        this.$router.push({path:'/shop/addOrEditBaseInfo/' + id ,query:{
+            activeName:'1'
         }});
       },
       goBack() {

@@ -351,10 +351,7 @@
     methods: {
       // 点击部门节点获取相应部门下的员工列表
       findByDepartmentId(departmentId) {
-        findByDepartmentId({departmentId: departmentId}, res => {
-          this.data = res
-          this.total = res.length
-        })
+        this.search(1, departmentId)
       },
       // 控制树结构的懒加载，点击父部门再加载子部门
       loadNode(node, resolve) {
@@ -555,7 +552,7 @@
         this.$router.push({path:'/staff/addStaff'});
       },
       // 获取员工信息列表
-      search(page) {
+      search(page, id) {
         let _t = this;
         _t.page = page;
         let param = {
@@ -567,12 +564,14 @@
           isLoginedToday: false,
           fillAt: this.fillAtParam,
           employedAt: this.employedAtParam,
-          birthday: this.birthdayParam
+          birthday: this.birthdayParam,
+          department: {id: id}
         };
         // 如果参数不需要则清除
         if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
         if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
         if (JSON.stringify(param.birthday) === "{}") delete param.birthday
+        if (JSON.stringify(param.department) === "{}") delete param.department
         // 发送请求获取员工列表
         find(param, res => {
           _t.data = res
@@ -588,12 +587,15 @@
           isLoginedToday: false,
           fillAt: this.fillAtParam,
           employedAt: this.employedAtParam,
-          birthday: this.birthdayParam
+          birthday: this.birthdayParam,
+          // count还没加
+          department: {id: id}
         };
         // 如果参数不需要则清除
         if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
         if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
         if (JSON.stringify(param.birthday) === "{}") delete param.birthday
+        if (JSON.stringify(param.department) === "{}") delete param.department
         // 发送请求获取员工列表
         find(param, res => {
           // 把启用数，禁用数置为0

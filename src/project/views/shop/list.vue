@@ -11,12 +11,12 @@
       </el-col>
       <!--      标签-->
       <el-col :span="24" style="margin-left: 42px">
-        <el-tag type="success">全部 (800)</el-tag>
-        <el-tag type="success">已合作 (600)</el-tag>
-        <el-tag type="success">已洽谈有意向 (20)</el-tag>
-        <el-tag type="success">已洽谈无意向 (200)</el-tag>
-        <el-tag type="success">微信沟通尚未见面洽谈 (20)</el-tag>
-        <el-tag type="success">已取消 (200)</el-tag>
+        <el-tag type="success">全部 ({{total}})</el-tag>
+        <el-tag type="success">已合作 ({{firstCount}})</el-tag>
+        <el-tag type="success">已洽谈有意向 ({{secondCount}})</el-tag>
+        <el-tag type="success">已洽谈无意向 ({{thirdCount}})</el-tag>
+        <el-tag type="success">微信沟通尚未见面洽谈 ({{forthCount}})</el-tag>
+        <el-tag type="success">已取消 ({{fifthCount}})</el-tag>
       </el-col>
       <!--    按钮和分页-->
       <el-col :span="24">
@@ -27,9 +27,11 @@
           <el-button style="background: rgb(0, 161, 108);border: none"  type="primary"
                      @click="gotrainRecord">培训记录总计
           </el-button>
-          <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary">导入
+          <el-button style="background: rgb(0, 161, 108);border: none" type="primary">导入
           </el-button>
-          <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary">导出
+          <el-button style="background: rgb(0, 161, 108);border: none" type="primary">导出
+          </el-button>
+          <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary" @click="toAddSalon">新增
           </el-button>
           <div class="pager-group">
             <el-pagination
@@ -69,8 +71,8 @@
           <el-table-column prop="status" label="状态"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="goShopDetail">查看</el-button>
-              <el-button type="text" size="small">编辑</el-button>
+              <el-button type="text" size="small" @click="goShopDetail(scope.row.id)">查看</el-button>
+              <el-button type="text" size="small" @click="goShopEdit(scope.row.id)">编辑</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -88,7 +90,7 @@
 <script>
   import Emitter from '@/framework/mixins/emitter'
   import Search from "@/framework/components/search";
-  import {find, count} from '@/project/service/salon'
+  import {find, count, countBySalonExample} from '@/project/service/salon'
 
   export default {
     mixins: [Emitter],
@@ -161,7 +163,17 @@
             displayValue: ["有", "无"],
             value: ["有", "无"]
           }
-        ]
+        ],
+        // 已合作
+        firstCount: 0,
+        // 已洽谈有意向
+        secondCount: 0,
+        // 已洽谈无意向
+        thirdCount: 0,
+        // 微信沟通尚未见面洽谈
+        forthCount: 0,
+        // 已取消
+        fifthCount: 0
       }
     },
     components: {
@@ -179,6 +191,18 @@
       // 前往培训记录总汇界面
       gotrainRecord() {
         this.$router.push({path:'/shop/trainRecord'});
+      },
+      // 前往新增店铺页面
+      toAddSalon() {
+        this.$router.push({path:'/shop/addOrEditBaseInfo', query:{
+            activeName:'0'
+        }})
+      },
+      // 前往编辑店铺页面
+      goShopEdit(id) {
+        this.$router.push({path:'/shop/addOrEditBaseInfo/' + id, query:{
+            activeName:'0'
+          }})
       },
       searchBySearchItem(searchItems) {
         let keys = [];
@@ -281,6 +305,26 @@
     mounted() {
       // 获取店铺列表数据
       this.search(1)
+      // 获取已合作数量 ===> 1
+      countBySalonExample({[this.model]: {cooperationStatus: '已合作'}}, res => {
+        this.firstCount = res
+      })
+      // 获取已洽谈有意向数量 ===> 2
+      countBySalonExample({[this.model]: {cooperationStatus: '已洽谈有意向'}}, res => {
+        this.secondCount = res
+      })
+      // 获取已洽谈无意向数量 ===> 3
+      countBySalonExample({[this.model]: {cooperationStatus: '已洽谈无意向'}}, res => {
+        this.thirdCount = res
+      })
+      // 获取微信沟通尚未见面洽谈数量 ===> 4
+      countBySalonExample({[this.model]: {cooperationStatus: '微信沟通尚未见面洽谈'}}, res => {
+        this.forthCount = res
+      })
+      // 获取已取消数量 ===> 5
+      countBySalonExample({[this.model]: {cooperationStatus: '已取消'}}, res => {
+        this.fifthCount = res
+      })
     }
   }
 </script>

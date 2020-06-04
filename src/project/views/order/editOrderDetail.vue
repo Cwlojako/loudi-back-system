@@ -63,6 +63,7 @@
 </template>
 
 <script>
+  import {getById} from '@/project/service/order'
   export default {
     data() {
       return {
@@ -73,7 +74,16 @@
     methods:{
       goBack() {
         this.$router.go(-1);
+      },
+      getOrderData(id) {
+        getById({id: id}, res => {
+          console.log(res)
+        })
       }
+    },
+    created() {
+      this.id = this.$route.params.id
+      this.getOrderData(this.id)
     }
   }
 </script>

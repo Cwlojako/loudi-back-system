@@ -7,10 +7,10 @@
           :data="trainingData"
           style="width: 95%;margin:0 auto;"
           @row-dblclick="handleRowClick">
-          <el-table-column prop="username" label="培训时间"></el-table-column>
-          <el-table-column prop="realname" label="培训人"></el-table-column>
-          <el-table-column prop="realname" label="培训主题"></el-table-column>
-          <el-table-column prop="realname" label="培训人数"></el-table-column>
+          <el-table-column prop="trainAt" label="培训时间"></el-table-column>
+          <el-table-column prop="employee.realName" label="培训人"></el-table-column>
+          <el-table-column prop="subject" label="培训主题"></el-table-column>
+          <el-table-column prop="studentQuantity" label="培训人数"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="260">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="goTrainDetail(scope.row.id)">

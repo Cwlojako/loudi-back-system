@@ -18,21 +18,9 @@
         >
           <el-table-column prop="id" label="订单编号"></el-table-column>
           <el-table-column prop="type" label="订单类型"></el-table-column>
-          <el-table-column prop='customer' label="顾客名称">
-            <template slot-scope="scope">
-              {{scope.row.customer ? scope.row.customer.name : "--"}}
-            </template>
-          </el-table-column>
-          <el-table-column prop="product" label="疗程部位">
-            <template slot-scope="scope">
-              {{scope.row.product ? scope.row.product.name : '--'}}
-            </template>
-          </el-table-column>
-          <el-table-column prop="phone" label="手机号码">
-            <template slot-scope="scope">
-              {{scope.row.customer ? scope.row.customer.phone : "--"}}
-            </template>
-          </el-table-column>
+          <el-table-column prop='customer.realName' label="顾客名称"></el-table-column>
+          <el-table-column prop="product.name" label="疗程部位"></el-table-column>
+          <el-table-column prop="customer.phone" label="手机号码"></el-table-column>
           <el-table-column prop="paymentAmount" label="成交金额"></el-table-column>
           <el-table-column prop="createAt" label="下单时间"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="240">
