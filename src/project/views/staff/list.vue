@@ -350,8 +350,9 @@
     },
     methods: {
       // 点击部门节点获取相应部门下的员工列表
-      findByDepartmentId(departmentId) {
-        this.search(1, departmentId)
+      findByDepartmentId(id) {
+        this.departmentId = id
+        this.search(1, this.departmentId)
       },
       // 控制树结构的懒加载，点击父部门再加载子部门
       loadNode(node, resolve) {
@@ -477,7 +478,7 @@
                 type: 'success',
                 message: '已禁用!'
               });
-              _t.search(_t.page);
+              _t.search(_t.page, this.departmentId);
             })
           } else {
             enable({id: row.id}, res => {
@@ -485,7 +486,7 @@
                 type: 'success',
                 message: '已启用!'
               });
-              _t.search(_t.page);
+              _t.search(_t.page, this.departmentId);
             })
           }
         }).catch(() => {
@@ -545,7 +546,7 @@
         } else {
           delete this.birthdayParam
         }
-        this.search(1);
+        this.search(1, this.departmentId);
       },
       // 新建员工
       toCreate() {
@@ -575,12 +576,16 @@
         // 发送请求获取员工列表
         find(param, res => {
           _t.data = res
-          this.get_Enable_Disable_total()
-          _t.getTotal()
+          // 获取每次查询结果的启用量，禁用量
+          this.get_Enable_Disable_total(id)
+          // 获取每次查询结果的总数
+          _t.getTotal(id)
+          // 获取每次查询结果的今日登陆过数量
+          this.getLoginedToday(id)
         });
       },
       // get_Enable_Disable_total获取启用量禁用量
-      get_Enable_Disable_total() {
+      get_Enable_Disable_total(id) {
         let _t = this;
         let param = {
           [this.model]: _t.extraParam,
@@ -588,7 +593,6 @@
           fillAt: this.fillAtParam,
           employedAt: this.employedAtParam,
           birthday: this.birthdayParam,
-          // count还没加
           department: {id: id}
         };
         // 如果参数不需要则清除
@@ -611,10 +615,30 @@
         });
       },
       // 获取员工信息条目总数
-      getTotal() {
+      getTotal(id) {
         let param = {
           [this.model]: this.extraParam,
           isLoginedToday: false,
+          fillAt: this.fillAtParam,
+          employedAt: this.employedAtParam,
+          birthday: this.birthdayParam,
+          department: {id: id}
+        }
+        // 如果参数不需要则清除
+        if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
+        if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
+        if (JSON.stringify(param.birthday) === "{}") delete param.birthday
+        if (JSON.stringify(param.department) === "{}") delete param.department
+        count(param, res => {
+          this.total = parseInt(res)
+        });
+      },
+      // 获取今日登录过的数量
+      getLoginedToday(id) {
+        let param = {
+          [this.model]: this.extraParam, 
+          isLoginedToday: true,
+          department: {id: id},
           fillAt: this.fillAtParam,
           employedAt: this.employedAtParam,
           birthday: this.birthdayParam
@@ -623,13 +647,7 @@
         if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
         if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
         if (JSON.stringify(param.birthday) === "{}") delete param.birthday
-        count(param, res => {
-          this.total = parseInt(res)
-        });
-      },
-      // 获取今日登录过的数量
-      getLoginedToday() {
-        let param = {[this.model]: this.extraParam, isLoginedToday: true};
+        if (JSON.stringify(param.department) === "{}") delete param.department
         count(param, res => {
           this.loginedTotal = parseInt(res)
         })
@@ -645,7 +663,7 @@
         }).then(() => {
           selectList.map(s => {
             enable({id: s.id}, res => {
-              _t.search(_t.page);
+              _t.search(_t.page, this.departmentId);
               this.$message({
                 type: 'success',
                 message: '启用成功!'
@@ -670,7 +688,7 @@
         }).then(() => {
           selectList.map(s => {
             disable({id: s.id}, res => {
-              _t.search(_t.page);
+              _t.search(_t.page, this.departmentId);
               this.$message({
                 type: 'success',
                 message: '禁用成功!'
@@ -707,12 +725,12 @@
       // 控制页码跳转
       handleCurrentChange(val) {
         this.page = val;
-        this.search(this.page);
+        this.search(this.page, this.departmentId);
       },
       // 控制当前页数据显示条数
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-        this.search(this.page);
+        this.search(this.page, this.departmentId);
       },
       // 控制“更多操作”
       handleClick(command) {
@@ -728,8 +746,6 @@
     },
     created() {
       this.search(1)
-      // 获取今日登录数
-      this.getLoginedToday()
     }
   }
 </script>
