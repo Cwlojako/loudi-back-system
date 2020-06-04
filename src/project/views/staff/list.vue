@@ -575,6 +575,27 @@
         if (JSON.stringify(param.birthday) === "{}") delete param.birthday
         // 发送请求获取员工列表
         find(param, res => {
+          _t.data = res
+          this.get_Enable_Disable_total()
+          _t.getTotal()
+        });
+      },
+      // get_Enable_Disable_total获取启用量禁用量
+      get_Enable_Disable_total() {
+        let _t = this;
+        let param = {
+          [this.model]: _t.extraParam,
+          isLoginedToday: false,
+          fillAt: this.fillAtParam,
+          employedAt: this.employedAtParam,
+          birthday: this.birthdayParam
+        };
+        // 如果参数不需要则清除
+        if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
+        if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
+        if (JSON.stringify(param.birthday) === "{}") delete param.birthday
+        // 发送请求获取员工列表
+        find(param, res => {
           // 把启用数，禁用数置为0
           this.disableTotal = 0
           this.enableTotal = 0
@@ -585,8 +606,6 @@
               this.disableTotal++
             }
           })
-          _t.data = res
-          _t.getTotal()
         });
       },
       // 获取员工信息条目总数
