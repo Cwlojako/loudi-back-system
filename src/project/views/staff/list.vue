@@ -17,7 +17,7 @@
                 <i class="treeIcon el-icon-circle-plus-outline" @click="showAddDepartment($event, data.id)"></i>
               </el-tooltip>
               <el-tooltip class="item" content="编辑" placement="bottom" :enterable="false">
-                <i class="treeIcon el-icon-edit" @click="showEditDepartment($event, data.id)"></i>
+                <i class="treeIcon el-icon-edit" @click="showEditDepartment($event, data.id, node)"></i>
               </el-tooltip>
               <el-tooltip class="item" content="删除" placement="top" :enterable="false">
                 <i class="treeIcon el-icon-delete" @click="deleteDepartment($event, data.id, node)"></i>
@@ -167,7 +167,7 @@
       <!--   修改部门信息表单验证规则和新增部门表单规则一致   -->
       <el-form :model="editDepartmentForm" :rules="rules" ref="editDepartmentRef" label-width="90px">
         <el-form-item label="上级部门:" prop="parent">
-          <el-input v-model="editDepartmentForm.parent" disabled readonly></el-input>
+          <el-input v-model="editParentTitle" disabled readonly></el-input>
         </el-form-item>
         <el-form-item label="部门名称:" prop="name">
           <el-input v-model="editDepartmentForm.name"></el-input>
@@ -181,7 +181,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="editDepartmentShow = false">取 消</el-button>
-        <el-button type="primary" @click="editDepartmentShow = false">确 定</el-button>
+        <el-button type="primary" @click="updateDepartment(departmentId, editParentId)">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -191,8 +191,8 @@
 <script>
   import Emitter from '@/framework/mixins/emitter'
   import Search from "@/framework/components/search";
-  import {find, findByDepartmentId, count, leave, enable, disable, batchEnable, batchDisable} from '@/project/service/employee'
-  import {save, delDepartment, get, findFather, findByParentId, findNext} from '@/project/service/department'
+  import {find, findByDepartmentId, count, leave, enable, disable} from '@/project/service/employee'
+  import {save, delDepartment, get, findFather, findNext, update} from '@/project/service/department'
 
   export default {
     mixins: [Emitter],
@@ -216,14 +216,8 @@
         },
         // 新增编辑部门表单验证规则
         rules: {
-          name: [
-            {required: true, message: '请填写部门名称', trigger: 'blur'},
-            {min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur'}
-          ],
-          position: [
-            {required: true, message: '请填写排序号', trigger: 'blur'},
-            {min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur'}
-          ]
+          name: [{required: true, message: '请填写部门名称', trigger: 'blur'}],
+          position: [{required: true, message: '请填写排序号', trigger: 'blur'}]
         },
         // 控制修改部门信息对话框的显示与隐藏
         editDepartmentShow: false,
@@ -259,6 +253,10 @@
         departmentId: 0,
         // 添加部门请求参数
         addDepartmentParam: {},
+        // 编辑部门的父级id
+        editParentId: 0,
+        // 编辑部门上级部门文本
+        editParentTitle: '',
         // 搜索组件配置项
         searchItems: [
           {
@@ -409,19 +407,40 @@
           })
         })
       },
-      // 编辑部门信息
-      showEditDepartment(e, id) {
-        this.editDepartmentShow = true;
-        // 阻止事件冒泡
+      // 显示编辑部门
+      showEditDepartment(e, id, node) {
         e.stopPropagation()
+        // 获取该节点的父节点id
+        if (node.parent.data) {
+          this.editParentId = node.parent.data.id
+        }
+        this.editDepartmentShow = true
         // 根据id获取部门信息
         get({id}, res => {
+          this.departmentId = res.id
           this.editDepartmentForm = res
           if (res.parent && res.parent.name) {
-            this.editDepartmentForm.parent = res.parent.name
+            this.editParentTitle = res.parent.name
           } else {
-            this.editDepartmentForm.parent = '顶级部门'
+            this.editParentTitle = '顶级部门'
           }
+        })
+      },
+      // 发送更新部门信息请求
+      updateDepartment(id, parentId) {
+        // 合并组成更新部门请求参数
+        let param = Object.assign(this.editDepartmentForm, {id: id})
+        this.$refs.editDepartmentRef.validate(valid => {
+          if (!valid) return false
+          update({department: param}, res => {
+            this.handleClose()
+            // 重新渲染该部门节点下的数据
+            this.refreshNode(parentId)
+            this.$message({
+              type: 'success',
+              message: '更新部门信息成功!'
+            });
+          })
         })
       },
       // 删除部门
@@ -440,14 +459,14 @@
             this.$message({
               type: 'success',
               message: '删除部门成功!'
-            });
-          });
+            })
+          })
         }).catch(() => {
           this.$message({
             type: 'info',
             message: '已取消删除'
-          });
-        });
+          })
+        })
         e.stopPropagation()
       },
       // 关闭新增部门对话框
@@ -572,7 +591,7 @@
         if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
         if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
         if (JSON.stringify(param.birthday) === "{}") delete param.birthday
-        if (JSON.stringify(param.department) === "{}") delete param.department
+        if (param.department.id === 0) delete param.department
         // 发送请求获取员工列表
         find(param, res => {
           _t.data = res
@@ -636,7 +655,7 @@
       // 获取今日登录过的数量
       getLoginedToday(id) {
         let param = {
-          [this.model]: this.extraParam, 
+          [this.model]: this.extraParam,
           isLoginedToday: true,
           department: {id: id},
           fillAt: this.fillAtParam,
@@ -745,7 +764,7 @@
       },
     },
     created() {
-      this.search(1)
+      this.search(1, this.departmentId)
     }
   }
 </script>

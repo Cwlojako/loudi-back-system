@@ -5,7 +5,7 @@
       <div class="main">
         <p>
           <span class="title">设备状态</span>
-          <span class="text">{{device.status}}</span>
+          <span class="text">{{device.enabled ? '启用' : '禁用'}}</span>
         </p>
         <p>
           <span class="title">订单编号</span>
@@ -33,10 +33,10 @@
         </p>
       </div>
       <div class="button-group">
-        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="openEquipment(device.id)">开机</el-button>
-        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="colseEquipment(device.id)">关机</el-button>
-        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="impower(device.id)">授权</el-button>
-        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="takeBack(device.id)">收回</el-button>
+        <el-button :disabled="device.enabled" style="background: rgb(0, 161, 108);border: none" type="primary" @click="openEquipment(device.id)">开机</el-button>
+        <el-button :disabled="!device.enabled" style="background: rgb(0, 161, 108);border: none" type="primary" @click="colseEquipment(device.id)">关机</el-button>
+        <el-button style="background: rgb(0, 161, 108);border: none" type="primary" @click="impower(device.id)">授权</el-button>
+        <el-button style="background: rgb(0, 161, 108);border: none" type="primary" @click="takeBack(device.id)">收回</el-button>
       </div>
     </div>
     <p class="p_title">
@@ -123,9 +123,11 @@
           type: 'warning'
         }).then(() => {
           enable({id: id}, res => {
+            // 刷新数据
+            this.$emit('refreshData', id)
             this.$message({
               type: 'success',
-              message: '操作成功!'
+              message: '开机成功!'
             });
           })
         }).catch(() => {
@@ -143,9 +145,10 @@
           type: 'warning'
         }).then(() => {
           disable({id: id}, res => {
+            this.$emit('refreshData', id)
             this.$message({
               type: 'success',
-              message: '操作成功!'
+              message: '关机成功!'
             });
           })
         }).catch(() => {

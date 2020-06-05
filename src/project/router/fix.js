@@ -22,7 +22,7 @@ const fix = {
       component: () => import('@/project/views/fix/list')
     },
     {
-      path:'/fix/fixDetail',
+      path:'/fix/fixDetail/:id',
       name:'fixDetail',
       meta:{
         isShowHeader:true,
@@ -39,7 +39,7 @@ const fix = {
           },
           {
             name:'维修详情',
-            path:'/fix/fixDetail'
+            path:'/fix/fixDetail/:id'
           }
         ]
       },

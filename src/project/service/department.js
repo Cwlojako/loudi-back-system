@@ -2,6 +2,7 @@ import axios from '@/framework/http/axios'
 const model = 'department'
 let saveUrl = `api/${model}/save`
 let deleteUrl = `api/${model}/delete`
+let updateUrl = `api/${model}/update`
 let getUrl = `api/${model}/get`
 let findFatherUrl = `api/${model}/findFather`
 let findByParentIdUrl = `api/${model}/findByParentId`
@@ -23,6 +24,15 @@ export function delDepartment(param, callback) {
 			callback(data)
 		}
 	})
+}
+
+// 更新部门信息
+export function update(param, callback) {
+  axios.post(updateUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
 }
 
 // 根据部门id获取部门信息

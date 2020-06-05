@@ -191,10 +191,10 @@
           },
           {
             name: "疗程部位",
-            key: "",
+            key: "product",
             type: "select",
-            displayValue: [],
-            value: []
+            displayValue: ["手部", "脚部", "腿部", "头部", "胸部", "腋毛"],
+            value: ["手部", "脚部", "腿部", "头部", "胸部", "腋毛"]
           },
           {
             name: "所属老师",
@@ -203,10 +203,10 @@
           },
           {
             name: "订单类型",
-            key: "",
+            key: "order",
             type: "select",
-            displayValue: [],
-            value: []
+            displayValue: ["暂存订单", "观察期", "已取消订单"],
+            value: ["暂存订单", "观察期", "已取消订单"]
           },
           {
             name: "顾客名称",
@@ -215,22 +215,22 @@
           },
           {
             name: "所属市场",
-            key: "",
+            key: "department",
             type: "select",
             displayValue: [],
             value: []
           },
           {
             name: "活动折扣",
-            key: "",
+            key: "promotion",
             type: "select",
-            displayValue: [],
-            value: []
+            displayValue: ["打板价", "亲友价", "会员价", "7.8折活动"],
+            value: ["打板价", "亲友价", "会员价", "7.8折活动"]
           },
           {
             name: "订单日期",
-            key: "accessAt",
-            type: "date",
+            key: "createAt",
+            type: "datetimerange",
           }
         ]
       }

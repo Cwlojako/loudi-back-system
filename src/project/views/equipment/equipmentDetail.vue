@@ -2,7 +2,7 @@
   <div>
     <el-tabs type="border-card">
       <el-tab-pane label="设备详情">
-        <equipmentInfo :deviceData="deviceData"></equipmentInfo>
+        <equipmentInfo :deviceData="deviceData" @refreshData="getDeviceData(id)"></equipmentInfo>
       </el-tab-pane>
       <el-tab-pane label="设备运行轨迹">
         <equipmentTrack></equipmentTrack>

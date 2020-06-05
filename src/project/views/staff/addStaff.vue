@@ -437,7 +437,7 @@
               this.$message({
                 type: 'success',
                 message: '更新员工详细信息成功!'
-              });
+              })
             })
           }
         })

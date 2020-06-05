@@ -43,11 +43,10 @@
     <el-dialog
       title="交接详情"
       :visible.sync="connectDetailShow"
-      width="30%"
-    >
+      width="30%">
       <el-row>
         <el-col :span="5"><div class="grid-content bg-purple">发起人</div></el-col>
-        <el-col :span="19"><div class="grid-content bg-purple-light">{{刘小奥}}</div></el-col>
+        <el-col :span="19"><div class="grid-content bg-purple-light"></div></el-col>
       </el-row>
       <el-row>
         <el-col :span="5"><div class="grid-content bg-purple">发起时间</div></el-col>

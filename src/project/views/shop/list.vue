@@ -271,9 +271,13 @@
         if (JSON.stringify(param.founder) === "{}") delete param.founder
         find(param, res => {
           _t.data = res;
+          // 动态查询总数
           _t.getTotal();
+          // 动态查询各个合作状态的总数
+          _t.getStatusCount()
         });
       },
+      // 获取总数
       getTotal() {
         let _t = this;
         let param = {
@@ -290,6 +294,47 @@
           _t.total = parseInt(res);
         });
       },
+      // 获取已合作总数
+      getStatusCount() {
+        let _t = this;
+        let param = {
+          [this.model]: _t.extraParam,
+          teacher: _t.teacherParam,
+          department: _t.departmentParam,
+          founder: _t.founderParam
+        }
+        // 如果没有查询条件则清除携带参数对象
+        if (JSON.stringify(param.teacher) === "{}") delete param.teacher
+        if (JSON.stringify(param.department) === "{}") delete param.department
+        if (JSON.stringify(param.founder) === "{}") delete param.founder
+        find(param, res => {
+          // 把各个和合作状态的初始值置为0
+          this.firstCount = 0
+          this.secondCount = 0
+          this.thirdCount = 0
+          this.forthCount = 0
+          this.fifthCount = 0
+          res.forEach(item => {
+            switch (item.cooperationStatus) {
+              case "已合作":
+                this.firstCount++
+                break
+              case "已洽谈有意向":
+                this.secondCount++
+                break
+              case "已洽谈无意向":
+                this.thirdCount++
+                break
+              case "微信沟通尚未见面洽谈":
+                this.forthCount++
+                break
+              case "已取消":
+                this.fifthCount++
+                break
+            }
+          })
+        })
+      },
       handleRowClick(row) {
         this.$router.push({path: '/manager/show/' + row.id})
       },
@@ -305,26 +350,6 @@
     mounted() {
       // 获取店铺列表数据
       this.search(1)
-      // 获取已合作数量 ===> 1
-      countBySalonExample({[this.model]: {cooperationStatus: '已合作'}}, res => {
-        this.firstCount = res
-      })
-      // 获取已洽谈有意向数量 ===> 2
-      countBySalonExample({[this.model]: {cooperationStatus: '已洽谈有意向'}}, res => {
-        this.secondCount = res
-      })
-      // 获取已洽谈无意向数量 ===> 3
-      countBySalonExample({[this.model]: {cooperationStatus: '已洽谈无意向'}}, res => {
-        this.thirdCount = res
-      })
-      // 获取微信沟通尚未见面洽谈数量 ===> 4
-      countBySalonExample({[this.model]: {cooperationStatus: '微信沟通尚未见面洽谈'}}, res => {
-        this.forthCount = res
-      })
-      // 获取已取消数量 ===> 5
-      countBySalonExample({[this.model]: {cooperationStatus: '已取消'}}, res => {
-        this.fifthCount = res
-      })
     }
   }
 </script>
