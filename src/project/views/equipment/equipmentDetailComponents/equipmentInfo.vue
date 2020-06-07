@@ -5,7 +5,7 @@
       <div class="main">
         <p>
           <span class="title">设备状态</span>
-          <span class="text">{{device.enabled ? '启用' : '禁用'}}</span>
+          <span class="text">{{device.enabled ? '运行中' : '关机'}}</span>
         </p>
         <p>
           <span class="title">订单编号</span>

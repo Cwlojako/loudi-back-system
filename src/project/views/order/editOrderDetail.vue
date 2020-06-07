@@ -1,5 +1,5 @@
 <template>
-  <div class="edit">
+  <div class="edit page">
     <el-card class="box-card">
       <p class="title">基本信息</p>
       <el-form :model="editFormData" :rules="editFormRule" ref="editFormRef" label-width="120px" class="demo-ruleForm" label-position="left">
@@ -123,10 +123,14 @@
   }
 </script>
 
-<style lang="less" scoped>
+<style lang="less" scoped> 
+  .page {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
   .edit {
-    padding-left: 30px;
-    padding-top: 30px;
+    padding-left: 20px;
+    padding-top: 20px;
     box-sizing: border-box;
     .title {
       font-weight: bold;

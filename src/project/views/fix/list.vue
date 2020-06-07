@@ -1,6 +1,6 @@
 <template>
-  <div class="staff">
-    <el-row class="page">
+  <div class="page">
+    <el-row>
       <!--    搜索-->
       <el-col :span="24">
         <search
@@ -231,4 +231,8 @@
 </script>
 
 <style lang="less" scoped>
+  .page {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 </style>

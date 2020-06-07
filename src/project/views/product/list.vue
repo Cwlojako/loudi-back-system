@@ -105,10 +105,14 @@
     <el-dialog
       :title="dialogTitle"
       :visible.sync="addOrEditDialogShow"
-      width="30%"
-      @close="closeProductDialog"
-    >
-      <el-form :model="productFormData" :rules="productFormRule" ref="productFormRef" label-width="150px" class="demo-ruleForm" label-position="left">
+      width="40%"
+      @close="closeProductDialog">
+      <el-form :model="productFormData"
+              :rules="productFormRule"
+              ref="productFormRef"
+              label-width="150px"
+              class="demo-ruleForm"
+              label-position="left">
         <el-form-item label="产品名称" prop="name" required>
           <el-input v-model="productFormData.name"></el-input>
         </el-form-item>
@@ -265,7 +269,7 @@
         </el-table-column>
       </el-table>
       <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary"
-                 class="addTreatment" @click="addTreatment">添加流程
+                class="addTreatment" @click="addTreatment">添加流程
       </el-button>
       <div>注：设备参数为选填项，若不设置异常范围则不提醒</div>
       <span slot="footer" class="dialog-footer">
@@ -707,7 +711,6 @@
     },
     mounted() {
       this.search(1);
-      // this.findAllRoles();
     }
   }
 </script>
@@ -719,7 +722,6 @@
     transform: translateX(-50%);
     top: 8px;
   }
-
   .el-input {
     width: 90px !important;
   }

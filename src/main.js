@@ -4,15 +4,23 @@ import Vue from 'vue'
 import App from './App'
 import router from './project/router'
 import store from './framework/store'
-import ElementUI from 'element-ui';
+import ElementUI from 'element-ui'
 import { post } from '@/framework/http/request'
-import 'element-ui/lib/theme-chalk/index.css';
+import 'element-ui/lib/theme-chalk/index.css'
 import locale from 'element-ui/lib/locale/lang/en'
 // import i18n from './project/i18n/i18n.js' //引入i8n配置
+import AMap from 'vue-amap'
 
 
 Vue.config.productionTip = false
-Vue.use(ElementUI);
+Vue.use(ElementUI)
+Vue.use(AMap)
+AMap.initAMapApiLoader({
+  key: "868b1e34bf4e2239e8394bb7b53d8b4d",
+  plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor'],
+  // 默认高德 sdk 版本为 1.4.4
+  v: '1.4.4'
+})
 // Vue.use(ElementUI, { locale });
 Vue.prototype.$post = post;
 // 下面这段代码是为了兼容ie浏览器而写

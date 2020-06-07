@@ -1,6 +1,6 @@
 <template>
-  <div class="staff">
-    <el-row class="page">
+  <div class="page">
+    <el-row>
       <!--    搜索-->
       <el-col :span="24">
         <search
@@ -10,10 +10,10 @@
         ></search>
       </el-col>
       <el-col :span="24" style="margin-left: 42px">
-        <el-tag type="success">全部(800)</el-tag>
-        <el-tag type="success">运行中(600)</el-tag>
-        <el-tag type="success">关机(20)</el-tag>
-        <el-tag type="success">今日使用过(200)</el-tag>
+        <el-tag type="success">全部 ({{this.total}})</el-tag>
+        <el-tag type="success">运行中 ({{this.enableTotal}})</el-tag>
+        <el-tag type="success">关机 ({{this.disableTotal}})</el-tag>
+        <el-tag type="success">今日使用过 (200)</el-tag>
       </el-col>
       <!--    按钮和分页-->
       <el-col :span="24">
@@ -27,6 +27,31 @@
           <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary"
                      @click="toCreate">导出
           </el-button>
+          <el-dropdown :trigger="'click'" @command="handleClick" size="medium" @visible-change="onMenuChange">
+            <el-button icon="el-icon-menu" style="background:#3e5265;color: white ">
+              更多操作<i class="el-icon-caret-bottom" ref="rotate" style="transition: all .3s;"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item
+                icon="el-icon-circle-check"
+                command="启用"
+                :disabled="selectList.findIndex(s=>{return s.enabled}) >=0 || selectList.length === 0"
+                :style="(selectList.findIndex(s=>{return s.enabled}) >=0 || selectList.length === 0)?{'color':'rgba(255,255,255,0.4)','cursor': 'not-allowed'}:{'color':'#fff'}"
+                @click="batchEnable"
+              >
+                启用
+              </el-dropdown-item>
+              <el-dropdown-item
+                icon="el-icon-circle-close"
+                command="禁用"
+                :disabled="selectList.findIndex(s=>{return !s.enabled}) >=0 || selectList.length === 0"
+                :style="(selectList.findIndex(s=>{return !s.enabled}) >=0 || selectList.length === 0)?{'color':'rgba(255,255,255,0.4)'}:{'color':'#fff'}"
+                @click.stop="batchDisable"
+              >
+                禁用
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
           <el-button style="background: rgb(0, 161, 108);border: none"  type="primary"
                      @click="goCollectHistoryPage">汇总统计历史
           </el-button>
@@ -50,22 +75,24 @@
       <el-col :span="24">
         <el-table
           :data="deviceData"
-          style="width: 95%;margin:0 auto;">
+          style="width: 95%;margin:0 auto;"
+          @selection-change="handleSelectionChange">
+          <el-table-column type="selection" width="55"></el-table-column>
           <el-table-column prop="number" label="设备编号"></el-table-column>
           <el-table-column prop="deviceModel.name" label="机型"></el-table-column>
           <el-table-column prop="department.name" label="归属市场"></el-table-column>
           <el-table-column prop="department.manager.realName" label="部门负责人"></el-table-column>
           <el-table-column prop="department.name" label="归属分公司"></el-table-column>
           <el-table-column prop="status" label="运行状态"></el-table-column>
-          <el-table-column prop="runAt" label="最后运行时间"></el-table-column>
+          <el-table-column prop="runAt" label="最后运行时间" width='180'></el-table-column>
           <el-table-column prop="handed" label="有无交接历史">
             <template slot-scope="scope">
-              {{scope.row.handed ? '无' : '有'}}
+              {{scope.row.handed ? '有' : '无'}}
             </template>
           </el-table-column>
           <el-table-column prop="repaired" label="有无维修历史">
             <template slot-scope="scope">
-              {{scope.row.repaired ? '无' : '有'}}
+              {{scope.row.repaired ? '有' : '无'}}
             </template>
           </el-table-column>
           <el-table-column prop="enabled" label="设备状态">
@@ -81,7 +108,9 @@
               <el-button type="text" size="small" @click="goEquipmentMessagePage(scope.row.id)">
                 编辑
               </el-button>
-              <el-button type="text" size="small">禁用</el-button>
+              <el-button type="text" size="small" @click.stop="handleStatusChange(scope.row)">
+                {{scope.row.enabled ? '禁用' : '启用'}}
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -101,50 +130,56 @@
     data() {
       return {
         model: "device",
-        editId: 0,//编辑id
+        selectList: [],
         deviceData: [], // 设备表格数据
         pageSize: 10,
         page: 1,
         total: 0,
+        // 运行设备数量
+        disableTotal: 0,
+        // 关机设备数量
+        enableTotal: 0,
         extraParam: {},
+        departmentParam: {},
+        deviceModelParam: {},
         // 搜索组件配置项
         searchItems: [
           {
             name: "设备编号",
-            key: "username",
+            key: "number",
             type: "string"
           },
           {
             name: "归属市场",
-            key: "",
+            key: "department",
             type: "select",
             displayValue: [],
             value: []
           },
           {
             name: "有无维修记录",
-            key: "",
+            key: "repaired",
             type: "select",
-            displayValue: [],
-            value: []
+            displayValue: ["有", "无"],
+            value: ["有", "无"]
           },
           {
-            name: "状态",
-            key: "",
+            name: "运行状态",
+            key: "status",
             type: "select",
-            displayValue: [],
-            value: []
+            displayValue: ["运行中", "关机"],
+            value: ["运行中", "关机"]
           },
           {
             name: "有无交接历史",
-            key: "",
+            key: "handed",
             type: "select",
-            displayValue: [],
-            value: []
+            displayValue: ["有", "无"],
+            value: ["有", "无"]
           },
           {
             name: "机型",
-            key: "",
+            key: "deviceModel",
             type: "select",
             displayValue: [],
             value: []
@@ -179,7 +214,7 @@
       handleStatusChange(row) {
         let status;
         let _t = this;
-        if (row.status.indexOf('启用') >= 0) {
+        if (row.enabled) {
           status = '禁用'
         } else {
           status = '启用'
@@ -228,9 +263,31 @@
         for (let i in keys) {
           if (searchItems[keys[i]]) {
             this.extraParam[keys[i]] = searchItems[keys[i]];
+            if (keys[i] === 'department') delete this.extraParam[keys[i]]
+            if (keys[i] === 'deviceModel') delete this.extraParam[keys[i]]
+            // 处理参数
+            if (keys[i] === 'handed' || keys[i] === 'repaired') {
+              this.extraParam[keys[i]] = searchItems[keys[i]] === '有'
+            }
           } else {
             delete this.extraParam[keys[i]];
           }
+        }
+        // 处理所属部门参数
+        if (searchItems.department) {
+          this.departmentParam = {
+            name: searchItems.department
+          }
+        } else {
+          delete this.departmentParam
+        }
+        // 处理机型参数
+        if (searchItems.deviceModel) {
+          this.deviceModelParam = {
+            name: searchItems.deviceModel
+          }
+        } else {
+          delete this.deviceModelParam
         }
         this.search(1);
       },
@@ -243,22 +300,61 @@
             size: _t.pageSize
           },
           isRunToday: false,
-          [this.model]: _t.extraParam
+          [this.model]: _t.extraParam,
+          department: _t.departmentParam,
+          deviceModel: _t.deviceModelParam
         }
+        // 如果参数不需要则清除
+        if (JSON.stringify(param.department) === "{}") delete param.department
+        if (JSON.stringify(param.deviceModel) === "{}") delete param.deviceModel
         find(param, res => {
           _t.deviceData = res;
-          _t.getTotal();
+          // 获取查询总数
+          _t.getTotal()
+          // 获取运行中 关机设备总数
+          _t.getStatusCount()
         });
       },
+      // 获取总数
       getTotal() {
-        let _t = this;
+        let _t = this
         let param = {
           [this.model]: _t.extraParam,
-          isRunToday: false
+          isRunToday: false,
+          department: _t.departmentParam,
+          deviceModel: _t.deviceModelParam
         }
+        // 如果参数不需要则清除
+        if (JSON.stringify(param.department) === "{}") delete param.department
+        if (JSON.stringify(param.deviceModel) === "{}") delete param.deviceModel
         count(param, res => {
-          _t.total = parseInt(res);
-        });
+          _t.total = parseInt(res)
+        })
+      },
+      // 获取运行中，关机中设备数量
+      getStatusCount() {
+        let _t = this
+        let param = {
+          isRunToday: false,
+          [this.model]: _t.extraParam,
+          department: _t.departmentParam,
+          deviceModel: _t.deviceModelParam
+        }
+        // 如果参数不需要则清除
+        if (JSON.stringify(param.department) === "{}") delete param.department
+        if (JSON.stringify(param.deviceModel) === "{}") delete param.deviceModel
+        find(param, res => {
+          // 把运行数，关机数置为0
+          this.disableTotal = 0
+          this.enableTotal = 0
+          res.forEach(item => {
+            if (item.status === '运行中') {
+              this.enableTotal++
+            } else {
+              this.disableTotal++
+            }
+          })
+        })
       },
       //批量启用
       batchEnable() {
@@ -272,13 +368,12 @@
           selectList.map(s => {
             enable({id: s.id}, res => {
               _t.search(_t.page);
-              // this.$message({
-              //   type: 'success',
-              //   message: '删除成功!'
-              // });
+              this.$message({
+                type: 'success',
+                message: '启用成功!'
+              });
             })
           })
-
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -290,7 +385,7 @@
       batchDisable() {
         let _t = this;
         let selectList = this.selectList;
-        this.$confirm('确定启用所选的记录吗?', '启用提示', {
+        this.$confirm('确定禁用所选的记录吗?', '启用提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -298,13 +393,12 @@
           selectList.map(s => {
             disable({id: s.id}, res => {
               _t.search(_t.page);
-              // this.$message({
-              //   type: 'success',
-              //   message: '删除成功!'
-              // });
+              this.$message({
+                type: 'success',
+                message: '禁用成功!'
+              })
             })
           })
-
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -322,20 +416,17 @@
       },
       handleClick(command) {
         switch (command) {
-          case '编辑':
-            console.log('编辑');
-            this.editId = this.selectList[0].id;
-            this.editProps.visible = true;
-            break;
           case '启用':
-            console.log('启用');
-            this.batchEnable();
-            break;
+            this.batchEnable()
+            break
           case '禁用':
-            console.log('禁用')
-            this.batchDisable();
-            break;
+            this.batchDisable()
+            break
         }
+      },
+      // 控制行是否选中
+      handleSelectionChange(val) {
+        this.selectList = val;
       }
     },
     mounted() {
@@ -363,6 +454,7 @@
   .page {
     overflow-y: auto;
     overflow-x: hidden;
+    padding-bottom: 20px;
   }
   .el-button + .el-button {
     margin-left: 2px;

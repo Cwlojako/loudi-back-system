@@ -4,8 +4,18 @@ let findByEmployeeIdUrl = `api/${model}/findByOrderAndSalonAndProductAndTeacherA
 let findByCustomerIdUrl = `api/${model}/findByOrderAndSalonAndProductAndTeacherAndCustomerAndDepartmentAndPromotion`
 let countUrl = `api/${model}/countByOrderAndSalonAndProductAndTeacherAndCustomerAndDepartmentAndPromotion`
 let findByOrderIdUrl = `api/${model}/findByOrderAndSalonAndProductAndTeacherAndCustomerAndDepartmentAndPromotion`
+let findUrl = `api/${model}/findByOrderAndSalonAndProductAndTeacherAndCustomerAndDepartmentAndPromotion`
 let getByIdUrl = `api/${model}/get`
 let updateUrl = `api/${model}/update`
+
+// 查询所有订单信息
+export function find(param, callback) {
+  axios.post(findUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
+}
 
 // 根据员工id获取员工所属订单信息
 export function findByEmployeeId(param, callback) {

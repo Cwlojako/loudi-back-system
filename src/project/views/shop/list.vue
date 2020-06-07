@@ -21,17 +21,17 @@
       <!--    按钮和分页-->
       <el-col :span="24">
         <div style="width: 95%;margin: 10px auto;">
-          <el-button style="background: rgb(0, 161, 108);border: none"  type="primary"
-                     @click="goSettlementRecord">结算记汇总计
-          </el-button>
-          <el-button style="background: rgb(0, 161, 108);border: none"  type="primary"
-                     @click="gotrainRecord">培训记录总计
+          <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary" @click="toAddSalon">新增
           </el-button>
           <el-button style="background: rgb(0, 161, 108);border: none" type="primary">导入
           </el-button>
           <el-button style="background: rgb(0, 161, 108);border: none" type="primary">导出
           </el-button>
-          <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary" @click="toAddSalon">新增
+          <el-button style="background: rgb(0, 161, 108);border: none"  type="primary"
+                    @click="goSettlementRecord">结算记汇总计
+          </el-button>
+          <el-button style="background: rgb(0, 161, 108);border: none"  type="primary"
+                    @click="gotrainRecord">培训记录总计
           </el-button>
           <div class="pager-group">
             <el-pagination

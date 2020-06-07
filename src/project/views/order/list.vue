@@ -16,10 +16,10 @@
         </div>
         <div class="btn-group">
           <el-button style="background: rgb(0, 161, 108);border: none"  type="primary"
-                     @click="toCreate" class="btn import-btn">导入
+                    class="btn import-btn">导入
           </el-button>
           <el-button style="background: rgb(0, 161, 108);border: none"  type="primary"
-                     @click="toCreate" class="btn export-btn">导出
+                    class="btn export-btn">导出
           </el-button>
         </div>
       </el-col>
@@ -50,129 +50,43 @@
       <!--    表格-->
       <el-col :span="24">
         <el-table
-          :data="data"
+          :data="orderData"
           style="width: 95%;margin:0 auto;"
-          @selection-change="handleSelectionChange"
           @row-dblclick="handleRowClick"
         >
-          <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column prop="username" label="订单编号"></el-table-column>
-          <el-table-column prop="realname" label="订单类型"></el-table-column>
-          <el-table-column prop="phone" label="顾客名称"></el-table-column>
-          <el-table-column prop="position " label="疗程部位"></el-table-column>
-          <el-table-column prop="department" label="店铺名称"></el-table-column>
-          <el-table-column prop="status" label="所属老师"></el-table-column>
-          <el-table-column prop="responsible" label="所属市场"></el-table-column>
-          <el-table-column prop="responsible" label="成交金额"></el-table-column>
-          <el-table-column prop="responsible" label="活动折扣"></el-table-column>
-          <el-table-column prop="responsible" label="下单时间"></el-table-column>
+          <el-table-column prop="id" label="订单编号"></el-table-column>
+          <el-table-column prop="type" label="订单类型"></el-table-column>
+          <el-table-column prop="customer.realName" label="顾客名称"></el-table-column>
+          <el-table-column prop="product.name " label="疗程部位"></el-table-column>
+          <el-table-column prop="salon.name" label="店铺名称"></el-table-column>
+          <el-table-column prop="teacher.realName" label="所属老师"></el-table-column>
+          <el-table-column prop="department.name" label="所属市场"></el-table-column>
+          <el-table-column prop="transactionPrice" label="成交金额"></el-table-column>
+          <el-table-column prop="promotion.name" label="活动折扣"></el-table-column>
+          <el-table-column prop="createAt" label="下单时间"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="goOrderDetail">查看</el-button>
-              <el-button type="text" size="small" @click="goOrderEdit">编辑</el-button>
+              <el-button type="text" size="small" @click="goOrderDetail(scope.row.id)">查看</el-button>
+              <el-button type="text" size="small" @click="goOrderEdit(scope.row.id)">编辑</el-button>
             </template>
           </el-table-column>
         </el-table>
       </el-col>
     </el-row>
-
-
   </div>
 </template>
 
 <script>
   import Emitter from '@/framework/mixins/emitter'
-  // import ICreate from "../manager/create";
-  // import IEdit from "../manager/edit";
-  import Search from "@/framework/components/search";
-  import {post} from "@/framework/http/request";
-  import {search, count, del, enable, disable} from '@/project/service/manager'
-
+  import Search from "@/framework/components/search"
+  import {find, count} from '@/project/service/order'
 
   export default {
     mixins: [Emitter],
     data() {
       return {
-        departmentData: [{
-          id: 1,
-          label: '总部',
-          children: [{
-            id: 4,
-            label: '培训部'
-          }, {
-            id: 9,
-            label: '营销部'
-          }, {
-            id: 6,
-            label: '后勤部'
-          }, {
-            id: 3,
-            label: '人事部'
-          }, {
-            id: 7,
-            label: '市场部',
-            children: [{
-              id: 13,
-              label: '湖南/湖北'
-            }, {
-              id: 14,
-              label: '广西/海南'
-            }, {
-              id: 26,
-              label: '福建/广东'
-            }]
-          }]
-        }],
-        // 控制新增部门对话框的显示与隐藏
-        addDepartmentShow: false,
-        //新增部门表单信息对象
-        addDepartmentForm: {
-          heightDepartment: '', // 上级部门
-          departmentName: '', // 部门名称
-          sortNum: '',// 排序号
-          remark: '' // 备注
-        },
-        // 新增部门表单验证规则
-        addDepartmentRules: {
-          heightDepartment: [
-            {required: true, message: '请选择上级部门', trigger: 'change'}
-          ],
-          departmentName: [
-            {required: true, message: '请填写部门名称', trigger: 'blur'},
-            {min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur'}
-          ],
-          sortNum: [
-            {required: true, message: '请填写排序号', trigger: 'blur'},
-            {min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur'}
-          ],
-          remark: [
-            {required: true, message: '请填写备注', trigger: 'blur'},
-            {min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur'}
-          ],
-        },
-        // 控制修改部门信息对话框的显示与隐藏
-        editDepartmentShow: false,
-        // 修改部门表单信息对象
-        editDepartmentForm: {
-          heightDepartment: '', // 上级部门
-          departmentName: '', // 部门名称
-          sortNum: '',// 排序号
-          remark: '' // 备注
-        },
-        model: "manager",
-        // createProps: {
-        //   visible: false
-        // },
-        // editProps: {
-        //   visible: false
-        // },
-        menu: {
-          visible: false
-        },
-        editId: 0,//编辑id
-        data: [], // 员工表格数据
-        selectList: [],
-        sort: {asc: [], desc: []},
+        model: "order",
+        orderData: [], // 订单表格数据
         pageSize: 10,
         page: 1,
         total: 0,
@@ -181,12 +95,12 @@
         searchItems: [
           {
             name: "店铺编号",
-            key: "username",
+            key: "salonId",
             type: "string"
           },
           {
             name: "店铺名称",
-            key: "realname",
+            key: "salonName",
             type: "string"
           },
           {
@@ -198,19 +112,19 @@
           },
           {
             name: "所属老师",
-            key: "username",
+            key: "teacher",
             type: "string"
           },
           {
             name: "订单类型",
-            key: "order",
+            key: "type",
             type: "select",
             displayValue: ["暂存订单", "观察期", "已取消订单"],
             value: ["暂存订单", "观察期", "已取消订单"]
           },
           {
             name: "顾客名称",
-            key: "username",
+            key: "customer",
             type: "string"
           },
           {
@@ -230,146 +144,22 @@
           {
             name: "订单日期",
             key: "createAt",
-            type: "datetimerange",
+            type: "daterange",
           }
         ]
       }
     },
-    computed: {
-      route() {
-        return this.$route;
-      }
-    },
     components: {
       Search
-      // ICreate,
-      // IEdit
     },
     methods: {
       // 前往订单详情页面
-      goOrderDetail() {
-        this.$router.push({path:'/order/orderDetail'})
+      goOrderDetail(id) {
+        this.$router.push({path:'/order/orderDetail/' + id})
       },
       // 前往订单编辑页面
-      goOrderEdit() {
-        this.$router.push({path:'/order/editOrderDetail'})
-      },
-      // 前往结算记录总汇界面
-      goSettlementRecord() {
-        this.$router.push({path:'/shop/SettlementRecord'})
-      },
-      // 前往培训记录总汇界面
-      gotrainRecord() {
-        this.$router.push({path:'/shop/trainRecord'});
-      },
-      // 前往查看员工相关信息页面
-      goShowStaffPage() {
-        this.$router.push({path: '/staff/showStaff'});
-      },
-      // 新增部门
-      addDepartment() {
-        this.addDepartmentShow = true;
-      },
-      // 编辑部门信息
-      editDepartment() {
-        this.editDepartmentShow = true;
-      },
-      // 删除部门
-      deleteDepartment() {
-        this.$confirm(' 删除该部门请确认该部门下没有员工', '确定删除该部门吗?', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          del({ids: ids}, res => {
-            _t.search(_t.page);
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            });
-          });
-
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-      },
-      // 关闭新增部门对话框
-      closeAddDepartment() {
-        this.$refs.addDepartmentRef.resetFields();
-      },
-      // 关闭修改部门信息对话框
-      closeEditDepartment() {
-        this.$refs.editDepartmentRef.resetFields();
-      },
-      handleEdit() {
-        this.editId = this.selectList[0].id
-        this.editProps.visible = true;
-      },
-      handleStatusChange(row) {
-        let status;
-        let _t = this;
-        if (row.status.indexOf('启用') >= 0) {
-          status = '禁用'
-        } else {
-          status = '启用'
-        }
-        this.$confirm(`确定${status}选中内容？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          if (status === '禁用') {
-            disable({id: row.id}, res => {
-              _t.$message({
-                type: 'success',
-                message: '已禁用!'
-              });
-              _t.search(_t.page);
-            })
-          } else {
-            enable({id: row.id}, res => {
-              _t.$message({
-                type: 'success',
-                message: '已启用!'
-              });
-              _t.search(_t.page);
-            })
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-
-      },
-      handlePageSizeChange(pageSize) {
-        this.pageSize = pageSize;
-        this.search(1);
-      },
-      handlePageChange(page) {
-        this.search(page);
-      },
-      handleSortChange(sort) {
-        let key = sort.key;
-        let order = sort.order;
-        let asc = this.sort.asc;
-        let desc = this.sort.desc;
-        if (asc.indexOf(key) > -1) {
-          let idx = asc.indexOf(key);
-          asc.splice(idx, 1);
-        }
-        if (desc.indexOf(key) > -1) {
-          let idx = desc.indexOf(key);
-          desc.splice(idx, 1);
-        }
-        if (order !== "normal") {
-          this.sort[order].push(key);
-        }
-        this.search(1);
+      goOrderEdit(id) {
+        this.$router.push({path:'/order/editOrderDetail/' + id})
       },
       searchBySearchItem(searchItems) {
         let keys = [];
@@ -384,157 +174,127 @@
         }
         for (let i in keys) {
           if (searchItems[keys[i]]) {
-            this.extraParam[keys[i]] = searchItems[keys[i]];
+            this.extraParam[keys[i]] = searchItems[keys[i]]
+            if (keys[i] === 'salonId') delete this.extraParam[keys[i]]
+            if (keys[i] === 'salonName') delete this.extraParam[keys[i]]
+            if (keys[i] === 'product') delete this.extraParam[keys[i]]
+            if (keys[i] === 'teacher') delete this.extraParam[keys[i]]
+            if (keys[i] === 'customer') delete this.extraParam[keys[i]]
+            if (keys[i] === 'department') delete this.extraParam[keys[i]]
+            if (keys[i] === 'promotion') delete this.extraParam[keys[i]]
+            if (keys[i] === 'createAt') delete this.extraParam[keys[i]]
           } else {
             delete this.extraParam[keys[i]];
           }
         }
+        // 处理店铺搜索参数
+        if (searchItems.salonName && searchItems.salonId) {
+          this.salonParam = {
+            id: searchItems.salonId,
+            name: searchItems.salonName
+          }
+        } else if(searchItems.salonName && !searchItems.salonId){
+          this.salonParam = {
+            name: searchItems.salonName
+          }
+        } else if(!searchItems.salonName && searchItems.salonId){
+          this.salonParam = {
+            id: searchItems.salonId
+          }
+        } else {
+          delete this.salonParam
+        }
+        // 处理疗程部位参数
+        if (searchItems.product) {
+          this.productParam = {
+            name: searchItems.product
+          }
+        } else {
+          delete this.productParam
+        }
+        // 处理所属老师参数
+        if (searchItems.teacher) {
+          this.teacherParam = {
+            name: searchItems.teacher
+          }
+        } else {
+          delete this.teacherParam
+        }
+        // 处理所属顾客参数
+        if (searchItems.customer) {
+          this.customerParam = {
+            name: searchItems.customer
+          }
+        } else {
+          delete this.customerParam
+        }
+        // 处理所属部门参数
+        if (searchItems.department) {
+          this.departmentParam = {
+            name: searchItems.department
+          }
+        } else {
+          delete this.departmentParam
+        }
+        // 处理活动折扣参数
+        if (searchItems.promotion) {
+          this.promotionParam = {
+            name: searchItems.promotion
+          }
+        } else {
+          delete this.promotionParam
+        }
+        // 处理下单时间参数
+        if (searchItems.createAt) {
+          this.createAtParam = {
+            'start': searchItems.createAt[0],
+            'end': searchItems.createAt[1]
+          }
+        } else {
+          delete this.createAtParam
+        }
         this.search(1);
-      },
-      toCreate() {
-        // this.createProps.visible = true;
-        this.$router.push({path: '/staff/addStaff'});
       },
       search(page) {
         let _t = this;
         _t.page = page;
-        console.log(this.sort);
         let param = {
           pageable: {
             page: page,
-            size: _t.pageSize,
-            sort: _t.sort
+            size: _t.pageSize
           },
-          [this.model]: _t.extraParam
-        };
-        if (
-          param.pageable.sort.asc.length === 0 &&
-          param.pageable.sort.desc.length === 0
-        ) {
-          delete param.pageable.sort;
+          [this.model]: _t.extraParam,
+          salon: _t.salonParam,
+          product: _t.productParam,
+          teacher: _t.teacherParam,
+          customer: _t.customerParam,
+          department: _t.departmentParam,
+          promotion: _t.promotionParam,
+          createAt: _t.createAtParam
         }
-        search(param, res => {
-          let data = res;
-          _t.data = data;
-          _t.getTotal();
+        find(param, res => {
+          _t.orderData = res
+          _t.getTotal()
         });
       },
       getTotal() {
-        let _t = this;
-        let param = {[this.model]: _t.extraParam};
+        let _t = this
+        let param = {
+          [this.model]: _t.extraParam,
+          salon: _t.salonParam,
+          product: _t.productParam,
+          teacher: _t.teacherParam,
+          customer: _t.customerParam,
+          department: _t.departmentParam,
+          promotion: _t.promotionParam,
+          createAt: _t.createAtParam
+        }
         count(param, res => {
-          _t.total = parseInt(res);
-        });
-      },
-      handleTransportSelectList(list) {
-        this.selectList = list;
-      },
-      //批量删除
-      batchDelete() {
-        this.broadcast("SiTable", "on-get-selectList");
-        this.$nextTick(() => {
-          let selectList = this.selectList;
-          if (selectList.length === 0) {
-            this.$notify.warning({
-              title: "至少选择一条数据"
-            });
-            return;
-          }
-          this.$confirm('确定删除所选记录吗?', '删除提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            del({ids: ids}, res => {
-              _t.search(_t.page);
-              this.$message({
-                type: 'success',
-                message: '删除成功!'
-              });
-            });
-
-          }).catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消删除'
-            });
-          });
-        });
-      },
-      //批量启用
-      batchEnable() {
-        let _t = this;
-        let selectList = this.selectList;
-        this.$confirm('确定启用所选的记录吗?', '启用提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          selectList.map(s => {
-            enable({id: s.id}, res => {
-              _t.search(_t.page);
-              // this.$message({
-              //   type: 'success',
-              //   message: '删除成功!'
-              // });
-            })
-          })
-
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          });
-        });
-      },
-      //批量禁用
-      batchDisable() {
-        let _t = this;
-        let selectList = this.selectList;
-        this.$confirm('确定启用所选的记录吗?', '启用提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          selectList.map(s => {
-            disable({id: s.id}, res => {
-              _t.search(_t.page);
-              // this.$message({
-              //   type: 'success',
-              //   message: '删除成功!'
-              // });
-            })
-          })
-
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          });
-        });
-      },
-
-      delete(id) {
-        let _t = this;
-        del({id: id}, res => {
-          _t.search(_t.page);
-        });
-      },
-      enable(id, url) {
-        let _t = this;
-        post(url, {id: id}, res => {
-          _t.search(_t.page);
-        });
-      },
-      handleClose() {
-        this.createProps.visible = false;
-        this.editProps.visible = false;
-      },
-      handleSelectionChange(val) {
-        this.selectList = val;
+          _t.total = parseInt(res)
+        })
       },
       handleRowClick(row) {
-        this.$router.push({path: '/manager/show/' + row.id})
+        this.$router.push({path: '/order/editOrderDetail/' + row.id})
       },
       handleCurrentChange(val) {
         this.page = val;
@@ -542,33 +302,12 @@
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-
         this.search(this.page);
-      },
-      onMenuChange(val) {
-        console.log(val);
-      },
-      handleClick(command) {
-        switch (command) {
-          case '编辑':
-            console.log('编辑');
-            this.editId = this.selectList[0].id;
-            this.editProps.visible = true;
-            break;
-          case '启用':
-            console.log('启用');
-            this.batchEnable();
-            break;
-          case '禁用':
-            console.log('禁用')
-            this.batchDisable();
-            break;
-        }
       }
     },
     mounted() {
+      // 获取订单数据
       this.search(1);
-      // this.findAllRoles();
     }
   }
 </script>

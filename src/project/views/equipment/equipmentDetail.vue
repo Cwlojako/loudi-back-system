@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='page'>
     <el-tabs type="border-card">
       <el-tab-pane label="设备详情">
         <equipmentInfo :deviceData="deviceData" @refreshData="getDeviceData(id)"></equipmentInfo>
@@ -57,6 +57,10 @@
 </script>
 
 <style lang="less" scoped>
+  .page {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
   .el-tabs {
     margin-left: 30px;
   }
