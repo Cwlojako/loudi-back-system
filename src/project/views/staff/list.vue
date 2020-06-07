@@ -631,7 +631,7 @@
               this.disableTotal++
             }
           })
-        });
+        })
       },
       // 获取员工信息条目总数
       getTotal(id) {
