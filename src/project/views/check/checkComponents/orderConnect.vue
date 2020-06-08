@@ -6,8 +6,7 @@
       </el-button>
       <!--    搜索-->
       <el-col :span="24">
-        <search
-          style="width: 95%;margin: 10px auto"
+        <search class="search"
           :search-items="customerSearchItems"
           @on-search="customerSearchBySearchItem"
         ></search>
@@ -16,69 +15,20 @@
       <el-col :span="24">
         <el-table
           :data="customerData"
-          style="width: 95%;margin:0 auto;"
           @selection-change="handleSelectionChange"
-          @row-dblclick="handleRowClick"
-        >
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
-          <el-table-column
-            prop="username"
-            label="订单编号"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="realname"
-            label="顾客姓名"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="realname"
-            label="顾客所属店铺"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="realname"
-            label="发起人"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="realname"
-            label="发起人市场"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="realname"
-            label="发起人分公司"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="phone"
-            label="接收人"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="phone"
-            label="接收人市场"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="phone"
-            label="接收人分公司"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="phone"
-            label="状态"
-          >
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            align="center"
-            label="操作"
-            width="260">
+          @row-dblclick="handleRowClick">
+          <el-table-column type="selection" width="55"></el-table-column>
+          <el-table-column prop="username" label="订单编号"></el-table-column>
+          <el-table-column prop="realname" label="顾客姓名"></el-table-column>
+          <el-table-column prop="realname" label="顾客所属店铺"></el-table-column>
+          <el-table-column prop="realname" label="发起人"></el-table-column>
+          <el-table-column prop="realname" label="发起人市场"></el-table-column>
+          <el-table-column prop="realname" label="发起人分公司"></el-table-column>
+          <el-table-column prop="phone" label="接收人"></el-table-column>
+          <el-table-column prop="phone" label="接收人市场"></el-table-column>
+          <el-table-column prop="phone" label="接收人分公司"></el-table-column>
+          <el-table-column prop="phone" label="状态"></el-table-column>
+          <el-table-column fixed="right" align="center" label="操作" width="260">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="seeOrderConnectDetail">
                 查看
@@ -115,7 +65,7 @@
     <!-- 自定义流程对话框   -->
     <el-dialog
       :visible.sync="customProcessShow"
-      width="50%"
+      width="60%"
     >
       <template slot="title">
         <span class="title">自定义流程</span>
@@ -147,7 +97,7 @@
     <el-dialog
       :title="addOrEditCustomTitle"
       :visible.sync="addOrEditCustomShow"
-      width="50%"
+      width="60%"
     >
       <el-form :model="addOrEditForm" :rules="addOrEditRules" ref="addOrEditRef" label-width="100px"
                class="demo-ruleForm">
@@ -855,30 +805,25 @@
 </script>
 
 <style lang="less" scoped>
+  .search {
+    padding: 10px 0;
+  }
   .search /deep/ .search-item {
     margin-right: 30px !important;
   }
-
-  .create {
-    margin: 20px 42px;
-  }
-
   .title {
     color: white;
     margin-right: 20px;
   }
-
   .addProcessSequence {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
   }
-
   .el-tree {
     height: 300px;
     overflow: auto;
   }
-
   ul li {
     box-sizing: border-box;
     list-style: none;
@@ -886,40 +831,30 @@
     margin: 5px 0;
     cursor: pointer;
   }
-
   span {
     display: inline-block;
   }
-
   .connectTitle {
     width: 100px;
     color: #999999;
   }
-
   .connectText {
     width: 170px;
   }
-
   .connectBaseInfo p {
     margin-bottom: 8px;
   }
-
   .processLog {
     margin-left: 30px;
-
     div {
       margin-bottom: 20px;
-
       p {
         margin-bottom: 8px;
       }
-
       .name {
         color: orangered;
         margin-right: 8px;
       }
     }
   }
-
-
 </style>

@@ -86,15 +86,15 @@
               </div>
               <div class="assignBox-right">
                 <div class="content-item-box">
-                  <span class="content-title">发起人</span>
+                  <span class="content-title">接收人</span>
                   <span class="content-text">{{salonHandoverData[0].assignee.realName}}</span>
                 </div>
                 <div class="content-item-box">
-                  <span class="content-title">发起人市场</span>
+                  <span class="content-title">接收人市场</span>
                   <span class="content-text">{{salonHandoverData[0].assignee.department.name}}</span>
                 </div>
                 <div class="content-item-box">
-                  <span class="content-title">发起人分公司</span>
+                  <span class="content-title">接收人分公司</span>
                   <span class="content-text">XXX</span>
                 </div>
               </div>

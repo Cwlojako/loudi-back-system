@@ -123,10 +123,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="疗程价格" prop="name" required>
-          <el-input v-model="productFormData.name"></el-input>
+          <el-input v-model="productFormData.name"></el-input>&nbsp;元
         </el-form-item>
         <el-form-item label="按次价格" prop="name" required>
-          <el-input v-model="productFormData.name"></el-input>
+          <el-input v-model="productFormData.name"></el-input>&nbsp;元
         </el-form-item>
         <el-form-item label="适用机型" prop="name" required>
           <el-input

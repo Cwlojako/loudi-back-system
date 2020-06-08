@@ -27,7 +27,7 @@
               <el-button type="text" size="small" @click="toSalonDetail(scope.row.id)">
                 查看
               </el-button>
-              <el-button type="text" size="small">
+              <el-button type="text" size="small" @click="toSalonEdit(scope.row.id)">
                 编辑
               </el-button>
             </template>
@@ -197,6 +197,9 @@
       },
       toSalonDetail(id) {
         this.$router.push({path: '/shop/shopDetail/' + id})
+      },
+      toSalonEdit(id) {
+        this.$router.push({path: '/shop/addOrEditBaseInfo/' + id, query: {activeName: '0'}})
       },
       handleCurrentChange(val) {
         this.page = val;

@@ -17,7 +17,7 @@
           </el-row>
           <el-row>
             <el-col :span="6"><div class="grid-content bg-purple">疗程部位</div></el-col>
-            <el-col :span="18"><div class="grid-content bg-purple-light">XXX</div></el-col>
+            <el-col :span="18"><div class="grid-content bg-purple-light">{{order.product.name}}</div></el-col>
           </el-row>
           <el-row>
             <el-col :span="6"><div class="grid-content bg-purple">原价</div></el-col>
@@ -159,7 +159,8 @@
           operator: {},
           partner: {},
           customer: {},
-          salon: {}
+          salon: {},
+          product: {}
         }
       }
     },

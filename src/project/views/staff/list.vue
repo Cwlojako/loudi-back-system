@@ -383,9 +383,7 @@
         // 根据id获取部门信息
         get({id}, res => {
           this.departmentId = res.id
-          if (res.name) {
-            this.addDepartmentForm.parent = res.name
-          }
+          this.addDepartmentForm.parent = res.name
         })
       },
       // 发送新增部门请求
@@ -619,6 +617,7 @@
         if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
         if (JSON.stringify(param.birthday) === "{}") delete param.birthday
         if (JSON.stringify(param.department) === "{}") delete param.department
+        if (param.department.id === 0) delete param.department
         // 发送请求获取员工列表
         find(param, res => {
           // 把启用数，禁用数置为0
@@ -648,6 +647,7 @@
         if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
         if (JSON.stringify(param.birthday) === "{}") delete param.birthday
         if (JSON.stringify(param.department) === "{}") delete param.department
+        if (param.department.id === 0) delete param.department
         count(param, res => {
           this.total = parseInt(res)
         });
@@ -667,6 +667,7 @@
         if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt
         if (JSON.stringify(param.birthday) === "{}") delete param.birthday
         if (JSON.stringify(param.department) === "{}") delete param.department
+        if (param.department.id === 0) delete param.department
         count(param, res => {
           this.loginedTotal = parseInt(res)
         })

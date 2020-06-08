@@ -6,8 +6,7 @@
       </el-button>
       <!--    搜索-->
       <el-col :span="24">
-        <search
-          style="width: 95%;margin: 10px auto"
+        <search class="search"
           :search-items="customerSearchItems"
           @on-search="customerSearchBySearchItem"
         ></search>
@@ -16,7 +15,6 @@
       <el-col :span="24">
         <el-table
           :data="customerData"
-          style="width: 95%;margin:0 auto;"
           @selection-change="handleSelectionChange"
           @row-dblclick="handleRowClick"
         >
@@ -857,14 +855,12 @@
 </script>
 
 <style lang="less" scoped>
+  .search {
+    padding: 10px 0;
+  }
   .search /deep/ .search-item {
     margin-right: 30px !important;
   }
-
-  .create {
-    margin: 20px 42px;
-  }
-
   .title {
     color: white;
     margin-right: 20px;

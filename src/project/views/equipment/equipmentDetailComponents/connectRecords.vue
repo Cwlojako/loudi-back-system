@@ -14,7 +14,7 @@
           <el-table-column prop="assigneeDepartment.name" label="接管方"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="260">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="showConnectDetail">
+              <el-button type="text" size="small" @click="showConnectDetail(scope.row.id)">
                 查看
               </el-button>
             </template>
@@ -46,23 +46,23 @@
       width="30%">
       <el-row>
         <el-col :span="5"><div class="grid-content bg-purple">发起人</div></el-col>
-        <el-col :span="19"><div class="grid-content bg-purple-light"></div></el-col>
+        <el-col :span="19"><div class="grid-content bg-purple-light">{{deviceHandover.operator.realName}}</div></el-col>
       </el-row>
       <el-row>
         <el-col :span="5"><div class="grid-content bg-purple">发起时间</div></el-col>
-        <el-col :span="19"><div class="grid-content bg-purple-light">2018-6-15</div></el-col>
+        <el-col :span="19"><div class="grid-content bg-purple-light">{{deviceHandover.createAt}}</div></el-col>
       </el-row>
       <el-row>
         <el-col :span="5"><div class="grid-content bg-purple">类型</div></el-col>
-        <el-col :span="19"><div class="grid-content bg-purple-light">跨市场交接</div></el-col>
+        <el-col :span="19"><div class="grid-content bg-purple-light">{{deviceHandover.type}}</div></el-col>
       </el-row>
       <el-row>
         <el-col :span="5"><div class="grid-content bg-purple">交接方</div></el-col>
-        <el-col :span="19"><div class="grid-content bg-purple-light">广东</div></el-col>
+        <el-col :span="19"><div class="grid-content bg-purple-light">{{deviceHandover.assignorDepartment.name}}</div></el-col>
       </el-row>
       <el-row>
         <el-col :span="5"><div class="grid-content bg-purple">接管方</div></el-col>
-        <el-col :span="19"><div class="grid-content bg-purple-light">长沙</div></el-col>
+        <el-col :span="19"><div class="grid-content bg-purple-light">{{deviceHandover.assigneeDepartment.name}}</div></el-col>
       </el-row>
       <el-row>
         <el-col :span="5"><div class="grid-content bg-purple">审批人</div></el-col>
@@ -81,7 +81,7 @@
 
 <script>
   import Search from "@/framework/components/search";
-  import {findByDeviceId} from '@/project/service/deviceHandover'
+  import {findByDeviceId, findByDeviceHandover} from '@/project/service/deviceHandover'
 
   export default {
     data() {
@@ -91,7 +91,11 @@
         // 设备交接表格数据
         deviceHandoverData: [],
         // 设备交接数据对象
-        deviceHandover: {},
+        deviceHandover: {
+          operator: {},
+          assignorDepartment: {},
+          assigneeDepartment: {}
+        },
         model: "deviceHandover",
         pageSize: 10,
         page: 1,
@@ -103,8 +107,15 @@
     },
     methods: {
       // 查看交接详情
-      showConnectDetail() {
-        this.connectDetailShow = true;
+      showConnectDetail(id) {
+        this.connectDetailShow = true
+        // 根据交接记录id获取交接记录详情
+        let param = {
+          [this.model]: {id: id}
+        }
+        findByDeviceHandover(param, res => {
+          this.deviceHandover = res
+        })
       },
       search(page, id) {
         let _t = this;
@@ -115,14 +126,20 @@
             size: _t.pageSize,
           },
           deviceId: id
-        };
+        }
         findByDeviceId(param, res => {
           _t.deviceHandoverData = res;
-          _t.getTotal(res.length);
-        });
+          _t.getTotal(id);
+        })
       },
-      getTotal(length) {
-        this.total = length
+      // 获取结果总数
+      getTotal(id) {
+        let param = {
+          deviceId: id
+        }
+        findByDeviceId(param, res => {
+          this.total = res.length
+        })
       },
       handleClose() {
         this.createProps.visible = false;
@@ -150,7 +167,6 @@
     }
   }
 </script>
-
 <style lang="less" scoped>
   .el-row {
     margin-bottom: 15px;
@@ -158,8 +174,4 @@
       color: #999999;
     }
   }
-
-
-
-
 </style>

@@ -150,12 +150,9 @@
 
 <script>
   import Emitter from '@/framework/mixins/emitter'
-  // import ICreate from "../manager/create";
-  // import IEdit from "../manager/edit";
   import Search from "@/framework/components/search";
   import {post} from "@/framework/http/request";
   import {search, count, del, enable, disable} from '@/project/service/manager'
-
 
   export default {
     mixins: [Emitter],
