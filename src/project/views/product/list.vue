@@ -103,14 +103,14 @@
             @close="handleCloseTag(tag)">
             {{tag.name}}
           </el-tag>
-<!--          <el-select v-model="value" placeholder="请选择" v-if="inputVisible && isShowAdd" @change="handleChange">-->
-            <div v-if="inputVisible && isShowAdd">
-              <el-radio-group v-model="radio">
-                <el-radio :label="3">备选项</el-radio>
-                <el-radio :label="6">备选项</el-radio>
-                <el-radio :label="9">备选项</el-radio>
-              </el-radio-group>
-            </div>
+          <el-autocomplete
+            v-if="inputVisible && isShowAdd"
+            class="inline-input"
+            v-model="deviceModel"
+            :fetch-suggestions="querySearch"
+            placeholder="请输入内容"
+            @select="handleSelect"
+          ></el-autocomplete>
           <el-button v-if="!inputVisible && isShowAdd" class="button-new-tag" size="small" @click="showSelect">+ 添加机型</el-button>
         </el-form-item>
         <el-form-item label="是否受疗程次数限制" prop="limited" required>
@@ -122,7 +122,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
        <el-button @click="addOrEditDialogShow = false">取 消</el-button>
-       <el-button type="primary" @click="addOrEditDialogShow = false">确 定</el-button>
+       <el-button type="primary" @click="addOrEditProduct(isEdit)">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -185,6 +185,7 @@
   import Emitter from '@/framework/mixins/emitter'
   import Search from "@/framework/components/search";
   import {findAll, findById} from '@/project/service/product'
+  import {find} from '@/project/service/deviceModel'
 
   export default {
     mixins: [Emitter],
@@ -240,12 +241,15 @@
           },
           {
             name: "机型",
-            key: "",
+            key: "deviceModel",
             type: "select",
             displayValue: [],
             value: []
           }
-        ]
+        ],
+        // 机型数组数据
+        deviceModelData: [],
+        deviceModel: ''
       }
     },
     components: {
@@ -283,13 +287,9 @@
       closeProductDialog() {
         this.$refs.productFormRef.resetFields();
       },
+      // 显示建议输入框
       showSelect() {
         this.inputVisible = true;
-      },
-      handleChange(val) {
-        console.log(val)
-        this.inputVisible = false
-        this.dynamicTags.push({name: 'aa'})
       },
       // 显示产品新建编辑框
       showProductDialog(title, id) {
@@ -318,6 +318,39 @@
           return item.id = tagId
         })
         this.dynamicTags.splice(index, 1)
+      },
+      // 提示输入框每一次输入值都会根据值去筛选符合的值
+      querySearch(queryString, cb) {
+        var deviceModelData = this.deviceModelData
+        var results = queryString ? deviceModelData.filter(this.createFilter(queryString)) : deviceModelData
+        // 调用 callback 返回建议列表的数据
+        cb(results)
+      },
+      // 根据输入关键词返回过滤后符合条件的数据
+      createFilter(queryString) {
+        return (data) => {
+          return (data.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+        };
+      },
+      // 确认选择适用机型后执行的操作
+      handleSelect(item) {
+        this.inputVisible = false
+        // 将value转回name
+        let value = item.value
+        delete item.value
+        item.name = value
+        this.dynamicTags.push(item)
+        // 修改表单对象绑定的机型数据
+        this.productFormData.deviceModel = item
+      },
+      // 确认新建或更新产品信息
+      addOrEditProduct(isEdit) {
+        if (isEdit) {
+          // 处理limited参数
+          this.productFormData.limited = this.productFormData.limited === '是'
+          // 确认更新，调用更新产品信息接口
+          console.log(this.productFormData)
+        }
       },
       // 显示疗程管理对话框
       showTreatmentDialog() {
@@ -351,6 +384,7 @@
       toCreate() {
         this.$router.push({path: '/staff/addStaff'});
       },
+      // 获取产品列表
       search(page) {
         let _t = this
         _t.page = page
@@ -375,6 +409,26 @@
           _t.total = res.length
         })
       },
+      // 获取所有机型
+      getDeviceModel() {
+        let param = {name: ''}
+        find(param, res => {
+          res.forEach((item, index) => {
+            this.searchItems[2].displayValue.push(item.name)
+            this.searchItems[2].value.push(item.name)
+          })
+          // 将机型的name字段改为value字段，因为提醒表单显示默认是显示value值
+          this.deviceModelData = res.map((item, index) => {
+            let obj =  {
+              value: item.name,
+              id: item.id,
+              description: item.description,
+              enabled: item.enabled
+            }
+            return obj
+          })
+        })
+      },
       handleCurrentChange(val) {
         this.page = val;
         this.search(this.page);
@@ -385,7 +439,9 @@
       },
     },
     mounted() {
-      this.search(1);
+      this.search(1)
+      // 获取所有机型列表
+      this.getDeviceModel()
     }
   }
 </script>
