@@ -366,6 +366,7 @@
       },
       // 确定选中部门
       handleSelectDepartment(checkedLabel) {
+        console.log(checkedLabel)
         this.selectDepartShow = false
         this.baseInfoForm.department = checkedLabel
       },
