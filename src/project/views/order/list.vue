@@ -179,6 +179,7 @@
             if (keys[i] === 'salonName') delete this.extraParam[keys[i]]
             if (keys[i] === 'product') delete this.extraParam[keys[i]]
             if (keys[i] === 'teacher') delete this.extraParam[keys[i]]
+            if (keys[i] === 'type') delete this.extraParam[keys[i]]
             if (keys[i] === 'customer') delete this.extraParam[keys[i]]
             if (keys[i] === 'department') delete this.extraParam[keys[i]]
             if (keys[i] === 'promotion') delete this.extraParam[keys[i]]
@@ -290,6 +291,7 @@
           createAt: _t.createAtParam
         }
         count(param, res => {
+
           _t.total = parseInt(res)
         })
       },

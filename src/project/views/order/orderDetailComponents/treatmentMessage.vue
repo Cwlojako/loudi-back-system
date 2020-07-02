@@ -7,12 +7,12 @@
           :data="treatmentData"
           style="width: 95%;margin:0 auto;">
           <el-table-column prop="username" label="疗程阶段">XXX</el-table-column>
-          <el-table-column prop="frequency" label="频率"></el-table-column>
-          <el-table-column prop="energy" label="能量"></el-table-column>
-          <el-table-column prop="refrigerationLevel" label="制冷等级"></el-table-column>
-          <el-table-column prop="flashTimes" label="发光次数"></el-table-column>
-          <el-table-column prop="creatAt" label="开始时间">XXX</el-table-column>
-          <el-table-column prop="enAt" label="结束时间">XXX</el-table-column>
+          <el-table-column prop="treatment.frequency" label="频率"></el-table-column>
+          <el-table-column prop="treatment.energy" label="能量"></el-table-column>
+          <el-table-column prop="treatment.refrigerationLevel" label="制冷等级"></el-table-column>
+          <el-table-column prop="treatment.flashTimes" label="发光次数"></el-table-column>
+          <el-table-column prop="openAt" label="开始时间"></el-table-column>
+          <el-table-column prop="closeAt" label="结束时间"></el-table-column>
           <el-table-column fixed="right" align="center" label="疗程图片">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="showTreatmentPic">
@@ -61,7 +61,7 @@
 
 <script>
   import Search from "@/framework/components/search";
-  import {findByProduct} from '@/project/service/treatment'
+  import { findByProduct } from '@/project/service/treatmentItem'
 
   export default {
     props: {
@@ -85,18 +85,17 @@
         this.$router.go(-1);
       },
       search(page, productId) {
-        let _t = this;
-        _t.page = page;
+        this.page = page;
         let param = {
           pageable: {
             page: page,
-            size: _t.pageSize,
+            size: this.pageSize,
           },
           product: {id: productId}
         }
         findByProduct(param, res => {
-          _t.treatmentData = res;
-          _t.getTotal(res.length)
+          this.treatmentData = res;
+          this.getTotal(res.length)
         });
       },
       getTotal(length) {

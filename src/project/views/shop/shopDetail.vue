@@ -2,7 +2,7 @@
   <div class='page'>
     <el-tabs class="box" type="border-card">
       <el-tab-pane label="基本信息">
-        <shopDetailBaseInfo :salonData="salonData"></shopDetailBaseInfo>
+        <shopDetailBaseInfo :salonData="salonData" @refreshData='getSalonData(id)'></shopDetailBaseInfo>
       </el-tab-pane>
       <el-tab-pane label="详细信息">
         <shopDetailInfo :salonData="salonData"></shopDetailInfo>

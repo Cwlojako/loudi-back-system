@@ -210,7 +210,7 @@
         <el-table-column prop="number" label="员工编号"></el-table-column>
         <el-table-column prop="realName" label="姓名"></el-table-column>
         <el-table-column prop="phone" label="手机号"></el-table-column>
-        <el-table-column prop="department " label="部门"></el-table-column>
+        <el-table-column prop="department.name" label="部门"></el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取 消</el-button>
@@ -277,11 +277,17 @@
         belongDepartmentShow:false,
         // 基本信息表单数据对象
         baseInfoData:{
-          department: {},
-          teacher: {},
+          department: {
+            name: ''
+          },
+          teacher: {
+            realName: ''
+          },
           address: '',
           businessHours: '',
-          founder: {},
+          founder: {
+            realName: ''
+          },
           settlementPeriod: '',
           commissionRate: '',
           bossName: '',
@@ -515,10 +521,10 @@
           console.log('编辑模式')
           // 否则则是进入编辑员工页面,根据id获取员工信息
           getById({id: this.editId}, res => {
-            this.baseInfoData = res
+            this.baseInfoData = Object.assign(this.baseInfoData, res)
+            console.log(this.baseInfoData)
             this.detailInfoData = res
             this.defaultId = res.department.id
-            console.log(res)
           })
         }
       }

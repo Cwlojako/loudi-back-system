@@ -55,10 +55,10 @@
           <el-table-column prop="responsible" label="退款金额"></el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="200">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="goCustomerDetail">
+              <el-button type="text" size="small" @click="goCustomerDetail(scope.row.id)">
                 查看
               </el-button>
-              <el-button type="text" size="small" @click="goEditCustomerDetail">
+              <el-button type="text" size="small" @click="goEditCustomerDetail()">
                 编辑
               </el-button>
             </template>
@@ -72,7 +72,8 @@
 <script>
   import Emitter from '@/framework/mixins/emitter'
   import Search from "@/framework/components/search";
-  import {search, count, del, enable, disable} from '@/project/service/manager'
+  //import {search, del,count, enable, disable} from '@/project/service/manager'
+  import { findByEmployeeId, count } from '@/project/service/customer'
 
   export default {
     mixins: [Emitter],
@@ -109,7 +110,9 @@
           {
             name: "顾客类型",
             key: "type",
-            type: "string"
+            type: "select",
+            displayValue: ["意向客户", "疗程客户", "体验客户" ],
+            value:["意向客户", "疗程客户", "体验客户" ]
           },
           {
             name: "顾客子类型",
@@ -181,12 +184,12 @@
     },
     methods: {
       // 前往顾客详情页面
-      goCustomerDetail() {
-        this.$router.push({path:'/customer/customerDetail'})
+      goCustomerDetail(id) {
+        this.$router.push({path:'/customer/customerDetail/' + id})
       },
       // 前往编辑顾客信息界面
-      goEditCustomerDetail() {
-        this.$router.push({path:'/customer/editCustomerDetail'})
+      goEditCustomerDetail(id) {
+        this.$router.push({path:'/customer/editCustomerDetail' })
       },
       searchBySearchItem(searchItems) {
         let keys = [];
@@ -201,11 +204,14 @@
         }
         for (let i in keys) {
           if (searchItems[keys[i]]) {
-            this.extraParam[keys[i]] = searchItems[keys[i]];
+            this.extraParam[keys[i]] = searchItems[keys[i]]
           } else {
             delete this.extraParam[keys[i]];
           }
+
         }
+        console.log(this.extraParam)
+
         this.search(1);
       },
       toCreate() {
@@ -221,15 +227,26 @@
           },
           [this.model]: _t.extraParam
         }
-        search(param, res => {
-          let data = res;
-          _t.data = data;
+
+        //发送请求获取顾客列表
+        findByEmployeeId(param, res => {
+          // let data = res;
+          // _t.data = data;
+          let data = res
+          _t.customerData = data
           _t.getTotal();
+          //console.log(_t.customerData)
         });
       },
       getTotal() {
         let _t = this;
-        let param = {[this.model]: _t.extraParam};
+        let param = {
+          [this.model]: _t.extraParam,
+          customer: _t.customerParam,
+          teacher: _t.teacherParam,
+          salon: _t.salonParam,
+          department: _t.departmentParam
+        };
         count(param, res => {
           _t.total = parseInt(res);
         });

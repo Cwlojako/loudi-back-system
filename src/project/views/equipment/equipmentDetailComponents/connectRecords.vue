@@ -73,7 +73,7 @@
         <el-col :span="19"><div class="grid-content bg-purple-light">2019-4-23</div></el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="connectDetailShow = false">确 定</el-button>
+        <el-button type="primary" @click="connectDetailShow =false ">确 定</el-button>
       </span>
     </el-dialog>
   </div>

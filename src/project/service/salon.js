@@ -7,6 +7,8 @@ let findUrl = `api/${model}/findBySalonAndEmployeeAndDepartment`
 let saveUrl = `api/${model}/save`
 let updateUrl = `api/${model}/update`
 let countBySalonExampleUrl = `api/${model}/countBySalonExample`
+let countMoneyUrl = `api/${model}/countMoney`
+let enableUrl = `api/${model}/enable`
 
 // 根据员工id获取员工所属店铺信息
 export function findByEmployeeId(param, callback) {
@@ -65,6 +67,24 @@ export function save(param, callback) {
 // 根据合作状态统计店铺数量
 export function countBySalonExample(param, callback) {
   axios.post(countBySalonExampleUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
+}
+
+// 根据合作状态获取各项金额
+export function countMoney(param, callback) {
+  axios.post(countMoneyUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
+}
+
+// 启禁用店铺
+export function enable(param, callback) {
+  axios.post(enableUrl, param).then(data => {
     if (data !== undefined && data !== '' && data !== null) {
       callback(data)
     }

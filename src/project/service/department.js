@@ -63,7 +63,7 @@ export function findByParentId(param, callback) {
 }
 
 // 根据父级部门id值找下一层级的所有部门
-export function findNext(param, callback) {
+  export function findNext(param, callback) {
 	axios.post(findNextUrl, param).then(data => {
 		if (data !== undefined && data !== '' && data !== null) {
 		callback(data)

@@ -536,6 +536,7 @@
             delete this.extraParam[keys[i]];
           }
         }
+        console.log(this.extraParam)
         // 处理填表时间参数
         if (searchItems.fillAt) {
           this.fillAtParam = {
@@ -585,6 +586,7 @@
           birthday: this.birthdayParam,
           department: {id: id}
         };
+
         // 如果参数不需要则清除
         if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
         if (JSON.stringify(param.employedAt) === "{}") delete param.employedAt

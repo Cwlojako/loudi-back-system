@@ -5,7 +5,7 @@
         <div class="grid-content bg-purple">启用状态</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">{{salon.enabled}}</div>
+        <div class="grid-content bg-purple-light">{{salon.enabled ? '启用' : '禁用'}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -61,7 +61,7 @@
         <div class="grid-content bg-purple">有无设备</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">{{salon.deviceAssigned}}</div>
+        <div class="grid-content bg-purple-light">{{salon.deviceAssigned ? '有' : '无'}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -115,7 +115,7 @@
     <el-row>
       <el-button style="background: rgb(0, 161, 108);border: none" type="primary" @click="goEditBaseInfo(salon.id)">编辑
       </el-button>
-      <el-button style="background: rgb(0, 161, 108);border: none" type="primary">禁用
+      <el-button style="background: rgb(0, 161, 108);border: none" type="primary" @click='triggerEnable(salon.id, salon.enabled)'>{{salon.enabled ? '禁用' : '启用'}}
       </el-button>
       <el-button style="background: rgb(0, 161, 108);border: none" type="primary" @click="goBack">返回上一页
       </el-button>
@@ -124,38 +124,57 @@
 </template>
 
 <script>
-    export default {
-      props: {
-        salonData: {
-          type: Object
-        }
+  import { enable } from '@/project/service/salon'
+  export default {
+    props: {
+      salonData: {
+        type: Object
+      }
+    },
+    data() {
+      return {
+        // 店铺数据对象
+        salon: {}
+      }
+    },
+    methods:{
+      // 前往编辑店铺基本信息页面
+      goEditBaseInfo(id) {
+        this.$router.push({path:'/shop/addOrEditBaseInfo/' + id ,query:{
+          activeName:'0'
+        }});
       },
-      data() {
-        return {
-          // 店铺数据对象
-          salon: {}
-        }
+      goBack() {
+        this.$router.go(-1);
       },
-      methods:{
-        // 前往编辑店铺基本信息页面
-        goEditBaseInfo(id) {
-          this.$router.push({path:'/shop/addOrEditBaseInfo/' + id ,query:{
-            activeName:'0'
-          }});
+      // 启禁用切换
+      triggerEnable(id, flag) {
+        let tip = flag ? '禁用' : '启用'
+        enable({id, judge: !flag}, res => {
+          this.$confirm(`${tip}`, `确定${tip}该店铺吗?`, {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.$message({
+              type: 'success',
+              message: `${tip}店铺成功`
+            })
+            // 刷新数据
+            this.$emit('refreshData', id)
+          })
+        })
+      }
+    },
+    watch: {
+      salonData: {
+        handler(val) {
+          this.salon = val
         },
-        goBack() {
-          this.$router.go(-1);
-        }
-      },
-      watch: {
-        salonData: {
-          handler(val) {
-            this.salon = val
-          },
-          deep: true
-        }
+        deep: true
       }
     }
+  }
 </script>
 
 <style lang="less" scoped>

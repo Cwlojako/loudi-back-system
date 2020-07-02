@@ -61,7 +61,7 @@
         </el-form-item>
       </el-form>
       <div style="margin-top: 30px">
-        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" >提交
+        <el-button style="background: rgb(0, 161, 108);border: none"  type="primary"  @click ="handleUpdateCustomer">提交
         </el-button>
         <el-button style="background: rgb(0, 161, 108);border: none"  type="primary" @click="goBack">返回上一页
         </el-button>
@@ -71,6 +71,7 @@
 </template>
 
 <script>
+  import {update, getById} from '@/project/service/customer'
   export default {
     data() {
       return {
@@ -108,8 +109,28 @@
       }
     },
     methods:{
+      handleUpdateCustomer() {
+        let param = this.editFormData;
+        console.log(param)
+        update({customer: param}, res => {
+          this.getCustomerDate(this.id)
+          this.$message({
+            type: 'success',
+            message: '更新订单信息成功!'
+          })
+        })
+      },
       goBack() {
         this.$router.go(-1);
+      },
+      getCustomerDate(id) {
+        getById({customer: {id: id}}, res => {
+          this.editFormData = res[0]
+        })
+      },
+      create() {
+        this.id = this.$route.params.id
+        this.getCustomerDate(this.id)
       }
     }
   }

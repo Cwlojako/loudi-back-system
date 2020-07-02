@@ -33,7 +33,6 @@
         <el-table
           :data="productData"
           style="width: 95%;margin:0 auto;">
-          <el-table-column type="selection" width="55"></el-table-column>
           <el-table-column prop="name" label="产品名称"></el-table-column>
           <el-table-column prop="gender" label="性别"></el-table-column>
           <el-table-column prop="coursePrice" label="疗程价格"></el-table-column>
@@ -55,11 +54,11 @@
               <el-button type="text" size="small" @click="showProductDialog('编辑产品', scope.row.id)">
                 编辑
               </el-button>
-              <el-button type="text" size="small" @click="showTreatmentDialog">
+              <el-button type="text" size="small" @click="showTreatmentDialog(scope.row.id)">
                 疗程管理
               </el-button>
-              <el-button type="text" size="small">
-                禁用
+              <el-button type="text" size="small" @click='changeStatus(scope.row.id, scope.row.enabled)'>
+                {{scope.row.enabled ? '禁用' : '启用'}}
               </el-button>
             </template>
           </el-table-column>
@@ -80,7 +79,7 @@
               class="demo-ruleForm"
               label-position="left">
         <el-form-item label="产品名称" prop="name">
-          <el-input v-model="productFormData.name"></el-input>
+          <el-input v-model="productFormData.name" placeholder='请输入产品名称'></el-input>
         </el-form-item>
         <el-form-item label="性别" prop="gender">
           <el-select v-model="productFormData.gender" placeholder="请选择性别">
@@ -101,16 +100,18 @@
             closable
             :disable-transitions="false"
             @close="handleCloseTag(tag)">
-            {{tag.name}}
+            {{tag.value || tag.name}}
           </el-tag>
+          <!-- 建议输入框 -->
           <el-autocomplete
             v-if="inputVisible && isShowAdd"
             class="inline-input"
-            v-model="deviceModel"
+            v-model="deviceModelName"
             :fetch-suggestions="querySearch"
             placeholder="请输入内容"
             @select="handleSelect"
           ></el-autocomplete>
+          <!-- 标签 -->
           <el-button v-if="!inputVisible && isShowAdd" class="button-new-tag" size="small" @click="showSelect">+ 添加机型</el-button>
         </el-form-item>
         <el-form-item label="是否受疗程次数限制" prop="limited" required>
@@ -130,35 +131,45 @@
     <el-dialog
       title="疗程管理"
       :visible.sync="treatmentManageShow"
-      width="85%">
+      width="85%"
+      @close='handleCloseTreament'>
       <el-form :model="addTreatmentFormData" inline>
         <el-row v-for="(item, index) in addTreatmentFormData.items" :key="index" class="treatment-item">
-          <span class="treatment-item-title">流程{{index + 1}}</span>
+          <span class="treatment-item-title">疗程{{index + 1}}</span>
           <el-form-item>
+            <div class='title'>下次提醒时间(天)</div>
             <el-input v-model="item.intervalDay" placeholder="下次提醒时间(天)"></el-input>
           </el-form-item>
           <el-form-item>
+            <div class='title'>能量(J)</div>
             <el-input v-model="item.energy" placeholder="能量(J)"></el-input>
           </el-form-item>
           <el-form-item>
+            <div class='title'>频率(HZ)</div>
             <el-input v-model="item.frequency" placeholder="频率(HZ)"></el-input>
           </el-form-item>
           <el-form-item>
+            <div class='title'>制冷等级(级)</div>
             <el-input v-model="item.refrigerationLevel" placeholder="制冷等级(级)"></el-input>
           </el-form-item>
           <el-form-item>
+            <div class='title'>发光次数(次)</div>
             <el-input v-model="item.flashTimes" placeholder="发光次数(次)"></el-input>
           </el-form-item>
           <el-form-item>
+            <div class='title'>操作时长(分钟)</div>
             <el-input v-model="item.duration" placeholder="操作时长(分钟)"></el-input>
           </el-form-item>
           <el-form-item>
+            <div class='title'>正常范围(%)</div>
             <el-input v-model="item.mildThreshold" placeholder="正常范围(%)"></el-input>
           </el-form-item>
           <el-form-item>
+            <div class='title'>一般异常(%)</div>
             <el-input v-model="item.moderateThreshold" placeholder="一般异常(%)"></el-input>
           </el-form-item>
           <el-form-item>
+            <div class='title'>中度异常(%)</div>
             <el-input v-model="item.severeThreshold" placeholder="中度异常(%)"></el-input>
           </el-form-item>
           <el-form-item>
@@ -168,12 +179,12 @@
       </el-form>
       <div class="btn-wrapper">
         <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary"
-                  class="addTreatment" @click="addTreatment">添加流程
+                  class="addTreatment" @click="addTreatment" :disabled='addTreatmentFormData.items.length >= 6'>添加疗程
         </el-button>
       </div>
-      <div class="tip">注：设备参数为选填项，若不设置异常范围则不提醒</div>
+      <div class="tip">注：最多只能设置6个疗程，设备参数为选填项，若不设置异常范围则不提醒</div>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="treatmentManageShow = false">取 消</el-button>
+    <el-button @click="handleCloseTreament">取 消</el-button>
     <el-button type="primary" @click="handleAddTreatment">确 定</el-button>
   </span>
     </el-dialog>
@@ -182,13 +193,12 @@
 </template>
 
 <script>
-  import Emitter from '@/framework/mixins/emitter'
   import Search from "@/framework/components/search";
-  import {findAll, findById} from '@/project/service/product'
-  import {find} from '@/project/service/deviceModel'
+  import { findAll, findById, update, save, changeStatus } from '@/project/service/product'
+  import { searchOneByProduct } from '@/project/service/treatment'
+  import { find } from '@/project/service/deviceModel'
 
   export default {
-    mixins: [Emitter],
     data() {
       return {
         // 添加疗程管理表格数据
@@ -202,7 +212,14 @@
         inputVisible: false,
         inputValue: '',
         // 产品表单数据
-        productFormData:{},
+        productFormData: {
+          name: '',
+          gender: '',
+          coursePrice: 0,
+          singlePrice: 0,
+          deviceModel: {},
+          limited: null
+        },
         // 产品表单验证规则
         productFormRule:{
           name: [{required: true, message: '请输入产品名称', trigger: 'blur'}],
@@ -225,19 +242,21 @@
         total: 0,
         radio: 3,
         extraParam: {},
+        // 机型搜索参数对象
+        deviceModelParam: {},
         // 搜索组件配置项
         searchItems: [
           {
             name: "产品名称",
-            key: "username",
+            key: "name",
             type: "string"
           },
           {
             name: "性别",
-            key: "",
+            key: "gender",
             type: "select",
-            displayValue: [],
-            value: []
+            displayValue: ["男", "女"],
+            value: ["男", "女"]
           },
           {
             name: "机型",
@@ -249,13 +268,15 @@
         ],
         // 机型数组数据
         deviceModelData: [],
-        deviceModel: ''
+        // 机型名称
+        deviceModelName: ''
       }
     },
     components: {
       Search
     },
     computed: {
+      // 是否显示添加机型按钮
       isShowAdd() {
         if (this.dynamicTags.length === 0) {
           return true
@@ -283,15 +304,37 @@
       deleteTreatment(index) {
         this.addTreatmentFormData.items.splice(index, 1)
       },
+      // 关闭疗程管理对话框
+      handleCloseTreament() {
+        this.addTreatmentFormData.items = []
+        this.treatmentManageShow = false
+        console.log('sdsd')
+      },
       // 关闭产品对话框时触发
       closeProductDialog() {
         this.$refs.productFormRef.resetFields();
+      },
+      // 显示疗程管理对话框
+      showTreatmentDialog(id) {
+        this.treatmentManageShow = true;
+        // 根据产品id获取疗程信息
+        searchOneByProduct({product: {id: id}}, res => {
+          for (let i = 0; i < res.length; i++) {
+            this.addTreatment()
+            this.addTreatmentFormData.items[i] = res[i]
+          }
+        })
+      },
+      // 确认添加疗程
+      handleAddTreatment() {
+        this.treatmentManageShow = false
+        console.log(this.addTreatmentFormData)
       },
       // 显示建议输入框
       showSelect() {
         this.inputVisible = true;
       },
-      // 显示产品新建编辑框
+      // 显示产品新建--编辑框
       showProductDialog(title, id) {
         this.addOrEditDialogShow = true
         this.dialogTitle = title
@@ -299,25 +342,26 @@
         this.dynamicTags = []
         if (title === '编辑产品') {
           this.isEdit = true
+          this.deviceModelName = ''
           let param = {
             id: id
           }
           // 根据产品id获取产品信息
           findById(param, res => {
+            console.log(res)
             this.productFormData = res
             // 处理limited参数
             this.productFormData.limited = res.limited ? '是' : '否'
             // 处理适用机型
             this.dynamicTags.push(res.deviceModel)
           })
+        } else {
+          console.log(this.productFormData)
         }
       },
       handleCloseTag(tag) {
-        let tagId = tag.id
-        let index = this.dynamicTags.findIndex(item => {
-          return item.id = tagId
-        })
-        this.dynamicTags.splice(index, 1)
+        this.deviceModelName = ''
+        this.dynamicTags.splice(0, 1)
       },
       // 提示输入框每一次输入值都会根据值去筛选符合的值
       querySearch(queryString, cb) {
@@ -335,13 +379,10 @@
       // 确认选择适用机型后执行的操作
       handleSelect(item) {
         this.inputVisible = false
-        // 将value转回name
-        let value = item.value
-        delete item.value
-        item.name = value
         this.dynamicTags.push(item)
         // 修改表单对象绑定的机型数据
         this.productFormData.deviceModel = item
+        this.deviceModelName = item.name
       },
       // 确认新建或更新产品信息
       addOrEditProduct(isEdit) {
@@ -349,17 +390,27 @@
           // 处理limited参数
           this.productFormData.limited = this.productFormData.limited === '是'
           // 确认更新，调用更新产品信息接口
-          console.log(this.productFormData)
+          this.$refs.productFormRef.validate(valid => {
+            if (!valid) return false
+            console.log(this.productFormData)
+            update({product: this.productFormData}, res => {
+              this.addOrEditDialogShow = false
+              // 重新获取数据
+              this.search(1)
+              this.$message({
+                type: 'success',
+                message: '更新产品信息成功'
+              })
+            })
+          })
+        } else {
+          // 新增产品
+          this.productFormData.deviceModel.name = this.productFormData.deviceModel.value
+          delete this.productFormData.deviceModel.value
+          save({product: this.productFormData}, res => {
+            this.treatmentManageShow = true
+          })
         }
-      },
-      // 显示疗程管理对话框
-      showTreatmentDialog() {
-        this.treatmentManageShow = true;
-      },
-      // 确认添加疗程
-      handleAddTreatment() {
-        this.treatmentManageShow = false
-        console.log(this.addTreatmentFormData)
       },
       searchBySearchItem(searchItems) {
         let keys = [];
@@ -374,10 +425,19 @@
         }
         for (let i in keys) {
           if (searchItems[keys[i]]) {
-            this.extraParam[keys[i]] = searchItems[keys[i]];
+            this.extraParam[keys[i]] = searchItems[keys[i]]
+            if (keys[i] === 'deviceModel') delete this.extraParam[keys[i]]
           } else {
             delete this.extraParam[keys[i]];
           }
+        }
+        // 处理机型参数
+        if (searchItems.deviceModel) {
+          this.deviceModelParam = {
+            'name': searchItems.deviceModel,
+          }
+        } else {
+          delete this.deviceModelParam
         }
         this.search(1);
       },
@@ -386,29 +446,45 @@
       },
       // 获取产品列表
       search(page) {
-        let _t = this
-        _t.page = page
+        this.page = page  
         let param = {
           pageable: {
             page: page,
-            size: _t.pageSize
+            size: this.pageSize
           },
-          [this.model]: _t.extraParam
+          [this.model]: this.extraParam,
+          deviceModel: this.deviceModelParam
         }
+        // 如果参数不需要则清除
+        if (JSON.stringify(param.deviceModel) === "{}") delete param.deviceModel
         findAll(param, res => {
-          _t.productData = res
-          _t.getTotal()
+          this.productData = res
+          this.getTotal()
         })
       },
       getTotal() {
-        let _t = this
         let param = {
-          [this.model]: _t.extraParam
+          [this.model]: this.extraParam,
+          deviceModel: this.deviceModelParam
         }
+        // 如果参数不需要则清除
+        if (JSON.stringify(param.deviceModel) === "{}") delete param.deviceModel
         findAll(param, res => {
-          _t.total = res.length
+          this.total = res.length
         })
       },
+      // 启禁用
+      changeStatus(id, status) {
+        let tip = status ? '禁用' : '启用'
+        changeStatus({id: id, enable: !status}, res => {
+          this.search(1)
+          this.$message({
+            type: 'success',
+            message: `${tip}成功`
+          })
+        })
+      },
+      
       // 获取所有机型
       getDeviceModel() {
         let param = {name: ''}
@@ -464,17 +540,22 @@
   }
   .tip {
     padding: 10px 0;
-    border-top: 1px solid #ccc;
   }
   .treatment-item {
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
-    height: 50px;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
     .treatment-item-title {
       flex: 0 0 50px;
       line-height: 50px;
       margin-right: 10px;
+    }
+    .el-form-item {
+      flex: 1;
+      .title {
+        text-align: center;
+      }
     }
   }
 </style>

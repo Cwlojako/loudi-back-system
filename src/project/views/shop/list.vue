@@ -11,15 +11,14 @@
       </el-col>
       <!--      标签-->
       <el-col :span="24" style="margin-left: 42px">
-        <el-tag type="success">全部 ({{total}})</el-tag>
-        <el-tag type="success">已合作 ({{firstCount}})</el-tag>
-        <el-tag type="success">已洽谈有意向 ({{secondCount}})</el-tag>
-        <el-tag type="success">已洽谈无意向 ({{thirdCount}})</el-tag>
-        <el-tag type="success">微信沟通尚未见面洽谈 ({{forthCount}})</el-tag>
-        <el-tag type="success">已取消 ({{fifthCount}})</el-tag>
+        <el-tag type="success" style='cursor: pointer;' @click='search(1)'>全部 ({{total}})</el-tag>
+        <el-tag type="success" style='cursor: pointer;' @click='findByCooperationStatus("已合作")'>已合作 ({{firstCount}})</el-tag>
+        <el-tag type="success" style='cursor: pointer;' @click='findByCooperationStatus("已洽谈有意向")'>已洽谈有意向 ({{secondCount}})</el-tag>
+        <el-tag type="success" style='cursor: pointer;' @click='findByCooperationStatus("已洽谈无意向")'>已洽谈无意向 ({{thirdCount}})</el-tag>
+        <el-tag type="success" style='cursor: pointer;' @click='findByCooperationStatus("微信沟通尚未见面洽谈")'>微信沟通尚未见面洽谈 ({{forthCount}})</el-tag>
+        <el-tag type="success" style='cursor: pointer;' @click='findByCooperationStatus("已取消")'>已取消 ({{fifthCount}})</el-tag>
       </el-col>
-      <!--    按钮和分页-->
-      <el-col :span="24">
+      <el-col>
         <div style="width: 95%;margin: 10px auto;">
           <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary" @click="toAddSalon">新增
           </el-button>
@@ -67,8 +66,16 @@
           <el-table-column prop="cooperationSubStatus" label="合作子状态" width="70px"></el-table-column>
           <el-table-column prop="responsible" label="培训次数"></el-table-column>
           <el-table-column prop="responsible" label="未出单天数" width="70px"></el-table-column>
-          <el-table-column prop="deviceAssigned" label="有无设备"></el-table-column>
-          <el-table-column prop="status" label="状态"></el-table-column>
+          <el-table-column label="有无设备">
+            <template slot-scope="scope">
+              {{scope.row.deviceAssigned ? '有' : '无'}}
+            </template>
+          </el-table-column>
+          <el-table-column label="状态">
+            <template slot-scope="scope">
+              {{scope.row.enabled ? '启用' : '禁用'}}
+            </template>
+          </el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="240">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="goShopDetail(scope.row.id)">查看</el-button>
@@ -79,10 +86,10 @@
       </el-col>
     </el-row>
     <div class="total-wrapper">
-      <span class="total-wrapper-item">订单总计:&nbsp;9999</span>
-      <span class="total-wrapper-item">结算总计:&nbsp;9999</span>
-      <span class="total-wrapper-item">欠款总计:&nbsp;9999</span>
-      <span class="total-wrapper-item">退款总额:&nbsp;9999</span>
+      <span class="total-wrapper-item">订单总计:&nbsp;{{totalTransactionPrice}}</span>
+      <span class="total-wrapper-item">结算总计:&nbsp;{{totalPaymentAmount}}</span>
+      <span class="total-wrapper-item">欠款总计:&nbsp;{{totalArrearage}}</span>
+      <span class="total-wrapper-item">退款总额:&nbsp;{{totalRefund}}</span>
     </div>
   </div>
 </template>
@@ -90,7 +97,7 @@
 <script>
   import Emitter from '@/framework/mixins/emitter'
   import Search from "@/framework/components/search";
-  import {find, count, countBySalonExample} from '@/project/service/salon'
+  import {find, count, countMoney} from '@/project/service/salon'
 
   export default {
     mixins: [Emitter],
@@ -164,16 +171,24 @@
             value: ["有", "无"]
           }
         ],
-        // 已合作
+        // 已合作数量
         firstCount: 0,
-        // 已洽谈有意向
+        // 已洽谈有意向数量
         secondCount: 0,
-        // 已洽谈无意向
+        // 已洽谈无意向数量
         thirdCount: 0,
-        // 微信沟通尚未见面洽谈
+        // 微信沟通尚未见面洽谈数量
         forthCount: 0,
-        // 已取消
-        fifthCount: 0
+        // 已取消数量
+        fifthCount: 0,
+        // 订单总计
+        totalTransactionPrice: 0,
+        // 结算统计
+        totalPaymentAmount: 0,
+        // 欠款总计
+        totalArrearage: 0,
+        // 退款总计
+        totalRefund: 0
       }
     },
     components: {
@@ -221,6 +236,14 @@
             if (keys[i] === 'teacher') delete this.extraParam[keys[i]]
             if (keys[i] === 'department') delete this.extraParam[keys[i]]
             if (keys[i] === 'founder') delete this.extraParam[keys[i]]
+            // 处理有无设备参数
+            if (keys[i] === 'deviceAssigned') {
+              this.extraParam[keys[i]] = searchItems[keys[i]] === '有'
+            }
+            // 处理启禁用参数
+            if (keys[i] === 'enabled') {
+              this.extraParam[keys[i]] = searchItems[keys[i]] === '启用'
+            }
           } else {
             delete this.extraParam[keys[i]];
           }
@@ -253,55 +276,53 @@
       },
       // 获取店铺列表数据
       search(page) {
-        let _t = this;
-        _t.page = page;
+        this.page = page;
         let param = {
           pageable: {
             page: page,
-            size: _t.pageSize,
+            size: this.pageSize,
           },
-          [this.model]: _t.extraParam,
-          teacher: _t.teacherParam,
-          department: _t.departmentParam,
-          founder: _t.founderParam
+          [this.model]: this.extraParam,
+          teacher: this.teacherParam,
+          department: this.departmentParam,
+          founder: this.founderParam
         };
         // 如果没有查询条件则清除携带参数对象
         if (JSON.stringify(param.teacher) === "{}") delete param.teacher
         if (JSON.stringify(param.department) === "{}") delete param.department
         if (JSON.stringify(param.founder) === "{}") delete param.founder
         find(param, res => {
-          _t.data = res;
+          this.data = res;
           // 动态查询总数
-          _t.getTotal();
+          this.getTotal();
           // 动态查询各个合作状态的总数
-          _t.getStatusCount()
+          this.getStatusCount()
+          this.extraParam = {}
         });
       },
       // 获取总数
       getTotal() {
-        let _t = this;
         let param = {
-          [this.model]: _t.extraParam,
-          teacher: _t.teacherParam,
-          department: _t.departmentParam,
-          founder: _t.founderParam
+          [this.model]: this.extraParam,
+          teacher: this.teacherParam,
+          department: this.departmentParam,
+          founder: this.founderParam
         };
         // 如果没有查询条件则清除携带参数对象
         if (JSON.stringify(param.teacher) === "{}") delete param.teacher
         if (JSON.stringify(param.department) === "{}") delete param.department
         if (JSON.stringify(param.founder) === "{}") delete param.founder
         count(param, res => {
-          _t.total = parseInt(res);
+          this.total = parseInt(res);
         });
       },
       // 获取已合作总数
       getStatusCount() {
-        let _t = this;
         let param = {
-          [this.model]: _t.extraParam,
-          teacher: _t.teacherParam,
-          department: _t.departmentParam,
-          founder: _t.founderParam
+          [this.model]: this.extraParam,
+          teacher: this.teacherParam,
+          department: this.departmentParam,
+          founder: this.founderParam
         }
         // 如果没有查询条件则清除携带参数对象
         if (JSON.stringify(param.teacher) === "{}") delete param.teacher
@@ -335,6 +356,54 @@
           })
         })
       },
+      // 点击状态标签获取对应状态下的全部数据
+      findByCooperationStatus(status) {
+        switch(status) {
+          case '已合作':
+            this.extraParam.cooperationStatus = '已合作'
+            this.search(1)
+            // 重新计算总金额
+            this.countMoneyByStatus('已合作')
+            break
+          case '已洽谈有意向':
+            this.extraParam.cooperationStatus = '已洽谈有意向'
+            this.search(1)
+            // 重新计算总金额
+            this.countMoneyByStatus('已洽谈有意向')
+            break
+          case '已洽谈无意向':
+            this.extraParam.cooperationStatus = '已洽谈无意向'
+            this.search(1)
+            // 重新计算总金额
+            this.countMoneyByStatus('已洽谈无意向')
+            break
+          case '微信沟通尚未见面洽谈':
+            this.extraParam.cooperationStatus = '微信沟通尚未见面洽谈'
+            this.search(1)
+            // 重新计算总金额
+            this.countMoneyByStatus('微信沟通尚未见面洽谈')
+            break
+          case '已取消':
+            this.extraParam.cooperationStatus = '已取消'
+            this.search(1)
+            // 重新计算总金额
+            this.countMoneyByStatus('已取消')
+            break
+        }
+      },
+      // 根据状态计算总金额
+      countMoneyByStatus(status) {
+        let param = {
+          cooperationStatus: status
+        }
+        countMoney(param, res => {
+          console.log(res)
+          this.totalTransactionPrice = parseFloat(res[0].totalTransactionPrice).toFixed(2)
+          this.totalPaymentAmount = parseFloat(res[0].totalPaymentAmount).toFixed(2)
+          this.totalRefund = parseFloat(res[0].totalRefund).toFixed(2)
+          this.totalArrearage = parseFloat(res[0].totalArrearage).toFixed(2)
+        })
+      },
       handleRowClick(row) {
         this.$router.push({path: '/manager/show/' + row.id})
       },
@@ -350,6 +419,8 @@
     mounted() {
       // 获取店铺列表数据
       this.search(1)
+      // 获取全部的金额统计
+      this.countMoneyByStatus('')
     }
   }
 </script>
