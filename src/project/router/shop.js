@@ -68,6 +68,33 @@ const shop = {
       component: () => import('@/project/views/shop/trainRecords')
     },
     {
+      path:'/shop/trainDetail/:id',
+      name:'trainRecord',
+      meta:{
+        isShowHeader: true,
+        isShowLeftSider: true,
+        breadcrumb: [
+          {
+            name:'首页',
+            path:'/index'
+          },
+          {
+            name:'店铺列表',
+            path:'/shop/list'
+          },
+          {
+            name:'培训记录',
+            path:'/shop/shopDetail'
+          },
+          {
+            name:'培训详情',
+            path:'/shop/trainDetail/:id'
+          }
+        ]
+      },
+      component: () => import('@/project/views/shop/trainDetail')
+    },
+    {
       path:'/shop/addOrEditBaseInfo/:id',
       name:'addOrEditBaseInfo',
       meta:{

@@ -108,7 +108,7 @@
             class="inline-input"
             v-model="deviceModelName"
             :fetch-suggestions="querySearch"
-            placeholder="请输入内容"
+            placeholder="请选择机型"
             @select="handleSelect"
           ></el-autocomplete>
           <!-- 标签 -->
@@ -133,60 +133,79 @@
       :visible.sync="treatmentManageShow"
       width="85%"
       @close='handleCloseTreament'>
-      <el-form :model="addTreatmentFormData" inline>
-        <el-row v-for="(item, index) in addTreatmentFormData.items" :key="index" class="treatment-item">
-          <span class="treatment-item-title">疗程{{index + 1}}</span>
-          <el-form-item>
-            <div class='title'>下次提醒时间(天)</div>
-            <el-input v-model="item.intervalDay" placeholder="下次提醒时间(天)"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <div class='title'>能量(J)</div>
-            <el-input v-model="item.energy" placeholder="能量(J)"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <div class='title'>频率(HZ)</div>
-            <el-input v-model="item.frequency" placeholder="频率(HZ)"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <div class='title'>制冷等级(级)</div>
-            <el-input v-model="item.refrigerationLevel" placeholder="制冷等级(级)"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <div class='title'>发光次数(次)</div>
-            <el-input v-model="item.flashTimes" placeholder="发光次数(次)"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <div class='title'>操作时长(分钟)</div>
-            <el-input v-model="item.duration" placeholder="操作时长(分钟)"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <div class='title'>正常范围(%)</div>
-            <el-input v-model="item.mildThreshold" placeholder="正常范围(%)"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <div class='title'>一般异常(%)</div>
-            <el-input v-model="item.moderateThreshold" placeholder="一般异常(%)"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <div class='title'>中度异常(%)</div>
-            <el-input v-model="item.severeThreshold" placeholder="中度异常(%)"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="info" @click="deleteTreatment(index)" size="small">删除</el-button>
-          </el-form-item>
-        </el-row>
-      </el-form>
+      <el-table
+          :data="addTreatmentFormData">
+          <el-table-column type="index" width="100">
+            <template slot-scope='scope'>
+              疗程{{scope.$index + 1}}
+            </template>
+          </el-table-column>
+          <el-table-column prop="intervalDay" label="下次提醒时间(天)">
+            <template slot-scope='scope'>
+              <el-input class='treatment-input' v-model='scope.row.intervalDay'></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column prop="energy" label="能量(J)">
+            <template slot-scope='scope'>
+              <el-input class='treatment-input' v-model='scope.row.energy'></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column prop="frequency" label="频率(HZ)">
+            <template slot-scope='scope'>
+              <el-input class='treatment-input' v-model='scope.row.frequency'></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column prop="refrigerationLevel" label="制冷等级(级)">
+            <template slot-scope='scope'>
+              <el-input class='treatment-input' v-model='scope.row.refrigerationLevel'></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column prop="flashTimes" label="发光次数(次)">
+            <template slot-scope='scope'>
+              <el-input class='treatment-input' v-model='scope.row.flashTimes'></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column prop="duration" label="操作时长(分钟)">
+            <template slot-scope='scope'>
+              <el-input class='treatment-input' v-model='scope.row.duration'></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column prop="mildThreshold" label="正常范围(%)">
+            <template slot-scope='scope'>
+              <el-input class='treatment-input' v-model='scope.row.mildThreshold'></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column prop="moderateThreshold" label="一般异常(%)">
+            <template slot-scope='scope'>
+              <el-input class='treatment-input' v-model='scope.row.moderateThreshold'></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column prop="severeThreshold" label="中度范围(%)">
+            <template slot-scope='scope'>
+              <el-input class='treatment-input' v-model='scope.row.severeThreshold'></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column prop="needPhotograph" label="是否需要拍照" align="center">
+            <template slot-scope='scope'>
+              <el-checkbox v-model='scope.row.needPhotograph'></el-checkbox>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope='scope'>
+              <el-button type="info" @click="deleteTreatment(scope.$index)" size="small">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       <div class="btn-wrapper">
         <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary"
-                  class="addTreatment" @click="addTreatment" :disabled='addTreatmentFormData.items.length >= 6'>添加疗程
+                  class="addTreatment" @click="addTreatment" :disabled='addTreatmentFormData.length >= 6'>添加疗程
         </el-button>
       </div>
       <div class="tip">注：最多只能设置6个疗程，设备参数为选填项，若不设置异常范围则不提醒</div>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="handleCloseTreament">取 消</el-button>
-    <el-button type="primary" @click="handleAddTreatment">确 定</el-button>
-  </span>
+        <el-button @click="handleCloseTreament">取 消</el-button>
+        <el-button type="primary" @click="handleAddTreatment">确 定</el-button>
+      </span>
     </el-dialog>
 
   </div>
@@ -195,7 +214,7 @@
 <script>
   import Search from "@/framework/components/search";
   import { findAll, findById, update, save, changeStatus } from '@/project/service/product'
-  import { searchOneByProduct } from '@/project/service/treatment'
+  import { searchOneByProduct, saveTreatment, deleteById } from '@/project/service/treatment'
   import { find } from '@/project/service/deviceModel'
 
   export default {
@@ -204,13 +223,13 @@
         // 添加疗程管理表格数据
         addTreatmentData:[],
         // 添加疗程表单对象
-        addTreatmentFormData: {
-          items: []
-        },
+        addTreatmentFormData: [],
         // 是否是编辑对话框
         isEdit: false,
         inputVisible: false,
         inputValue: '',
+        // 当前行的产品id
+        productId: '',
         // 产品表单数据
         productFormData: {
           name: '',
@@ -218,7 +237,7 @@
           coursePrice: 0,
           singlePrice: 0,
           deviceModel: {},
-          limited: null
+          limited: '是'
         },
         // 产品表单验证规则
         productFormRule:{
@@ -288,47 +307,64 @@
     methods: {
       // 添加流程
       addTreatment() {
-        this.addTreatmentFormData.items.push({
-          intervalDay: '',
-          energy: '',
-          frequency: '',
-          refrigerationLevel: '',
-          flashTimes: '',
-          duration: '',
-          mildThreshold: '',
-          moderateThreshold: '',
-          severeThreshold: ''
-        });
+        this.addTreatmentFormData.push({
+          intervalDay: '', // 下次提醒时间
+          energy: '', // 能量
+          frequency: '', // 频率
+          refrigerationLevel: '', // 制冷等级
+          flashTimes: '', // 发光次数
+          duration: '', // 操作时长
+          mildThreshold: '', // 正常范围阈值
+          moderateThreshold: '', // 一般异常阈值
+          severeThreshold: '', // 中度异常阈值
+          needPhotograph: '' // 是否需要拍照
+        })
       },
       // 删除流程
       deleteTreatment(index) {
-        this.addTreatmentFormData.items.splice(index, 1)
+        let deleteTreatment = this.addTreatmentFormData.splice(index, 1)
+        if (deleteTreatment[0].id) {
+          // 如果删除的元素存在id则是需要同步请求
+          deleteById({id: deleteTreatment[0].id}, res => {
+            this.$message.success('删除成功，请点击确定保存')
+          })
+        }
+        console.log(this.addTreatmentFormData)
       },
       // 关闭疗程管理对话框
       handleCloseTreament() {
-        this.addTreatmentFormData.items = []
+        this.addTreatmentFormData = []
         this.treatmentManageShow = false
-        console.log('sdsd')
       },
       // 关闭产品对话框时触发
       closeProductDialog() {
         this.$refs.productFormRef.resetFields();
+        this.inputVisible = false
       },
       // 显示疗程管理对话框
       showTreatmentDialog(id) {
+        console.log(id)
+        this.productId = id
         this.treatmentManageShow = true;
         // 根据产品id获取疗程信息
         searchOneByProduct({product: {id: id}}, res => {
-          for (let i = 0; i < res.length; i++) {
-            this.addTreatment()
-            this.addTreatmentFormData.items[i] = res[i]
-          }
+          this.defaultLength = res.length
+          this.addTreatmentFormData = res
         })
       },
-      // 确认添加疗程
+      // 确认编辑疗程
       handleAddTreatment() {
+        for (let i = this.defaultLength, len = this.addTreatmentFormData.length; i < len; i++) {
+          let param = Object.assign({product: {id: this.productId}}, this.addTreatmentFormData[i])
+          saveTreatment({treatment: param}, res => {
+              this.addOrEditDialogShow = false
+              this.treatmentManageShow = false
+              this.$message.success('添加成功')
+              // 刷新产品数据表
+              this.search(this.page)
+          })
+        }
         this.treatmentManageShow = false
-        console.log(this.addTreatmentFormData)
       },
       // 显示建议输入框
       showSelect() {
@@ -404,11 +440,13 @@
             })
           })
         } else {
-          // 新增产品
           this.productFormData.deviceModel.name = this.productFormData.deviceModel.value
           delete this.productFormData.deviceModel.value
-          save({product: this.productFormData}, res => {
-            this.treatmentManageShow = true
+          this.$refs.productFormRef.validate(valid => {
+            if (!valid) return false
+            save({product: this.productFormData}, res => {
+              this.showTreatmentDialog(res.id)
+            })
           })
         }
       },
@@ -450,7 +488,8 @@
         let param = {
           pageable: {
             page: page,
-            size: this.pageSize
+            size: this.pageSize,
+            desc: 'id'
           },
           [this.model]: this.extraParam,
           deviceModel: this.deviceModelParam
@@ -535,27 +574,10 @@
       transform: translateX(-50%);
     }
   }
-  .el-input {
-    width: 120px !important;
-  }
   .tip {
     padding: 10px 0;
   }
-  .treatment-item {
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;
-    border-bottom: 1px solid rgba(0, 0, 0, .1);
-    .treatment-item-title {
-      flex: 0 0 50px;
-      line-height: 50px;
-      margin-right: 10px;
-    }
-    .el-form-item {
-      flex: 1;
-      .title {
-        text-align: center;
-      }
-    }
+  .treatment-input {
+    width: 80px;
   }
 </style>

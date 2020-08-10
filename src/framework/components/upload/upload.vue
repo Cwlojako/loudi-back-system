@@ -19,7 +19,6 @@
        <el-dialog title="查看图片" :visible.sync="dialogVisible"  :modal-append-to-body='false'>
          <img width="100%" :src="dialogImageUrl" alt="">
        </el-dialog>
-
      </div>
      <div class="upload-file" v-if="type === 'file'">
        <el-upload
@@ -31,11 +30,9 @@
          :on-remove="handleRemove"
          :on-success="handleSuccess"
          :on-exceed="handleExceed"
-         :beforeUpload="onBeforeUpload"
-         >
+         :beforeUpload="onBeforeUpload">
          <i class="el-icon-upload"></i>
          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-
        </el-upload>
      </div>
    </div>
@@ -63,7 +60,7 @@ export default {
     //上传大小,单位为kb
     maxSize: {
       type: Number,
-      default: 1024
+      default: 51200
     },
     accept: {
       type: String,
@@ -113,7 +110,7 @@ export default {
       });
       this.defaultList.splice(index,1);
     },
-    handleSuccess(res,file,fileList) {
+    handleSuccess(res, file, fileList) {
       console.log(file)
       this.defaultList.push(file);
     },

@@ -93,7 +93,7 @@
         <div class="grid-content bg-purple">广告费</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light">XXX</div>
+        <div class="grid-content bg-purple-light">{{salon.advertisingAmount}}</div>
       </el-col>
     </el-row>
     <el-row>

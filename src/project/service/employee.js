@@ -12,6 +12,7 @@ let batchEnableUrl = `api/${model}/batchEnable`
 let batchDisableUrl = `api/${model}/batchDisable`
 let leaveUrl = `api/${model}/leave`
 let restoreUrl = `api/${model}/restore`
+let getManagerInfoUrl = `api/${model}/getManagerInfo`
 
 // 根据id获取员工信息
 export function getById(param, callback) {
@@ -109,5 +110,12 @@ export function restore(param, callback) {
 	}
 	})
 }
-
+export function getManagerInfo(callback) {
+	axios.post(getManagerInfoUrl).then(data => {
+	  if (data !== undefined && data !== '' && data !== null) {
+		// callback when data is exist
+		callback(data)
+	  }
+	})
+  }
 

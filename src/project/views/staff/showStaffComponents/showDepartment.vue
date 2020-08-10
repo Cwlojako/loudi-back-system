@@ -175,7 +175,7 @@
             sort: _t.sort
           },
           [this.model]: _t.extraParam
-        };
+        }
         if (
           param.pageable.sort.asc.length === 0 &&
           param.pageable.sort.desc.length === 0
@@ -226,7 +226,6 @@
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-
         this.search(this.page);
       },
       onMenuChange(val) {

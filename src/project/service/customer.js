@@ -3,7 +3,7 @@ const model = 'customer'
 let findByEmployeeIdUrl = `api/${model}/find`
 let countUrl = `api/${model}/count`
 let getByIdUrl = `api/${model}/get`
-let updateUrl = 'api/${model}/update'
+let updateUrl = `api/${model}/update`
 
 // 根据员工id获取员工所属顾客信息
 export function findByEmployeeId(param, callback) {

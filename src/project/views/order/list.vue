@@ -57,7 +57,7 @@
           <el-table-column prop="id" label="订单编号"></el-table-column>
           <el-table-column prop="type" label="订单类型"></el-table-column>
           <el-table-column prop="customer.realName" label="顾客名称"></el-table-column>
-          <el-table-column prop="product.name " label="疗程部位"></el-table-column>
+          <el-table-column prop="product.name" label="疗程部位"></el-table-column>
           <el-table-column prop="salon.name" label="店铺名称"></el-table-column>
           <el-table-column prop="teacher.realName" label="所属老师"></el-table-column>
           <el-table-column prop="department.name" label="所属市场"></el-table-column>
@@ -79,7 +79,7 @@
 <script>
   import Emitter from '@/framework/mixins/emitter'
   import Search from "@/framework/components/search"
-  import {find, count} from '@/project/service/order'
+  import {find, count, statisticalMonthlyData} from '@/project/service/order'
 
   export default {
     mixins: [Emitter],
@@ -172,6 +172,7 @@
         ) {
           keys.push(searchItemList[i].key);
         }
+        console.log(keys)
         for (let i in keys) {
           if (searchItems[keys[i]]) {
             this.extraParam[keys[i]] = searchItems[keys[i]]
@@ -257,42 +258,39 @@
         this.search(1);
       },
       search(page) {
-        let _t = this;
-        _t.page = page;
+        this.page = page;
         let param = {
           pageable: {
             page: page,
-            size: _t.pageSize
+            size: this.pageSize
           },
-          [this.model]: _t.extraParam,
-          salon: _t.salonParam,
-          product: _t.productParam,
-          teacher: _t.teacherParam,
-          customer: _t.customerParam,
-          department: _t.departmentParam,
-          promotion: _t.promotionParam,
-          createAt: _t.createAtParam
+          [this.model]: this.extraParam,
+          salon: this.salonParam,
+          product: this.productParam,
+          teacher: this.teacherParam,
+          customer: this.customerParam,
+          department: this.departmentParam,
+          promotion: this.promotionParam,
+          createAt: this.createAtParam
         }
         find(param, res => {
-          _t.orderData = res
-          _t.getTotal()
+          this.orderData = res
+          this.getTotal()
         });
       },
       getTotal() {
-        let _t = this
         let param = {
-          [this.model]: _t.extraParam,
-          salon: _t.salonParam,
-          product: _t.productParam,
-          teacher: _t.teacherParam,
-          customer: _t.customerParam,
-          department: _t.departmentParam,
-          promotion: _t.promotionParam,
-          createAt: _t.createAtParam
+          [this.model]: this.extraParam,
+          salon: this.salonParam,
+          product: this.productParam,
+          teacher: this.teacherParam,
+          customer: this.customerParam,
+          department: this.departmentParam,
+          promotion: this.promotionParam,
+          createAt: this.createAtParam
         }
         count(param, res => {
-
-          _t.total = parseInt(res)
+          this.total = parseInt(res)
         })
       },
       handleRowClick(row) {
@@ -305,11 +303,18 @@
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
         this.search(this.page);
+      },
+      getTotal() {
+        statisticalMonthlyData({}, res => {
+          console.log(res)
+        })
       }
     },
     mounted() {
       // 获取订单数据
       this.search(1);
+      // 获取统计数据
+      this.getTotal()
     }
   }
 </script>

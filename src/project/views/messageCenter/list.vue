@@ -53,7 +53,7 @@
 <script>
   import Search from "@/framework/components/search";
   import Emitter from '@/framework/mixins/emitter'
-  import {search, count, del, batchDelete ,enable, close, batchClose} from '@/project/service/advice'
+  // import {search, count, del, batchDelete ,enable, close, batchClose} from '@/project/service/advice'
 
   export default {
     name: 'messageCenterList',

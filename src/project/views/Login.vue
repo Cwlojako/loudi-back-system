@@ -26,7 +26,8 @@
 </template>
 <script>
   const md5 = require('js-md5');
-  const LOGIN_URL = "/api/manager/login";
+  const LOGIN_URL = "/api/manager/authenticateByUsername";
+  import {getManagerInfo} from '@/project/service/employee'
   import {post} from "@/framework/http/request"
   export default {
     name: "Login",
@@ -45,27 +46,39 @@
     },
     methods: {
       handleSubmit(name) {
-        let _t = this;
         this.$refs[name].validate(valid => {
           if (valid) {
             // 如果校验成功则发送登录请求
             let param = {
-              username: _t.formValidate.username,
-              password: _t.formValidate.password
+              username: this.formValidate.username,
+              password: this.formValidate.password
             };
             // 这里是用axios封装的post方法，第一个参数是路径，第二个参数是参数，第三是回调函数，数据存储在回调中
             post(LOGIN_URL, param ,(res) =>{
-              console.log(res)
-              let user = res;
-              // console.log(res);
-              // 将用户信息存储到vuex中方便共享
-              _t.$store.commit('SAVE_USER', {
-                user: user,
-              });
-              // 缓存到localstorage中
-              _t.$store.dispatch("SAVE_USER_CACHE");
+              let user = {token: res}
+              // 存取token
+              this.$store.commit('SAVE_TOKEN', res)
+              this.$store.dispatch("SAVE_TOKEN_CACHE")
+              getManagerInfo(res => {
+                user.username = res.username
+                user.avatar = res.avatar
+                user.id = res.id
+                this.$store.commit('SAVE_USER', {
+                  user: user,
+                })
+                this.$store.dispatch("SAVE_USER_CACHE")
+                this.$router.push("/index")
+              })
               // 跳转到index页
-              _t.$router.push("/index");
+              //  console.log(user)
+              // // 将用户信息存储到vuex中方便共享
+              // this.$store.commit('SAVE_USER', {
+              //   user: user,
+              // })
+              // // 缓存到localstorage中
+              // this.$store.dispatch("SAVE_USER_CACHE")
+              // // 跳转到index页
+              // this.$router.push("/index")
             })
           }
         });

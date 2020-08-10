@@ -1,6 +1,6 @@
 <template>
-  <div class="staff">
-    <el-row class="page">
+  <div class="staff page">
+    <el-row>
       <!--    搜索-->
       <el-col :span="24">
         <search
@@ -58,7 +58,7 @@
               <el-button type="text" size="small" @click="goCustomerDetail(scope.row.id)">
                 查看
               </el-button>
-              <el-button type="text" size="small" @click="goEditCustomerDetail()">
+              <el-button type="text" size="small" @click="goEditCustomerDetail(scope.row.id)">
                 编辑
               </el-button>
             </template>
@@ -72,7 +72,6 @@
 <script>
   import Emitter from '@/framework/mixins/emitter'
   import Search from "@/framework/components/search";
-  //import {search, del,count, enable, disable} from '@/project/service/manager'
   import { findByEmployeeId, count } from '@/project/service/customer'
 
   export default {
@@ -189,7 +188,7 @@
       },
       // 前往编辑顾客信息界面
       goEditCustomerDetail(id) {
-        this.$router.push({path:'/customer/editCustomerDetail' })
+        this.$router.push({path:'/customer/editCustomerDetail/' + id })
       },
       searchBySearchItem(searchItems) {
         let keys = [];
@@ -208,7 +207,6 @@
           } else {
             delete this.extraParam[keys[i]];
           }
-
         }
         console.log(this.extraParam)
 
@@ -229,23 +227,16 @@
         }
 
         //发送请求获取顾客列表
-        findByEmployeeId(param, res => {
-          // let data = res;
-          // _t.data = data;
+        findByEmployeeId( param, res => {
           let data = res
           _t.customerData = data
           _t.getTotal();
-          //console.log(_t.customerData)
         });
       },
       getTotal() {
         let _t = this;
         let param = {
-          [this.model]: _t.extraParam,
-          customer: _t.customerParam,
-          teacher: _t.teacherParam,
-          salon: _t.salonParam,
-          department: _t.departmentParam
+          [this.model]: _t.extraParam
         };
         count(param, res => {
           _t.total = parseInt(res);

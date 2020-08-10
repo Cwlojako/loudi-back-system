@@ -9,22 +9,22 @@
           <el-table-column prop="createAt" label="转让日期"></el-table-column>
           <el-table-column prop="assignee" label="转让人">
             <template slot-scope="scope">
-              {{scope.row.assignee.realName}}
+              {{scope.row.assignor ? scope.row.assignor.realName : ''}}
             </template>
           </el-table-column>
           <el-table-column prop="assignor" label="接收人">
             <template slot-scope="scope">
-              {{scope.row.assignor.realName}}
+              {{scope.row.assignee ? scope.row.assignee.realName : ''}}
             </template>
           </el-table-column>
           <el-table-column prop="assignorDepartment" label="接收人市场部">
             <template slot-scope="scope">
-              {{scope.row.assignor.department.name}}
+              {{scope.row.assignee ? scope.row.assignee.department.name : ''}}
             </template>
           </el-table-column>
           <el-table-column fixed="right" align="center" label="操作" width="260">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="seeOrderConnectDetail">
+              <el-button type="text" size="small" @click="seeOrderConnectDetail(scope.row.id)">
                 查看
               </el-button>
             </template>
@@ -56,10 +56,9 @@
     <el-dialog
       title="店铺交接详情"
       :visible.sync="seeConnectDetailShow"
-      width="50%"
-    >
+      width="50%">
       <el-row class="salon-handover-box">
-        <el-col :span="16" class="salon-handover-box-left" v-if="salonHandoverData[0] !== undefined">
+        <el-col :span="16" class="salon-handover-box-left">
           <div class="left-first-baseInfoBox">
             <div class="content-item-box">
               <span class="content-title">状态</span>
@@ -67,17 +66,17 @@
             </div>
             <div class="content-item-box">
               <span class="content-title">发起时间</span>
-              <span class="content-text">{{salonHandoverData[0].createAt}}</span>
+              <span class="content-text"></span>
             </div>
             <div class="assignBox">
               <div class="assignBox-left">
                 <div class="content-item-box">
                   <span class="content-title">发起人</span>
-                  <span class="content-text">{{salonHandoverData[0].assignor.realName}}</span>
+                  <span class="content-text">{{salonHandover.assignor.realName}}</span>
                 </div>
                 <div class="content-item-box">
                   <span class="content-title">发起人市场</span>
-                  <span class="content-text">{{salonHandoverData[0].assignor.department.name}}</span>
+                  <span class="content-text">{{salonHandover.assignor.department.name}}</span>
                 </div>
                 <div class="content-item-box">
                   <span class="content-title">发起人分公司</span>
@@ -87,11 +86,11 @@
               <div class="assignBox-right">
                 <div class="content-item-box">
                   <span class="content-title">接收人</span>
-                  <span class="content-text">{{salonHandoverData[0].assignee.realName}}</span>
+                  <span class="content-text">{{salonHandover.assignee.realName}}</span>
                 </div>
                 <div class="content-item-box">
                   <span class="content-title">接收人市场</span>
-                  <span class="content-text">{{salonHandoverData[0].assignee.department.name}}</span>
+                  <span class="content-text">{{salonHandover.assignee.department.name}}</span>
                 </div>
                 <div class="content-item-box">
                   <span class="content-title">接收人分公司</span>
@@ -101,7 +100,7 @@
             </div>
           </div>
           <h3>详情</h3>
-          <div class="left-first-baseInfoBox" v-if="salonData.teacher !== undefined && salonData.founder !== undefined">
+          <div class="left-first-baseInfoBox">
             <div class="assignBox">
               <div class="assignBox-left">
                 <div class="content-item-box">
@@ -128,7 +127,7 @@
               <div class="assignBox-right">
                 <div class="content-item-box">
                   <span class="content-title">店家分成比例</span>
-                  <span class="content-text">{{salonData.commissionRate}}</span>
+                  <span class="content-text">{{salonData.commissionRate}}%</span>
                 </div>
                 <div class="content-item-box">
                   <span class="content-title">老板姓名</span>
@@ -176,7 +175,7 @@
 
 <script>
   import Search from "@/framework/components/search";
-  import {findHandoverBySalonId} from '@/project/service/salonHandover'
+  import {findHandoverBySalonId, get} from '@/project/service/salonHandover'
   import {getById} from '@/project/service/salon'
   export default {
     data() {
@@ -193,8 +192,19 @@
         }],
         // 控制查看交接详情对话框的显示与隐藏
         seeConnectDetailShow: false,
+        salonHandover: {
+          assignor: {
+            department: ''
+          },
+          assignee: {
+            department: ''
+          }
+        },
         // 店铺数据对象
-        salonData: {},
+        salonData: {
+          teacher: '',
+          founder: ''
+        },
         // 店铺交接记录
         salonHandoverData: [],
         model: "salonHandover",
@@ -209,8 +219,11 @@
       goBack() {
         this.$router.go(-1);
       },
-      seeOrderConnectDetail() {
+      seeOrderConnectDetail(id) {
         this.seeConnectDetailShow = true;
+        get({salonHandOverId: id}, res => {
+          this.salonHandover = res
+        })
       },
       handleCurrentChange(val) {
         this.page = val;
@@ -229,7 +242,7 @@
       // 获取店铺交接数据
       getSalonHandoverData(page, id) {
         let param = {
-          salon: {id: id},
+          salonId: id,
           pageable: {
             page: page,
             size: this.pageSize

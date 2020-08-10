@@ -57,9 +57,9 @@
         </div>
       </el-tab-pane>
       <el-tab-pane name="1" label="详细信息">
-        <el-form :model="detailInfoData" :rules="detailInfoRule" ref="detailInfoRef" label-width="100px" class="demo-ruleForm" label-position="left">
+        <el-form ref="detailRef" :model="baseInfoData" :rules="baseInfoRule" label-width="100px" class="demo-ruleForm" label-position="left">
           <el-form-item label="来源" prop="region">
-            <el-select v-model="detailInfoData.sourceChannel" placeholder="请选择来源">
+            <el-select v-model="baseInfoData.sourceChannel" placeholder="请选择来源">
               <el-option label="跑店" value="跑店"></el-option>
               <el-option label="主动联系" value="主动联系"></el-option>
               <el-option label="介绍" value="介绍"></el-option>
@@ -67,7 +67,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="合作状态" prop="cooperationStatus">
-            <el-select v-model="detailInfoData.cooperationStatus" placeholder="请选择合作状态">
+            <el-select v-model="baseInfoData.cooperationStatus" placeholder="请选择合作状态">
               <el-option label="已合作" value="已合作"></el-option>
               <el-option label="已洽谈无意向" value="已洽谈无意向"></el-option>
               <el-option label="微信沟通尚未洽谈" value="微信沟通尚未洽谈"></el-option>
@@ -76,20 +76,20 @@
             </el-select>
           </el-form-item>
           <el-form-item label="项目负责人" prop="projectLeader">
-            <el-input v-model="detailInfoData.projectLeader"></el-input>
+            <el-input v-model="baseInfoData.projectLeader"></el-input>
           </el-form-item>
           <el-form-item label="负责人电话" prop="projectLeaderPhone">
-            <el-input v-model="detailInfoData.projectLeaderPhone"></el-input>
+            <el-input v-model="baseInfoData.projectLeaderPhone"></el-input>
           </el-form-item>
           <el-form-item label="店家分类" prop="category">
-            <el-select v-model="detailInfoData.category" placeholder="请选择店家分类">
+            <el-select v-model="baseInfoData.category" placeholder="请选择店家分类">
               <el-option label="美容美发" value="美容美发"></el-option>
               <el-option label="养生" value="养生"></el-option>
               <el-option label="其他" value="其他"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="店家质量" prop="quality">
-            <el-select v-model="detailInfoData.quality" placeholder="请选择店家质量">
+            <el-select v-model="baseInfoData.quality" placeholder="请选择店家质量">
               <el-option label="高端质量" value="高端质量"></el-option>
               <el-option label="很好" value="很好"></el-option>
               <el-option label="好" value="好"></el-option>
@@ -98,26 +98,26 @@
             </el-select>
           </el-form-item>
           <el-form-item label="店内面积" prop="area">
-            <el-input v-model="detailInfoData.area"></el-input>&nbsp;m²
+            <el-input v-model="baseInfoData.area"></el-input>&nbsp;m²
           </el-form-item>
           <el-form-item label="经营年限" prop="licenseExpireAt">
-            <el-input v-model="detailInfoData.licenseExpireAt"></el-input>&nbsp;年
+            <el-input v-model="baseInfoData.licenseExpireAt"></el-input>&nbsp;年
           </el-form-item>
           <el-form-item label="美容师人数" prop="beauticianQuantity">
-            <el-input v-model="detailInfoData.beauticianQuantity"></el-input>
+            <el-input v-model="baseInfoData.beauticianQuantity"></el-input>
           </el-form-item>
           <el-form-item label="店内会员数" prop="memberQuantity">
-            <el-input v-model="detailInfoData.memberQuantity"></el-input>
+            <el-input v-model="baseInfoData.memberQuantity"></el-input>
           </el-form-item>
           <el-form-item label="店家配合度" prop="cooperationDegree">
-            <el-input v-model="detailInfoData.cooperationDegree"></el-input>
+            <el-input v-model="baseInfoData.cooperationDegree"></el-input>
           </el-form-item>
           <el-form-item label="店内基本项目" prop="serviceContent">
             <el-input
               type="textarea"
               :rows="6"
               placeholder="请输入内容"
-              v-model="detailInfoData.serviceContent"
+              v-model="baseInfoData.serviceContent"
               resize="none"
             >
             </el-input>
@@ -127,7 +127,7 @@
               type="textarea"
               :rows="6"
               placeholder="请输入内容"
-              v-model="detailInfoData.serviceEnvironment"
+              v-model="baseInfoData.serviceEnvironment"
               resize="none"
             >
             </el-input>
@@ -137,7 +137,7 @@
               type="textarea"
               :rows="6"
               placeholder="请输入内容"
-              v-model="detailInfoData.description"
+              v-model="baseInfoData.description"
               resize="none"
             >
             </el-input>
@@ -147,7 +147,7 @@
               type="textarea"
               :rows="6"
               placeholder="请输入内容"
-              v-model="detailInfoData.comment"
+              v-model="baseInfoData.comment"
               resize="none"
             >
             </el-input>
@@ -291,7 +291,22 @@
           settlementPeriod: '',
           commissionRate: '',
           bossName: '',
-          bossPhone: ''
+          bossPhone: '',
+          sourceChannel: '', // 来源
+          cooperationStatus: '', // 合作状态
+          projectLeader: '', // 项目负责人
+          projectLeaderPhone: '', // 负责人电话
+          category: '', // 店家分类
+          quality: '', // quality
+          area: '', // 店内面积
+          licenseExpireAt: '', // 经营年限
+          beauticianQuantity: '', // 美容师人数
+          memberQuantity: '', // 店内会员数
+          cooperationDegree: '', // 店家配合度
+          serviceContent: '', // 店内基本项目
+          serviceEnvironment: '', //店内环境
+          description: '', //店内介绍
+          comment: '' //备注
         },
         // 基本信息表单验证规则
         baseInfoRule:{
@@ -305,10 +320,6 @@
           bossName: [{required: true, message: '请填写老板名称'}],
           bossPhone: [{required: true, message: '请填写老板电话'}]
         },
-        // 详细信息表单数据对象
-        detailInfoData:{},
-        // 详细信息表单验证规则
-        detailInfoRule:{},
         extraParam: {},
         // 店铺id
         editId: 0,
@@ -473,7 +484,6 @@
             console.log('更新')
             let param = this.baseInfoData
             update({salon: param}, res => {
-              this.selectAddOrEdit()
               this.$message({
                 type: 'success',
                 message: '更新店铺基本信息成功!'
@@ -484,14 +494,14 @@
       },
       // 新增编辑店铺详细信息
       handleSaveDetail() {
-        this.$refs.detailInfoRef.validate(valid => {
+        this.$refs.detailRef.validate(valid => {
           if (!valid) return false
           if (!this.editId) {
             // 添加店铺详细信息
             console.log('新建')
             let param = this.baseInfoData
             save({salon: param}, res => {
-              this.$refs.baseInfoRef.resetFields()
+              this.$refs.detailRef.resetFields()
               // 跳转到店铺列表主页
               this.$router.push({path: `/shop/list`})
               this.$message({
@@ -504,11 +514,11 @@
             console.log('更新')
             let param = this.baseInfoData
             update({salon: param}, res => {
-              this.selectAddOrEdit()
               this.$message({
                 type: 'success',
                 message: '更新店铺详细信息成功!'
-              });
+              })
+              this.$router.push({path: '/shop/shopDetail/' + this.editId})
             })
           }
         })
@@ -521,9 +531,7 @@
           console.log('编辑模式')
           // 否则则是进入编辑员工页面,根据id获取员工信息
           getById({id: this.editId}, res => {
-            this.baseInfoData = Object.assign(this.baseInfoData, res)
-            console.log(this.baseInfoData)
-            this.detailInfoData = res
+            this.baseInfoData = res
             this.defaultId = res.department.id
           })
         }

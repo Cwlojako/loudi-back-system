@@ -9,7 +9,7 @@
               <img src="../../assets/more.png" alt="" width="10" height="8">
             </el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="状态" v-if="advice.status === '待处理'">标记已处理</el-dropdown-item>
+              <el-dropdown-item command="状态">标记已处理</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -55,9 +55,6 @@
 </template>
 
 <script>
-  import {get, enable, disable, findById} from '@/project/service/advice'
-
-
   export default {
     name: "show",
     data() {

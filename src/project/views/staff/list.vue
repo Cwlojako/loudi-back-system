@@ -48,10 +48,10 @@
               <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary"
                         @click="toCreate">新建
               </el-button>
-              <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary"
+              <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-folder-add" type="primary"
                         @click="toCreate">导入
               </el-button>
-              <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-plus" type="primary"
+              <el-button style="background: rgb(0, 161, 108);border: none" icon="el-icon-folder-remove" type="primary"
                         @click="toCreate">导出
               </el-button>
               <el-dropdown :trigger="'click'" @command="handleClick" size="medium" @visible-change="onMenuChange">
@@ -62,8 +62,8 @@
                   <el-dropdown-item
                     icon="el-icon-circle-check"
                     command="启用"
-                    :disabled="selectList.findIndex(s=>{return s.enabled}) >=0 || selectList.length === 0"
-                    :style="(selectList.findIndex(s=>{return s.enabled}) >=0 || selectList.length === 0)?{'color':'rgba(255,255,255,0.4)','cursor': 'not-allowed'}:{'color':'#fff'}"
+                    :disabled="selectList.some(item => item.enabled)"
+                    :style="selectList.some(item => item.enabled)?{'color':'rgba(255,255,255,0.4)','cursor': 'not-allowed'}:{'color':'#fff'}"
                     @click="batchEnable"
                   >
                     启用
@@ -71,8 +71,8 @@
                   <el-dropdown-item
                     icon="el-icon-circle-close"
                     command="禁用"
-                    :disabled="selectList.findIndex(s=>{return !s.enabled}) >=0 || selectList.length === 0"
-                    :style="(selectList.findIndex(s=>{return !s.enabled}) >=0 || selectList.length === 0)?{'color':'rgba(255,255,255,0.4)'}:{'color':'#fff'}"
+                    :disabled="selectList.some(item => !item.enabled)"
+                    :style="selectList.some(item => !item.enabled)?{'color':'rgba(255,255,255,0.4)'}:{'color':'#fff'}"
                     @click.stop="batchDisable"
                   >
                     禁用
@@ -295,10 +295,17 @@
           },
           {
             name: "职位变更",
-            key: "",
+            key: "positionChanged",
             type: "select",
-            displayValue: ['部门','职位','在职状态'],
-            value: ['部门','职位','在职状态']
+            displayValue: ['是','否'],
+            value: ['是','否']
+          },
+          {
+            name: "部门变更",
+            key: "departmentChanged",
+            type: "select",
+            displayValue: ["是", "否"],
+            value: ["是", "否"]
           },
           {
             name: "入职日期",
@@ -318,13 +325,6 @@
             type: "select",
             displayValue: ["在职", "离职"],
             value: ["在职", "离职"]
-          },
-          {
-            name: "部门变更",
-            key: "departmentChanged",
-            type: "select",
-            displayValue: ["是", "否"],
-            value: ["是", "否"]
           },
           {
             name: "手机号码",
@@ -532,6 +532,13 @@
             if (keys[i] === 'fillAt') delete this.extraParam[keys[i]]
             if (keys[i] === 'employedAt') delete this.extraParam[keys[i]]
             if (keys[i] === 'birthday') delete this.extraParam[keys[i]]
+            // 处理职位变更，部门变更搜索参数
+            if (keys[i] === 'positionChanged') {
+              this.extraParam[keys[i]] = searchItems[keys[i]] === '是'
+            }
+            if (keys[i] === 'departmentChanged') {
+              this.extraParam[keys[i]] = searchItems[keys[i]] === '是'
+            }
           } else {
             delete this.extraParam[keys[i]];
           }
@@ -572,20 +579,20 @@
       },
       // 获取员工信息列表
       search(page, id) {
-        let _t = this;
-        _t.page = page;
+        this.page = page;
         let param = {
           pageable: {
             page: page,
-            size: _t.pageSize
+            size: this.pageSize
           },
-          [this.model]: _t.extraParam,
+          [this.model]: this.extraParam,
           isLoginedToday: false,
           fillAt: this.fillAtParam,
           employedAt: this.employedAtParam,
           birthday: this.birthdayParam,
           department: {id: id}
         };
+        console.log(param)
 
         // 如果参数不需要则清除
         if (JSON.stringify(param.fillAt) === "{}") delete param.fillAt
@@ -594,11 +601,11 @@
         if (param.department.id === 0) delete param.department
         // 发送请求获取员工列表
         find(param, res => {
-          _t.data = res
+          this.data = res
           // 获取每次查询结果的启用量，禁用量
           this.get_Enable_Disable_total(id)
           // 获取每次查询结果的总数
-          _t.getTotal(id)
+          this.getTotal(id)
           // 获取每次查询结果的今日登陆过数量
           this.getLoginedToday(id)
         });

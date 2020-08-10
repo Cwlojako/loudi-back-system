@@ -46,12 +46,12 @@ const customer = {
       component: () => import('@/project/views/customer/customerDetail')
     },
     {
-      path:'/customer/editCustomerDetail',
+      path:'/customer/editCustomerDetail/:id',
       name:'customerDetail',
       meta:{
-        isShowHeader:true,
-        isShowLeftSider:true,
-        keepAlive:true,
+        isShowHeader: true,
+        isShowLeftSider: true,
+        keepAlive: false,
         breadcrumb: [
           {
             name:'首页',
@@ -67,7 +67,7 @@ const customer = {
           },
           {
             name:'编辑顾客信息',
-            path:'/customer/editCustomerDetail'
+            path:'/customer/editCustomerDetail/:id'
           }
         ]
       },

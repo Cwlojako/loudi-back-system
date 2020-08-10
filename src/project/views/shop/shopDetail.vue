@@ -14,7 +14,7 @@
         <trainRecord></trainRecord>
       </el-tab-pane>
       <el-tab-pane label="交接记录">
-        <connectRecord :salonHandoverData="salonHandoverData"></connectRecord>
+        <connectRecord></connectRecord>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -32,7 +32,6 @@
       return {
         // 店铺数据
         salonData: {},
-        salonHandoverData: []
       }
     },
     components:{

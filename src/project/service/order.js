@@ -7,6 +7,7 @@ let findByOrderIdUrl = `api/${model}/findByOrderAndSalonAndProductAndTeacherAndC
 let findUrl = `api/${model}/findByOrderAndSalonAndProductAndTeacherAndCustomerAndDepartmentAndPromotion`
 let getByIdUrl = `api/${model}/get`
 let updateUrl = `api/${model}/update`
+let statisticalMonthlyDataUrl = `api/${model}/statisticalMonthlyData`
 
 // 查询所有订单信息
 export function find(param, callback) {
@@ -72,3 +73,11 @@ export function update(param, callback) {
   })
 }
 
+// 统计当月订单数据
+export function statisticalMonthlyData(param, callback) {
+  axios.post(statisticalMonthlyDataUrl, param).then(data => {
+    if (data !== undefined && data !== '' && data !== null) {
+      callback(data)
+    }
+  })
+}

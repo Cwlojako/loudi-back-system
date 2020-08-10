@@ -12,11 +12,11 @@ const advice = {
         keepAlive:true,
         breadcrumb: [
           {
-            name:'message.index',
+            name:'首页',
             path:'/index'
           },
           {
-            name:'message.advice',
+            name:'意见反馈',
             path:'/advice/list'
           }
         ]

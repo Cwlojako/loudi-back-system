@@ -21,119 +21,116 @@
     <el-col :span="24">
       <el-table
         :data="data"
-        style="width: 95%;margin:0 auto;"
-      >
-        <el-table-column
-          prop="number"
-          label="版本号"
-        >
+        style="width: 95%;margin:0 auto;">
+        <el-table-column prop="number" label="版本号">
+          <template slot-scope='scope'>
+            <el-button type='text' @click='toEdit(scope.row.id)'>{{scope.row.number}}</el-button>
+          </template>
         </el-table-column>
-        <el-table-column
-          prop="description"
-          label="版本描述"
-        >
+        <el-table-column prop="description" label="版本描述"></el-table-column>
+        <el-table-column label="强制更新">
+          <template slot-scope='scope'>
+            {{scope.row.optional ? '是' : '否'}}
+          </template>
         </el-table-column>
-        <el-table-column
-          prop="isOptional"
-          label="强制更新"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="updateAt"
-          label="更新时间"
-        >
-        </el-table-column>
+        <el-table-column prop="updateAt" label="更新时间"></el-table-column>
       </el-table>
     </el-col>
     <!--    新建-->
     <i-create
       :dialog-visible="createProps.visible"
-      :platform="messageType"
+      :platform="platform"
       @on-dialog-close="handleClose"
-      @on-save-success="onSaveSuccess"
+      @onRefreshData="search(page)"
+    />
+    <!-- 编辑 -->
+    <i-edit
+      :dialog-visible="editProps.visible"
+      :platform="platform"
+      :editId='editId'
+      @on-dialog-close="handleClose"
+      @onRefreshData="search(page)"
     />
   </el-row>
 </template>
 
 <script>
   import ICreate from "../create"
+  import IEdit from "../edit"
   import Emitter from '@/framework/mixins/emitter'
-  import {search, count} from '@/project/service/version'
+  import {search, count} from '@/project/service/application'
 
   export default {
     mixins: [Emitter],
     data() {
       return {
-        model: "version",
+        model: "application",
         createProps: {
           visible: false
         },
+        editProps: {
+          visible: false
+        },
+        editId: 0,
         data: [],
         pageSize: 10,
         page: 1,
         total: 0,
         extraParam: {},
-        messageType:'iphone',
+        platform:'iphone',
       };
     },
     components: {
-      ICreate
+      ICreate, IEdit
     },
     methods: {
+      toEdit(editId) {
+        this.editProps.visible = true
+        this.editId = editId
+      },
       toCreate() {
         this.createProps.visible = true;
       },
       search(page) {
-        let _t = this;
-        _t.page = page;
-        _t.extraParam = {
-          platform: this.messageType
+        this.page = page
+        this.extraParam = {
+          platform: this.platform
         };
         let param = {
           pageable: {
             page: page,
-            size: _t.pageSize,
-            sort: _t.sort
+            size: this.pageSize
           },
-          [this.model]: _t.extraParam
+          [this.model]: this.extraParam
         };
         search(param, res => {
-          let data = res.map (s => {
-            s.isOptional  = s.isOptional ? '是' : '否';
-            return s;
-          });
-          _t.data = data;
-          _t.getTotal();
-        });
+          this.data = res
+          this.getTotal()
+        })
       },
       getTotal() {
-        let _t = this;
-        let param = {[this.model]: _t.extraParam};
+        let param = {[this.model]: this.extraParam}
         count(param, res => {
-          _t.total = parseInt(res);
+          this.total = parseInt(res)
         });
       },
 
       handleClose() {
-        this.createProps.visible = false;
+        this.createProps.visible = false
+        this.editProps.visible = false
       },
 
       handleCurrentChange(val) {
-        this.page = val;
-        this.search(this.page);
+        this.page = val
+        this.search(this.page)
       },
       handleSizeChange(pageSize) {
-        this.pageSize = pageSize;
-        this.search(this.page);
-      },
-
-      onSaveSuccess(){
-        this.search(this.page);
-        this.handleClose();
+        this.pageSize = pageSize
+        this.search(this.page)
       }
     },
     mounted() {
-      this.search(1);
+      this.search(1)
     }
   };
 </script>

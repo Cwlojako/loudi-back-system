@@ -19,6 +19,8 @@
   import orderDetailBaseInfo from "./orderDetailComponents/orderDetailBaseInfo"; // 引入订单详情基本信息组件
   import collectionRecord from "./orderDetailComponents/collectionRecord"; // 引入订单详情收款记录组件
   import treatmentMessage from "./orderDetailComponents/treatmentMessage"; // 引入订单详情疗程信息组件
+  import {find, search, count, get} from '@/project/service/treatmentException'
+
   export default {
     data() {
       return {
@@ -37,7 +39,7 @@
     },
     methods: {
       getOrderData(id) {
-        findByOrderId({[this.model]: {id: id}}, res => {
+        find(param, res => {
           console.log(res)
           this.orderData = res[0]
           // 获取产品id

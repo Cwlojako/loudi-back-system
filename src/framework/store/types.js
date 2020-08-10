@@ -8,3 +8,6 @@ export const CLEAR_USER_CACHE = "CLEAR_USER_CACHE";
 export const GET_USER_CACHE = "GET_USER_CACHE";
 // 判断用户缓存是否存在
 export const GET_USER_EXIST = "GET_USER_EXIST";
+//
+export const SAVE_TOKEN = "SAVE_TOKEN";
+export const SAVE_TOKEN_CACHE = "SAVE_TOKEN_CACHE";

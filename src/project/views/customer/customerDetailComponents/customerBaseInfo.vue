@@ -73,7 +73,7 @@
       <el-col :span="22"><div class="grid-content bg-purple-light">{{customer.comment}}</div></el-col>
     </el-row>
     <el-col>
-      <el-button style="background: rgb(0, 161, 108);border: none" type="primary" @click="goEditCustomerDetail">编辑</el-button>
+      <el-button style="background: rgb(0, 161, 108);border: none" type="primary" @click="goEditCustomerDetail(customer.id)">编辑</el-button>
       <el-button style="background: rgb(0, 161, 108);border: none" type="primary" @click="goBack">返回上一页</el-button>
     </el-col>
   </div>
@@ -98,8 +98,8 @@
       goBack() {
         this.$router.go(-1);
       },
-      goEditCustomerDetail() {
-        this.$router.push({path: '/customer/editCustomerDetail'})
+      goEditCustomerDetail(id) {
+        this.$router.push({path: '/customer/editCustomerDetail/' + id})
       },
       getCustomerData(id) {
         getById({id: id}, res => {

@@ -161,7 +161,7 @@
       </el-input>
       <span slot="footer" class="dialog-footer">
     <el-button @click="editRemarkShow = false">取 消</el-button>
-    <el-button type="primary" @click="handleUpdateComment(id)">确 定</el-button>
+    <el-button type="primary" @click="handle(id)">确 定</el-button>
   </span>
     </el-dialog>
   </div>
@@ -208,7 +208,7 @@
           this.$router.go('-1');
         },
         // 更新备注信息
-        handleUpdateComment(id) {
+        handle(id) {
           this.employeeData.comment = this.remarkText
           let param = {
             employee: Object.assign({id: id}, this.employeeData)

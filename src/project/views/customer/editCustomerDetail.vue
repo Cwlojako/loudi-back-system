@@ -3,17 +3,17 @@
     <el-card class="box-card">
       <p class="title">基本信息</p>
       <el-form :model="editFormData" :rules="editFormRule" ref="editFormRef" label-width="120px" class="demo-ruleForm" label-position="left">
-        <el-form-item label="姓名" prop="name" required>
-          <el-input v-model="editFormData.name"></el-input>
+        <el-form-item label="姓名" prop="realName" required>
+          <el-input v-model="editFormData.realName"></el-input>
         </el-form-item>
-        <el-form-item label="性别" prop="sex" required>
-          <el-select v-model="editFormData.sex" placeholder="请选择">
+        <el-form-item label="性别" prop="gender" required>
+          <el-select v-model="editFormData.gender" placeholder="请选择">
             <el-option label="男" value="男"></el-option>
             <el-option label="女" value="女"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="生日" prop="birthDate" required>
-          <el-date-picker type="date" placeholder="选择日期" v-model="editFormData.birthDate" style="width:200px;"></el-date-picker>
+        <el-form-item label="生日" prop="birthday" required>
+          <el-date-picker type="date" placeholder="选择日期" v-model="editFormData.birthday" style="width:200px;"></el-date-picker>
         </el-form-item>
         <el-form-item label="联系电话" prop="phone" required>
           <el-input v-model="editFormData.phone"></el-input>
@@ -24,14 +24,14 @@
             <el-option label="区域二" value="beijing"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="顾客来源" prop="source" required>
-          <el-select v-model="editFormData.source" placeholder="请选择店铺">
+        <el-form-item label="顾客来源" prop="salonName" >
+          <el-select v-model="editFormData.salon.name" placeholder="请选择店铺">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="顾客类别" prop="type">
-          <el-select v-model="editFormData.type" placeholder="请选择" clearable>
+        <el-form-item label="顾客类别" prop="subtype">
+          <el-select v-model="editFormData.subtype" placeholder="请选择" clearable>
             <el-option v-for="(item, index) in customerType" :key='index' :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
@@ -40,8 +40,8 @@
             <el-option v-for="(item, index) in customerAttr" :key='index' :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="意向部位" prop="willArea">
-          <el-select v-model="editFormData.willArea" placeholder="请选择" clearable>
+        <el-form-item label="意向部位" prop="purposePart">
+          <el-select v-model="editFormData.purposePart" placeholder="请选择" clearable>
             <el-option v-for="(item, index) in customerArea" :key='index' :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
@@ -109,29 +109,43 @@
       }
     },
     methods:{
+      // 提交用户的相关信息
       handleUpdateCustomer() {
-        let param = this.editFormData;
-        console.log(param)
-        update({customer: param}, res => {
-          this.getCustomerDate(this.id)
-          this.$message({
-            type: 'success',
-            message: '更新订单信息成功!'
+        this.$refs.editFormRef.validate(valid => {
+          if(!valid)  return false
+          let param  = this.editFormData
+          update({customer:param}, res => {
+            this.getCustomerData(this.id)
+            this.$message({
+              type: 'success',
+              message: '更新订单信息成功!'
+            })
+            //console.log(param)
           })
         })
+        // let param = this.editFormData;
+        // update({customer: param}, res => {
+        //   this.getCustomerDate(this.id)
+        //   this.$message({
+        //     type: 'success',
+        //     message: '更新订单信息成功!'
+        //   })
+        // })
       },
       goBack() {
         this.$router.go(-1);
       },
-      getCustomerDate(id) {
-        getById({customer: {id: id}}, res => {
-          this.editFormData = res[0]
+      getCustomerData(id) {
+        getById({id:id}, res => {
+          console.log(res)
+          this.editFormData = res
         })
-      },
-      create() {
-        this.id = this.$route.params.id
-        this.getCustomerDate(this.id)
+        console.log(this.editFormData)
       }
+    },
+    mounted() {
+      this.id = this.$route.params.id
+      this.getCustomerData(this.id)
     }
   }
 </script>

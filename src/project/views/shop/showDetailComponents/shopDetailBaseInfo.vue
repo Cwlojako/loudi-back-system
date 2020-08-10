@@ -21,7 +21,7 @@
         <div class="grid-content bg-purple">所属市场</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light" v-if="salon.department !== undefined">{{salon.department.name}}</div>
+        <div class="grid-content bg-purple-light" v-if="salon.department">{{salon.department.name}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -29,7 +29,7 @@
         <div class="grid-content bg-purple">所属老师</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light" v-if="salon.teacher !== undefined">{{salon.teacher.realName}}</div>
+        <div class="grid-content bg-purple-light" v-if="salon.teacher">{{salon.teacher.realName}}</div>
       </el-col>
     </el-row>
     <el-row>
@@ -53,7 +53,7 @@
         <div class="grid-content bg-purple">跑店人员</div>
       </el-col>
       <el-col :span="22">
-        <div class="grid-content bg-purple-light" v-if="salon.founder !== undefined">{{salon.founder.realName}}</div>
+        <div class="grid-content bg-purple-light" v-if="salon.founder">{{salon.founder.realName}}</div>
       </el-col>
     </el-row>
     <el-row>
